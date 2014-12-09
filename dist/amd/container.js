@@ -1,7 +1,7 @@
-define(["exports", "metadata", "./annotations", "./util"], function (exports, _metadata, _annotations, _util) {
+define(["exports", "aurelia-metadata", "./annotations", "./util"], function (exports, _aureliaMetadata, _annotations, _util) {
   "use strict";
 
-  var getAnnotation = _metadata.getAnnotation;
+  var getAnnotation = _aureliaMetadata.getAnnotation;
   var Inject = _annotations.Inject;
   var Resolver = _annotations.Resolver;
   var Registration = _annotations.Registration;

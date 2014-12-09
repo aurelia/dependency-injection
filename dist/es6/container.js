@@ -1,4 +1,4 @@
-import {getAnnotation} from 'metadata';
+import {getAnnotation} from 'aurelia-metadata';
 import {Inject, Resolver, Registration} from './annotations';
 import {isClass} from './util';
 

@@ -1,6 +1,6 @@
 "use strict";
 
-var getAnnotation = require('metadata').getAnnotation;
+var getAnnotation = require('aurelia-metadata').getAnnotation;
 var Inject = require('./annotations').Inject;
 var Resolver = require('./annotations').Resolver;
 var Registration = require('./annotations').Registration;
