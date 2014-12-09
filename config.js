@@ -7,7 +7,7 @@ System.config({
 
 System.config({
   "map": {
-    "aurelia-metadata": "github:aurelia/metadata@0.0.3"
+    "aurelia-metadata": "github:aurelia/metadata@0.0.5"
   }
 });
 
