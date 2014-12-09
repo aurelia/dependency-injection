@@ -1,4 +1,4 @@
-import {Container} from '../dist/amd/index';
+import {Container} from '../lib/index';
 
 describe('container', () => {
   it('should have some tests', () => {
