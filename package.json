@@ -17,7 +17,7 @@
   "main": "dist/commonjs/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/aurelia/dependency-injection"
+    "url": "http://github.com/aurelia/dependency-injection"
   },
   "jspm": {
     "main": "amd/index",
@@ -25,7 +25,8 @@
       "lib": "dist"
     },
     "dependencies": {
-      "aurelia-metadata": "github:aurelia/metadata@^0.0.5"
+      "aurelia-metadata": "github:aurelia/metadata@^0.1.0",
+      "es6-shim": "github:paulmillr/es6-shim@^0.21.1"
     }
   },
   "devDependencies": {
