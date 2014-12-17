@@ -12,6 +12,14 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 
 * [aurelia-metadata](https://github.com/aurelia/metadata)
 
+## Used By
+
+* [aurelia-framework](https://github.com/aurelia/framework)
+* [aurelia-router](https://github.com/aurelia/router)
+* [aurelia-templating](https://github.com/aurelia/templating)
+* [aurelia-templating-resources](https://github.com/aurelia/templating-resources)
+* [aurelia-templating-router](https://github.com/aurelia/templating-router)
+
 ## Platform Support
 
 This library can be used in the **browser** as well as on the **server**.
