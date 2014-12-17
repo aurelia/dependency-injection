@@ -16,7 +16,7 @@
     "url": "http://github.com/aurelia/dependency-injection"
   },
   "dependencies": {
-    "aurelia-metadata": "0.1.0",
+    "aurelia-metadata": "0.1.1",
     "es6-shim": "0.21.1"
   }
 }
