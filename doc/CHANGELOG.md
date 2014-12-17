@@ -1,3 +1,11 @@
+### 0.1.1 (2014-12-17)
+
+
+#### Bug Fixes
+
+* **package:** update dependencies to latest ([54a0bda1](http://github.com/aurelia/dependency-injection/commit/54a0bda1a217200c07cbee81193b044038b2b09a))
+
+
 ## 0.1.0 (2014-12-11)
 
 

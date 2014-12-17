@@ -1,6 +1,6 @@
 {
   "name": "aurelia-dependency-injection",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A lightweight, extensible dependency injection container for JavaScript.",
   "keywords": [
     "aurelia",
@@ -10,7 +10,9 @@
   ],
   "homepage": "http://aurelia.io",
   "license": "MIT",
-  "authors": ["Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)"],
+  "authors": [
+    "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)"
+  ],
   "repository": {
     "type": "git",
     "url": "http://github.com/aurelia/dependency-injection"
