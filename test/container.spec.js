@@ -31,6 +31,28 @@ describe('container', () => {
     expect(app.logger).toEqual(jasmine.any(Logger));
   });
 
+  it('should exec methods of injected dependencies', function() {
+    class Logger {
+      version() { return '1.2.3'; }
+    }
+
+    class App {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+
+      get loggerVersion() {
+        return this.logger.version();
+      }
+    }
+
+    var container = new Container();
+    var app = container.get(App);
+
+    expect(app.loggerVersion).toEqual('1.2.3');
+  });
+
   it('inject dependencies in many classes should be singleton', function() {
     class Logger {}
 
