@@ -102,4 +102,34 @@ describe('container', () => {
 
     expect(app1.logger).not.toBe(app2.logger);
   });
+
+  it('transient inject dependencies in many extended classes should not be singleton', function() {
+    class LoggerBase {
+      static annotations() { return [new Transient()] };
+    }
+
+    class Logger extends LoggerBase {
+      
+    }
+
+    class App1 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    class App2 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    var app1 = container.get(App1);
+    var app2 = container.get(App2);
+
+    expect(app1.logger).not.toBe(app2.logger);
+  });
 });
