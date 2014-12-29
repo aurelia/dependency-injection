@@ -80,7 +80,10 @@ export class Container {
   * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
   */
   autoRegisterAll(fns){
-    fns.forEach(x => this.autoRegister(x));
+    var i = fns.length;
+    while(i--) {
+      this.autoRegister(fns[i]);
+    }
   }
 
   /**
@@ -236,7 +239,7 @@ export class Container {
 
   createConstructionInfo(fn){
     var info = {isClass: isClass(fn)}, injectAnnotation,
-        keys = [], i, ii, parameters = fn.parameters, paramAnnotation;
+        keys = [], i, ii, j, jj, param, parameters = fn.parameters, paramAnnotation;
 
     if(fn.inject !== undefined){
       if(typeof fn.inject === 'function'){
@@ -254,17 +257,19 @@ export class Container {
     }
 
     if (parameters) {
-      parameters.forEach((param, idx) => {
-        for(i = 0, ii = param.length; i < ii; i++){
-          paramAnnotation = param[i];
+      for(i = 0, ii = parameters.length; i < ii; ++i){
+        param = parameters[i];
+
+        for(j = 0, jj = param.length; j < jj; ++j){
+          paramAnnotation = param[j];
 
           if(paramAnnotation instanceof Inject) {
-            keys[idx] = paramAnnotation.keys[0];
-          }else if(!keys[idx]){ // Type Annotation
-            keys[idx] = paramAnnotation;
+            keys[i] = paramAnnotation.keys[0];
+          }else if(!keys[i]){ // Type Annotation
+            keys[i] = paramAnnotation;
           }
         }
-      });
+      }
     }
 
     info.keys = keys;
