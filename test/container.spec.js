@@ -461,7 +461,7 @@ describe('container', () => {
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
 
-    it('configures concrete transient viua api for abstract dependency', function() {
+    it('configures concrete transient via api for abstract dependency', function() {
       class LoggerBase {}
       class Logger extends LoggerBase {}
 
