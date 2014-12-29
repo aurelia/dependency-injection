@@ -5,7 +5,8 @@ export {
   Singleton,
   Resolver,
   Lazy,
-  All
+  All,
+  Optional
 } from './annotations';
 
 export {Container} from './container';
