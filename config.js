@@ -1,8 +1,7 @@
 System.config({
   "paths": {
     "*": "*.js",
-    "github:*": "jspm_packages/github/*.js",
-    "aurelia-dependency-injection/*": "dist/*.js"
+    "github:*": "jspm_packages/github/*.js"
   }
 });
 
