@@ -13,11 +13,13 @@ export class Container {
   }
 
   registerTransient(key, fn) {
+    fn = fn || key;
     this.registerHandler(key, x => x.invoke(fn));
   }
 
   registerSingleton(key, fn) {
     var singleton = null;
+    fn = fn || key;
     this.registerHandler(key, x => singleton || (singleton = x.invoke(fn)));
   }
 

@@ -278,4 +278,70 @@ describe('container', () => {
 
     expect(app1.logger).not.toBe(app2.logger);
   });
+
+  it('should inject concrete singelton dependency in classes that require abstract base class via api', function() {
+    class LoggerBase {}
+    class Logger extends LoggerBase {}
+
+    class App {
+      static inject() { return [LoggerBase]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    container.registerSingleton(LoggerBase, Logger);
+
+    var app = container.get(App);
+
+    expect(app.logger).toEqual(jasmine.any(Logger));
+  });
+
+  it('should inject concrete transient dependency in classes that require abstract base class via api', function() {
+    class LoggerBase {}
+    class Logger extends LoggerBase {}
+
+    class App {
+      static inject() { return [LoggerBase]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    container.registerTransient(LoggerBase, Logger);
+
+    var app = container.get(App);
+
+    expect(app.logger).toEqual(jasmine.any(Logger));
+  });
+
+  it('should register key as service when only key provided for transient api', function() {
+    class Logger {}
+
+    var container = new Container();
+    container.registerTransient(Logger);
+
+    var logger1 = container.get(Logger),
+        logger2 = container.get(Logger);
+
+    expect(logger1).toEqual(jasmine.any(Logger));
+    expect(logger2).toEqual(jasmine.any(Logger));
+    expect(logger2).not.toBe(logger1);
+  });
+
+  it('should register key as service when only key provided for singleton api', function() {
+    class Logger {}
+
+    var container = new Container();
+    container.registerSingleton(Logger);
+
+    var logger1 = container.get(Logger),
+        logger2 = container.get(Logger);
+
+    expect(logger1).toEqual(jasmine.any(Logger));
+    expect(logger2).toEqual(jasmine.any(Logger));
+    expect(logger2).toBe(logger1);
+  });
 });
