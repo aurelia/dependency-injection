@@ -80,8 +80,9 @@ export class Container {
     return [];
   }
 
-  hasHandler(key) {
-    return this.entries.has(key);
+  hasHandler(key, checkParent=false) {
+    return this.entries.has(key) 
+      || (checkParent && this.parent && this.parent.hasHandler(key, checkParent));
   }
 
   createChild(){

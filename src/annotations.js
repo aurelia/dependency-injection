@@ -65,3 +65,22 @@ export class All extends Resolver {
     return new All(key);
   }
 }
+
+export class Optional extends Resolver {
+  constructor(key, checkParent=false){
+    this.key = key;
+    this.checkParent = checkParent;
+  }
+
+  get(container){
+    if(container.hasHandler(this.key, this.checkParent)){
+      return container.get(this.key);
+    }
+
+    return null;
+  }
+
+  static of(key, checkParent=false){
+    return new Optional(key, checkParent);
+  }
+}
