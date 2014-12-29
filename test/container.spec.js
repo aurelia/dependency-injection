@@ -1,11 +1,6 @@
-import {Container, Transient} from '../src/index';
+import {Container, Transient, Singleton} from '../src/index';
 
 describe('container', () => {
-  it('should have some tests', () => {
-    var container = new Container();
-    expect(container).toBe(container);
-  });
-
   it('should instantiate a class without injected services', function() {
     class App {}
 
@@ -15,7 +10,7 @@ describe('container', () => {
     expect(app).toEqual(jasmine.any(App));
   });
 
-  it('should inject dependencies over static inject function', function() {
+  it('should inject dependencies via static inject method (ES6)', function() {
     class Logger {}
 
     class App {
@@ -31,29 +26,41 @@ describe('container', () => {
     expect(app.logger).toEqual(jasmine.any(Logger));
   });
 
-  it('should exec methods of injected dependencies', function() {
-    class Logger {
-      version() { return '1.2.3'; }
-    }
+  it('should inject dependencies via static inject property (TypeScript,CoffeeScript,ES5)', function() {
+    class Logger {}
 
     class App {
-      static inject() { return [Logger]; };
       constructor(logger) {
         this.logger = logger;
       }
-
-      get loggerVersion() {
-        return this.logger.version();
-      }
     }
+
+    App.inject = [Logger];
 
     var container = new Container();
     var app = container.get(App);
 
-    expect(app.loggerVersion).toEqual('1.2.3');
+    expect(app.logger).toEqual(jasmine.any(Logger));
   });
 
-  it('inject dependencies in many classes should be singleton', function() {
+  it('should inject dependencies via static parameters property (AtScript)', function() {
+    class Logger {}
+
+    class App {
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    App.parameters = [[Logger]];
+
+    var container = new Container();
+    var app = container.get(App);
+
+    expect(app.logger).toEqual(jasmine.any(Logger));
+  });
+
+  it('should inject dependency in many classes as singleton', function() {
     class Logger {}
 
     class App1 {
@@ -77,7 +84,33 @@ describe('container', () => {
     expect(app1.logger).toBe(app2.logger);
   });
 
-  it('transient inject dependencies in many classes should not be singleton', function() {
+  it('should inject dependency in many classes as transient (non singleton) via api', function() {
+    class Logger {}
+
+    class App1 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    class App2 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    container.registerTransient(Logger, Logger);
+
+    var app1 = container.get(App1);
+    var app2 = container.get(App2);
+
+    expect(app1.logger).not.toBe(app2.logger);
+  });
+
+  it('should inject dependency in many classes as transient (non singleton) via annotations method (ES6)', function() {
     class Logger {
       static annotations() { return [new Transient()] };
     }
@@ -103,7 +136,32 @@ describe('container', () => {
     expect(app1.logger).not.toBe(app2.logger);
   });
 
-  it('transient inject dependencies in many extended classes should not be singleton', function() {
+  it('should inject dependency in many classes as transient (non singleton) via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', function() {
+    class Logger {}
+    Logger.annotations = [new Transient()];
+
+    class App1 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    class App2 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    var app1 = container.get(App1);
+    var app2 = container.get(App2);
+
+    expect(app1.logger).not.toBe(app2.logger);
+  });
+
+  it('should inject dependency in many *extended* classes as transient (non singleton) via base annotations method (ES6)', function() {
     class LoggerBase {
       static annotations() { return [new Transient()] };
     }
@@ -111,6 +169,94 @@ describe('container', () => {
     class Logger extends LoggerBase {
       
     }
+
+    class App1 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    class App2 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    var app1 = container.get(App1);
+    var app2 = container.get(App2);
+
+    expect(app1.logger).not.toBe(app2.logger);
+  });
+
+  it('should inject dependency in many *extended* classes as transient (non singleton) via base annotations property (ES5, AtScript, TypeScript, CoffeeScript)', function() {
+    class LoggerBase {}
+    LoggerBase.annotations = [new Transient()];
+
+    class Logger extends LoggerBase {
+      
+    }
+
+    class App1 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    class App2 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    var app1 = container.get(App1);
+    var app2 = container.get(App2);
+
+    expect(app1.logger).not.toBe(app2.logger);
+  });
+
+  it('should inject dependency in many *extended* classes as transient (non singleton) via annotations method (ES6)', function() {
+    class LoggerBase {
+      static annotations() { return [new Singleton()] };
+    }
+
+    class Logger extends LoggerBase {
+      static annotations() { return [new Transient()] };
+    }
+
+    class App1 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    class App2 {
+      static inject() { return [Logger]; };
+      constructor(logger) {
+        this.logger = logger;
+      }
+    }
+
+    var container = new Container();
+    var app1 = container.get(App1);
+    var app2 = container.get(App2);
+
+    expect(app1.logger).not.toBe(app2.logger);
+  });
+
+  it('should inject dependency in many *extended* classes as transient (non singleton) via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', function() {
+    class LoggerBase {
+      static annotations() { return [new Singleton()] };
+    }
+
+    class Logger extends LoggerBase {}
+    Logger.annotations = [new Transient()];
 
     class App1 {
       static inject() { return [Logger]; };
