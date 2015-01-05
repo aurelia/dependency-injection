@@ -63,7 +63,7 @@ describe('container', () => {
   });
 
   describe('registration', () => {
-    it('automatically configures as singleton', function() {
+    it('automatically configures as singleton', () => {
       class Logger {}
 
       class App1 {
@@ -87,7 +87,7 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures singleton via api', function() {
+    it('configures singleton via api', () => {
       class Logger {}
 
       class App1 {
@@ -113,7 +113,7 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures singleton via annotations method (ES6)', function() {
+    it('configures singleton via annotations method (ES6)', () => {
       class Logger {
         static annotations() { return [new Singleton()] };
       }
@@ -139,7 +139,7 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures singleton via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', function() {
+    it('configures singleton via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
       Logger.annotations = [new Singleton()];
 
@@ -164,7 +164,7 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via api', function() {
+    it('configures transient (non singleton) via api', () => {
       class Logger {}
 
       class App1 {
@@ -190,7 +190,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via annotations method (ES6)', function() {
+    it('configures transient (non singleton) via annotations method (ES6)', () => {
       class Logger {
         static annotations() { return [new Transient()] };
       }
@@ -216,7 +216,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', function() {
+    it('configures transient (non singleton) via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
       Logger.annotations = [new Transient()];
 
@@ -241,7 +241,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures instance via api', function() {
+    it('configures instance via api', () => {
       class Logger {}
 
       class App1 {
@@ -269,7 +269,7 @@ describe('container', () => {
       expect(app2.logger).toBe(instance);
     });
 
-    it('configures custom via api', function() {
+    it('configures custom via api', () => {
       class Logger {}
 
       class App1 {
@@ -296,7 +296,7 @@ describe('container', () => {
       expect(app2.logger).toEqual("something strange");
     });
 
-    it('uses base annotations method (ES6) when derived does not specify', function() {
+    it('uses base annotations method (ES6) when derived does not specify', () => {
       class LoggerBase {
         static annotations() { return [new Transient()] };
       }
@@ -326,7 +326,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('uses base annotations property (ES5, AtScript, TypeScript, CoffeeScript) when derived does not specify', function() {
+    it('uses base annotations property (ES5, AtScript, TypeScript, CoffeeScript) when derived does not specify', () => {
       class LoggerBase {}
       LoggerBase.annotations = [new Transient()];
 
@@ -355,7 +355,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('overrides base annotations method (ES6) with derived configuration', function() {
+    it('overrides base annotations method (ES6) with derived configuration', () => {
       class LoggerBase {
         static annotations() { return [new Singleton()] };
       }
@@ -385,7 +385,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('overrides base annotations property (ES5, AtScript, TypeScript, CoffeeScript) with derived configuration', function() {
+    it('overrides base annotations property (ES5, AtScript, TypeScript, CoffeeScript) with derived configuration', () => {
       class LoggerBase {
         static annotations() { return [new Singleton()] };
       }
@@ -414,7 +414,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures key as service when transient api only provided with key', function() {
+    it('configures key as service when transient api only provided with key', () => {
       class Logger {}
 
       var container = new Container();
@@ -428,7 +428,7 @@ describe('container', () => {
       expect(logger2).not.toBe(logger1);
     });
 
-    it('configures key as service when singleton api only provided with key', function() {
+    it('configures key as service when singleton api only provided with key', () => {
       class Logger {}
 
       var container = new Container();
@@ -442,7 +442,7 @@ describe('container', () => {
       expect(logger2).toBe(logger1);
     });
 
-    it('configures concrete singelton via api for abstract dependency', function() {
+    it('configures concrete singelton via api for abstract dependency', () => {
       class LoggerBase {}
       class Logger extends LoggerBase {}
 
@@ -461,7 +461,7 @@ describe('container', () => {
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
 
-    it('configures concrete transient via api for abstract dependency', function() {
+    it('configures concrete transient via api for abstract dependency', () => {
       class LoggerBase {}
       class Logger extends LoggerBase {}
 
@@ -478,6 +478,36 @@ describe('container', () => {
       var app = container.get(App);
 
       expect(app.logger).toEqual(jasmine.any(Logger));
+    });
+
+    it('doesn\'t get hidden when a super class adds annotations which don\'t include the base registration type', () => {
+      class LoggerBase {
+        static annotations() { return [new Transient()]; };
+      }
+
+      class Logger extends LoggerBase {
+        static annotations() { return ['goofy', 'mickey']; };
+      }
+
+      class App1 {
+        static inject() { return [Logger]; };
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+
+      class App2 {
+        static inject() { return [Logger]; };
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+
+      var container = new Container();
+      var app1 = container.get(App1);
+      var app2 = container.get(App2);
+
+      expect(app1.logger).not.toBe(app2.logger);
     });
   });
 });

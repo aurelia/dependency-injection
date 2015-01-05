@@ -64,7 +64,7 @@ export class Container {
   * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
   */
   autoRegister(fn, key){
-    var registrationAnnotation = getAnnotation(fn, Registration);
+    var registrationAnnotation = getAnnotation(fn, Registration, true);
     
     if(registrationAnnotation){
       registrationAnnotation.register(this, key || fn, fn);
