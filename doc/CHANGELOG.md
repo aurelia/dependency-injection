@@ -1,3 +1,11 @@
+### 0.2.1 (2015-01-06)
+
+
+#### Bug Fixes
+
+* **package:** change doc json media type ([b82feb82](http://github.com/aurelia/dependency-injection/commit/b82feb82f758ddc820039d7e32b1079908706020))
+
+
 ## 0.2.0 (2015-01-06)
 
 
