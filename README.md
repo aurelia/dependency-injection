@@ -6,7 +6,7 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 
 ## Polyfills
 
-* Depending on target browser(s), [es6-shim](https://github.com/paulmillr/es6-shim) may be required for `Map` support.
+* Depending on target browser(s), [core-js](https://github.com/zloirock/core-js) may be required for `Map` support.
 
 ## Dependencies
 

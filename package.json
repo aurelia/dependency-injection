@@ -27,7 +27,7 @@
     },
     "dependencies": {
       "aurelia-metadata": "^0.2.3",
-      "es6-shim": "github:paulmillr/es6-shim@^0.21.1"
+      "core-js": "npm:core-js@^0.4.1"
     }
   },
   "devDependencies": {

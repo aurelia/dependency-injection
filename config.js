@@ -2,14 +2,21 @@ System.config({
   "paths": {
     "*": "*.js",
     "github:*": "jspm_packages/github/*.js",
-    "aurelia-dependency-injection/*": "dist/*.js"
+    "aurelia-dependency-injection/*": "dist/*.js",
+    "npm:*": "jspm_packages/npm/*.js"
   }
 });
 
 System.config({
   "map": {
     "aurelia-metadata": "github:aurelia/metadata@0.2.3",
-    "es6-shim": "github:paulmillr/es6-shim@0.21.1"
+    "core-js": "npm:core-js@0.4.1",
+    "github:jspm/nodelibs-process@0.1.0": {
+      "process": "npm:process@0.10.0"
+    },
+    "npm:core-js@0.4.1": {
+      "process": "github:jspm/nodelibs-process@0.1.0"
+    }
   }
 });
 
