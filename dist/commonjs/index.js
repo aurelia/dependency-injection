@@ -7,4 +7,5 @@ exports.Singleton = require("./annotations").Singleton;
 exports.Resolver = require("./annotations").Resolver;
 exports.Lazy = require("./annotations").Lazy;
 exports.All = require("./annotations").All;
+exports.Optional = require("./annotations").Optional;
 exports.Container = require("./container").Container;

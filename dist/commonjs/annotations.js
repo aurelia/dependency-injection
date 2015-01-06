@@ -1,8 +1,8 @@
 "use strict";
 
 var _slice = Array.prototype.slice;
-var _extends = function (child, parent) {
-  child.prototype = Object.create(parent.prototype, {
+var _inherits = function (child, parent) {
+  child.prototype = Object.create(parent && parent.prototype, {
     constructor: {
       value: child,
       enumerable: false,
@@ -10,7 +10,7 @@ var _extends = function (child, parent) {
       configurable: true
     }
   });
-  child.__proto__ = parent;
+  if (parent) child.__proto__ = parent;
 };
 
 var Inject = function Inject() {
@@ -20,64 +20,59 @@ var Inject = function Inject() {
 };
 
 exports.Inject = Inject;
-var Registration = (function () {
-  var Registration = function Registration() {};
+var Registration = function Registration() {};
 
-  Registration.prototype.register = function (container, key, fn) {
-    throw new Error("A custom Registration must implement register(container, key, fn).");
-  };
-
-  return Registration;
-})();
+Registration.prototype.register = function (container, key, fn) {
+  throw new Error("A custom Registration must implement register(container, key, fn).");
+};
 
 exports.Registration = Registration;
-var Transient = (function (Registration) {
+var Transient = (function () {
+  var _Registration = Registration;
   var Transient = function Transient(key) {
     this.key = key;
   };
 
-  _extends(Transient, Registration);
+  _inherits(Transient, _Registration);
 
   Transient.prototype.register = function (container, key, fn) {
     container.registerTransient(this.key || key, fn);
   };
 
   return Transient;
-})(Registration);
+})();
 
 exports.Transient = Transient;
-var Singleton = (function (Registration) {
+var Singleton = (function () {
+  var _Registration2 = Registration;
   var Singleton = function Singleton(key) {
     this.key = key;
   };
 
-  _extends(Singleton, Registration);
+  _inherits(Singleton, _Registration2);
 
   Singleton.prototype.register = function (container, key, fn) {
     container.registerSingleton(this.key || key, fn);
   };
 
   return Singleton;
-})(Registration);
-
-exports.Singleton = Singleton;
-var Resolver = (function () {
-  var Resolver = function Resolver() {};
-
-  Resolver.prototype.get = function (container) {
-    throw new Error("A custom Resolver must implement get(container) and return the resolved instance(s).");
-  };
-
-  return Resolver;
 })();
 
+exports.Singleton = Singleton;
+var Resolver = function Resolver() {};
+
+Resolver.prototype.get = function (container) {
+  throw new Error("A custom Resolver must implement get(container) and return the resolved instance(s).");
+};
+
 exports.Resolver = Resolver;
-var Lazy = (function (Resolver) {
+var Lazy = (function () {
+  var _Resolver = Resolver;
   var Lazy = function Lazy(key) {
     this.key = key;
   };
 
-  _extends(Lazy, Resolver);
+  _inherits(Lazy, _Resolver);
 
   Lazy.prototype.get = function (container) {
     var _this = this;
@@ -91,15 +86,16 @@ var Lazy = (function (Resolver) {
   };
 
   return Lazy;
-})(Resolver);
+})();
 
 exports.Lazy = Lazy;
-var All = (function (Resolver) {
+var All = (function () {
+  var _Resolver2 = Resolver;
   var All = function All(key) {
     this.key = key;
   };
 
-  _extends(All, Resolver);
+  _inherits(All, _Resolver2);
 
   All.prototype.get = function (container) {
     return container.getAll(this.key);
@@ -110,6 +106,33 @@ var All = (function (Resolver) {
   };
 
   return All;
-})(Resolver);
+})();
 
 exports.All = All;
+var Optional = (function () {
+  var _Resolver3 = Resolver;
+  var Optional = function Optional(key) {
+    var checkParent = arguments[1] === undefined ? false : arguments[1];
+    this.key = key;
+    this.checkParent = checkParent;
+  };
+
+  _inherits(Optional, _Resolver3);
+
+  Optional.prototype.get = function (container) {
+    if (container.hasHandler(this.key, this.checkParent)) {
+      return container.get(this.key);
+    }
+
+    return null;
+  };
+
+  Optional.of = function (key) {
+    var checkParent = arguments[1] === undefined ? false : arguments[1];
+    return new Optional(key, checkParent);
+  };
+
+  return Optional;
+})();
+
+exports.Optional = Optional;

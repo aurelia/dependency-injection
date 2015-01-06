@@ -1,192 +1,193 @@
-define(["exports", "aurelia-metadata", "./annotations", "./util"], function (exports, _aureliaMetadata, _annotations, _util) {
-  "use strict";
+"use strict";
 
+define(["exports", "aurelia-metadata", "./annotations", "./util"], function (exports, _aureliaMetadata, _annotations, _util) {
   var getAnnotation = _aureliaMetadata.getAnnotation;
   var Inject = _annotations.Inject;
   var Resolver = _annotations.Resolver;
   var Registration = _annotations.Registration;
   var isClass = _util.isClass;
-  var Container = (function () {
-    var Container = function Container(constructionInfo) {
-      this.constructionInfo = constructionInfo || new Map();
-      this.entries = new Map();
-    };
+  var Container = function Container(constructionInfo) {
+    this.constructionInfo = constructionInfo || new Map();
+    this.entries = new Map();
+  };
 
-    Container.prototype.registerInstance = function (key, instance) {
-      this.registerHandler(key, function (x) {
-        return instance;
-      });
-    };
+  Container.prototype.registerInstance = function (key, instance) {
+    this.registerHandler(key, function (x) {
+      return instance;
+    });
+  };
 
-    Container.prototype.registerTransient = function (key, fn) {
-      this.registerHandler(key, function (x) {
-        return x.invoke(fn);
-      });
-    };
+  Container.prototype.registerTransient = function (key, fn) {
+    fn = fn || key;
+    this.registerHandler(key, function (x) {
+      return x.invoke(fn);
+    });
+  };
 
-    Container.prototype.registerSingleton = function (key, fn) {
-      var singleton = null;
-      this.registerHandler(key, function (x) {
-        return singleton || (singleton = x.invoke(fn));
-      });
-    };
+  Container.prototype.registerSingleton = function (key, fn) {
+    var singleton = null;
+    fn = fn || key;
+    this.registerHandler(key, function (x) {
+      return singleton || (singleton = x.invoke(fn));
+    });
+  };
 
-    Container.prototype.autoRegister = function (fn, key) {
-      var registrationAnnotation = getAnnotation(fn, Registration);
+  Container.prototype.autoRegister = function (fn, key) {
+    var registrationAnnotation = getAnnotation(fn, Registration, true);
 
-      if (registrationAnnotation) {
-        registrationAnnotation.register(this, key || fn, fn);
-      } else {
-        this.registerSingleton(key || fn, fn);
-      }
-    };
+    if (registrationAnnotation) {
+      registrationAnnotation.register(this, key || fn, fn);
+    } else {
+      this.registerSingleton(key || fn, fn);
+    }
+  };
 
-    Container.prototype.autoRegisterAll = function (fns) {
-      var _this = this;
-      fns.forEach(function (x) {
-        return _this.autoRegister(x);
-      });
-    };
+  Container.prototype.autoRegisterAll = function (fns) {
+    var i = fns.length;
+    while (i--) {
+      this.autoRegister(fns[i]);
+    }
+  };
 
-    Container.prototype.registerHandler = function (key, handler) {
-      this.getOrCreateEntry(key).push(handler);
-    };
+  Container.prototype.registerHandler = function (key, handler) {
+    this.getOrCreateEntry(key).push(handler);
+  };
 
-    Container.prototype.get = function (key) {
-      var entry;
+  Container.prototype.get = function (key) {
+    var entry;
 
-      if (key instanceof Resolver) {
-        return key.get(this);
-      }
+    if (key instanceof Resolver) {
+      return key.get(this);
+    }
 
-      if (key === Container) {
-        return this;
-      }
+    if (key === Container) {
+      return this;
+    }
 
-      entry = this.entries.get(key);
+    entry = this.entries.get(key);
 
-      if (entry !== undefined) {
-        return entry[0](this);
-      }
-
-      if (this.parent) {
-        return this.parent.get(key);
-      }
-
-      this.autoRegister(key);
-      entry = this.entries.get(key);
-
+    if (entry !== undefined) {
       return entry[0](this);
-    };
+    }
 
-    Container.prototype.getAll = function (key) {
-      var _this2 = this;
-      var entry = this.entries.get(key);
+    if (this.parent) {
+      return this.parent.get(key);
+    }
 
-      if (entry !== undefined) {
-        return entry.map(function (x) {
-          return x(_this2);
-        });
-      }
+    this.autoRegister(key);
+    entry = this.entries.get(key);
 
-      if (this.parent) {
-        return this.parent.getAll(key);
-      }
+    return entry[0](this);
+  };
 
-      return [];
-    };
+  Container.prototype.getAll = function (key) {
+    var _this = this;
+    var entry = this.entries.get(key);
 
-    Container.prototype.hasHandler = function (key) {
-      return this.entries.has(key);
-    };
+    if (entry !== undefined) {
+      return entry.map(function (x) {
+        return x(_this);
+      });
+    }
 
-    Container.prototype.createChild = function () {
-      var childContainer = new Container(this.constructionInfo);
-      childContainer.parent = this;
-      return childContainer;
-    };
+    if (this.parent) {
+      return this.parent.getAll(key);
+    }
 
-    Container.prototype.createTypedChild = function (childContainerType) {
-      var childContainer = new childContainerType(this.constructionInfo);
-      childContainer.parent = this;
-      return childContainer;
-    };
+    return [];
+  };
 
-    Container.prototype.getOrCreateEntry = function (key) {
-      var entry = this.entries.get(key);
+  Container.prototype.hasHandler = function (key) {
+    var checkParent = arguments[1] === undefined ? false : arguments[1];
+    return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
+  };
 
-      if (entry === undefined) {
-        entry = [];
-        this.entries.set(key, entry);
-      }
+  Container.prototype.createChild = function () {
+    var childContainer = new Container(this.constructionInfo);
+    childContainer.parent = this;
+    return childContainer;
+  };
 
-      return entry;
-    };
+  Container.prototype.createTypedChild = function (childContainerType) {
+    var childContainer = new childContainerType(this.constructionInfo);
+    childContainer.parent = this;
+    return childContainer;
+  };
 
-    Container.prototype.invoke = function (fn) {
-      var info = this.getOrCreateConstructionInfo(fn), keys = info.keys, args = new Array(keys.length), context, i, ii;
+  Container.prototype.invoke = function (fn) {
+    var info = this.getOrCreateConstructionInfo(fn), keys = info.keys, args = new Array(keys.length), context, i, ii;
 
-      for (i = 0, ii = keys.length; i < ii; ++i) {
-        args[i] = this.get(keys[i]);
-      }
+    for (i = 0, ii = keys.length; i < ii; ++i) {
+      args[i] = this.get(keys[i]);
+    }
 
-      if (info.isClass) {
-        context = Object.create(fn.prototype);
-        return fn.apply(context, args) || context;
+    if (info.isClass) {
+      context = Object.create(fn.prototype);
+      return fn.apply(context, args) || context;
+    } else {
+      return fn.apply(undefined, args);
+    }
+  };
+
+  Container.prototype.getOrCreateEntry = function (key) {
+    var entry = this.entries.get(key);
+
+    if (entry === undefined) {
+      entry = [];
+      this.entries.set(key, entry);
+    }
+
+    return entry;
+  };
+
+  Container.prototype.getOrCreateConstructionInfo = function (fn) {
+    var info = this.constructionInfo.get(fn);
+
+    if (info === undefined) {
+      info = this.createConstructionInfo(fn);
+      this.constructionInfo.set(fn, info);
+    }
+
+    return info;
+  };
+
+  Container.prototype.createConstructionInfo = function (fn) {
+    var info = { isClass: isClass(fn) }, injectAnnotation, keys = [], i, ii, j, jj, param, parameters = fn.parameters, paramAnnotation;
+
+    if (fn.inject !== undefined) {
+      if (typeof fn.inject === "function") {
+        info.keys = fn.inject();
       } else {
-        return fn.apply(undefined, args);
-      }
-    };
-
-    Container.prototype.getOrCreateConstructionInfo = function (fn) {
-      var info = this.constructionInfo.get(fn);
-
-      if (info === undefined) {
-        info = this.createConstructionInfo(fn);
-        this.constructionInfo.set(fn, info);
+        info.keys = fn.inject;
       }
 
       return info;
-    };
+    }
 
-    Container.prototype.createConstructionInfo = function (fn) {
-      var info = { isClass: isClass(fn) }, injectAnnotation, keys = [], i, ii, parameters = fn.parameters, paramAnnotation;
+    injectAnnotation = getAnnotation(fn, Inject);
+    if (injectAnnotation) {
+      keys = keys.concat(injectAnnotation.keys);
+    }
 
-      if (fn.inject !== undefined) {
-        if (typeof fn.inject === "function") {
-          info.keys = fn.inject();
-        } else {
-          info.keys = fn.inject;
-        }
+    if (parameters) {
+      for (i = 0, ii = parameters.length; i < ii; ++i) {
+        param = parameters[i];
 
-        return info;
-      }
+        for (j = 0, jj = param.length; j < jj; ++j) {
+          paramAnnotation = param[j];
 
-      injectAnnotation = getAnnotation(fn, Inject);
-      if (injectAnnotation) {
-        keys = keys.concat(injectAnnotation.keys);
-      }
-
-      if (parameters) {
-        parameters.forEach(function (param, idx) {
-          for (i = 0, ii = param.length; i < ii; i++) {
-            paramAnnotation = param[i];
-
-            if (paramAnnotation instanceof Inject) {
-              keys[idx] = paramAnnotation.keys[0];
-            } else if (!keys[idx]) {
-              keys[idx] = paramAnnotation;
-            }
+          if (paramAnnotation instanceof Inject) {
+            keys[i] = paramAnnotation.keys[0];
+          } else if (!keys[i]) {
+            keys[i] = paramAnnotation;
           }
-        });
+        }
       }
+    }
 
-      info.keys = keys;
-      return info;
-    };
-
-    return Container;
-  })();
+    info.keys = keys;
+    return info;
+  };
 
   exports.Container = Container;
 });
