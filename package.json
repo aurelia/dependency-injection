@@ -68,7 +68,7 @@
         },
         {
           "rel": "describedby",
-          "mediaType": "application/yuidoc+json",
+          "mediaType": "aurelia-doc+json",
           "title": "API",
           "href": "doc/api.json"
         },
