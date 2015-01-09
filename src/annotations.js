@@ -221,3 +221,43 @@ export class Optional extends Resolver {
     return new Optional(key, checkParent);
   }
 }
+
+
+/**
+* An annotation used to inject the dependency from the parent container instead of the current one
+*
+* @class Parent
+* @constructor
+* @extends Resolver
+* @param {Object} key The key to resolve from the parent container.
+*/
+export class Parent extends Resolver {
+  constructor(key){
+    this.key = key;
+  }
+
+  /**
+  * Called by the container to load the dependency from the parent container
+  *
+  * @method get
+  * @param {Container} container The container to resolve the parent from.
+  * @return {Function} Returns the matching instance from the parent container
+  */
+  get(container){
+    return container.parent 
+      ? container.parent.get(this.key)
+      : null;
+  }
+
+  /**
+  * Creates a Parent Resolver for the supplied key.
+  *
+  * @method of
+  * @static
+  * @param {Object} key The key to resolve.
+  * @return {Parent} Returns an insance of Parent for the key.
+  */
+  static of(key){
+    return new Parent(key);
+  }
+}

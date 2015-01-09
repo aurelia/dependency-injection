@@ -6,7 +6,8 @@ export {
   Resolver,
   Lazy,
   All,
-  Optional
+  Optional,
+  Parent
 } from './annotations';
 
 export {Container} from './container';
