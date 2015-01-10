@@ -224,7 +224,7 @@ export class Optional extends Resolver {
 
 
 /**
-* An annotation used to inject the dependency from the parent container instead of the current one
+* An annotation used to inject the dependency from the parent container instead of the current one.
 *
 * @class Parent
 * @constructor
