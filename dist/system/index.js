@@ -1,6 +1,6 @@
-"use strict";
-
 System.register(["./annotations", "./container"], function (_export) {
+  "use strict";
+
   return {
     setters: [function (_annotations) {
       _export("Inject", _annotations.Inject);

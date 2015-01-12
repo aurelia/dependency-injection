@@ -1,6 +1,6 @@
-"use strict";
-
 define(["exports"], function (exports) {
+  "use strict";
+
   exports.isClass = isClass;
   if (!(function f() {}).name) {
     Object.defineProperty(Function.prototype, "name", {

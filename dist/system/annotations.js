@@ -1,12 +1,14 @@
-"use strict";
-
 System.register([], function (_export) {
-  var _slice, _inherits, Inject, Registration, Transient, Singleton, Resolver, Lazy, All, Optional, Parent;
+  "use strict";
+
+  var _inherits, _prototypeProperties, Inject, Registration, Transient, Singleton, Resolver, Lazy, All, Optional, Parent;
   return {
     setters: [],
     execute: function () {
-      _slice = Array.prototype.slice;
       _inherits = function (child, parent) {
+        if (typeof parent !== "function" && parent !== null) {
+          throw new TypeError("Super expression must either be null or a function, not " + typeof parent);
+        }
         child.prototype = Object.create(parent && parent.prototype, {
           constructor: {
             value: child,
@@ -18,150 +20,235 @@ System.register([], function (_export) {
         if (parent) child.__proto__ = parent;
       };
 
+      _prototypeProperties = function (child, staticProps, instanceProps) {
+        if (staticProps) Object.defineProperties(child, staticProps);
+        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+      };
+
       Inject = function Inject() {
-        var keys = _slice.call(arguments);
+        var keys = [];
+
+        for (var _key = 0; _key < arguments.length; _key++) {
+          keys[_key] = arguments[_key];
+        }
 
         this.keys = keys;
       };
 
       _export("Inject", Inject);
 
-      Registration = function Registration() {};
+      Registration = (function () {
+        var Registration = function Registration() {};
 
-      Registration.prototype.register = function (container, key, fn) {
-        throw new Error("A custom Registration must implement register(container, key, fn).");
-      };
+        _prototypeProperties(Registration, null, {
+          register: {
+            value: function (container, key, fn) {
+              throw new Error("A custom Registration must implement register(container, key, fn).");
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
+        return Registration;
+      })();
       _export("Registration", Registration);
 
-      Transient = (function () {
-        var _Registration = Registration;
+      Transient = (function (Registration) {
         var Transient = function Transient(key) {
           this.key = key;
         };
 
-        _inherits(Transient, _Registration);
+        _inherits(Transient, Registration);
 
-        Transient.prototype.register = function (container, key, fn) {
-          container.registerTransient(this.key || key, fn);
-        };
+        _prototypeProperties(Transient, null, {
+          register: {
+            value: function (container, key, fn) {
+              container.registerTransient(this.key || key, fn);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
         return Transient;
-      })();
+      })(Registration);
       _export("Transient", Transient);
 
-      Singleton = (function () {
-        var _Registration2 = Registration;
+      Singleton = (function (Registration) {
         var Singleton = function Singleton(key) {
           this.key = key;
         };
 
-        _inherits(Singleton, _Registration2);
+        _inherits(Singleton, Registration);
 
-        Singleton.prototype.register = function (container, key, fn) {
-          container.registerSingleton(this.key || key, fn);
-        };
+        _prototypeProperties(Singleton, null, {
+          register: {
+            value: function (container, key, fn) {
+              container.registerSingleton(this.key || key, fn);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
         return Singleton;
-      })();
+      })(Registration);
       _export("Singleton", Singleton);
 
-      Resolver = function Resolver() {};
+      Resolver = (function () {
+        var Resolver = function Resolver() {};
 
-      Resolver.prototype.get = function (container) {
-        throw new Error("A custom Resolver must implement get(container) and return the resolved instance(s).");
-      };
+        _prototypeProperties(Resolver, null, {
+          get: {
+            value: function (container) {
+              throw new Error("A custom Resolver must implement get(container) and return the resolved instance(s).");
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
+        return Resolver;
+      })();
       _export("Resolver", Resolver);
 
-      Lazy = (function () {
-        var _Resolver = Resolver;
+      Lazy = (function (Resolver) {
         var Lazy = function Lazy(key) {
           this.key = key;
         };
 
-        _inherits(Lazy, _Resolver);
+        _inherits(Lazy, Resolver);
 
-        Lazy.prototype.get = function (container) {
-          var _this = this;
-          return function () {
-            return container.get(_this.key);
-          };
-        };
-
-        Lazy.of = function (key) {
-          return new Lazy(key);
-        };
+        _prototypeProperties(Lazy, {
+          of: {
+            value: function (key) {
+              return new Lazy(key);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        }, {
+          get: {
+            value: function (container) {
+              var _this = this;
+              return function () {
+                return container.get(_this.key);
+              };
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
         return Lazy;
-      })();
+      })(Resolver);
       _export("Lazy", Lazy);
 
-      All = (function () {
-        var _Resolver2 = Resolver;
+      All = (function (Resolver) {
         var All = function All(key) {
           this.key = key;
         };
 
-        _inherits(All, _Resolver2);
+        _inherits(All, Resolver);
 
-        All.prototype.get = function (container) {
-          return container.getAll(this.key);
-        };
-
-        All.of = function (key) {
-          return new All(key);
-        };
+        _prototypeProperties(All, {
+          of: {
+            value: function (key) {
+              return new All(key);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        }, {
+          get: {
+            value: function (container) {
+              return container.getAll(this.key);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
         return All;
-      })();
+      })(Resolver);
       _export("All", All);
 
-      Optional = (function () {
-        var _Resolver3 = Resolver;
+      Optional = (function (Resolver) {
         var Optional = function Optional(key) {
           var checkParent = arguments[1] === undefined ? false : arguments[1];
           this.key = key;
           this.checkParent = checkParent;
         };
 
-        _inherits(Optional, _Resolver3);
+        _inherits(Optional, Resolver);
 
-        Optional.prototype.get = function (container) {
-          if (container.hasHandler(this.key, this.checkParent)) {
-            return container.get(this.key);
+        _prototypeProperties(Optional, {
+          of: {
+            value: function (key) {
+              var checkParent = arguments[1] === undefined ? false : arguments[1];
+              return new Optional(key, checkParent);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
           }
+        }, {
+          get: {
+            value: function (container) {
+              if (container.hasHandler(this.key, this.checkParent)) {
+                return container.get(this.key);
+              }
 
-          return null;
-        };
-
-        Optional.of = function (key) {
-          var checkParent = arguments[1] === undefined ? false : arguments[1];
-          return new Optional(key, checkParent);
-        };
+              return null;
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
         return Optional;
-      })();
+      })(Resolver);
       _export("Optional", Optional);
 
-      Parent = (function () {
-        var _Resolver4 = Resolver;
+      Parent = (function (Resolver) {
         var Parent = function Parent(key) {
           this.key = key;
         };
 
-        _inherits(Parent, _Resolver4);
+        _inherits(Parent, Resolver);
 
-        Parent.prototype.get = function (container) {
-          return container.parent ? container.parent.get(this.key) : null;
-        };
-
-        Parent.of = function (key) {
-          return new Parent(key);
-        };
+        _prototypeProperties(Parent, {
+          of: {
+            value: function (key) {
+              return new Parent(key);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        }, {
+          get: {
+            value: function (container) {
+              return container.parent ? container.parent.get(this.key) : null;
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
         return Parent;
-      })();
+      })(Resolver);
       _export("Parent", Parent);
     }
   };

@@ -1,6 +1,6 @@
-"use strict";
-
 define(["exports", "./annotations", "./container"], function (exports, _annotations, _container) {
+  "use strict";
+
   exports.Inject = _annotations.Inject;
   exports.Registration = _annotations.Registration;
   exports.Transient = _annotations.Transient;
