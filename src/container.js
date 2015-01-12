@@ -178,19 +178,6 @@ export class Container {
   }
 
   /**
-  * Creates a new dependency injection container using a derived container type whose parent is the current container.
-  *
-  * @method createTypedChild
-  * @param {Function} childContainerType A type derived from Container which will be instantiated as the child.
-  * @return {Container} Returns a new container instance parented to this.
-  */
-  createTypedChild(childContainerType){
-    var childContainer = new childContainerType(this.constructionInfo);
-    childContainer.parent = this;
-    return childContainer;
-  }
-
-  /**
   * Invokes a function, recursively resolving its dependencies.
   *
   * @method invoke
