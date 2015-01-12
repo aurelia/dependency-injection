@@ -26,7 +26,7 @@
       "lib": "dist"
     },
     "dependencies": {
-      "aurelia-metadata": "^0.2.3",
+      "aurelia-metadata": "^0.2.4",
       "core-js": "npm:core-js@^0.4.1"
     }
   },
