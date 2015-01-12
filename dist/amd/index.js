@@ -9,5 +9,6 @@ define(["exports", "./annotations", "./container"], function (exports, _annotati
   exports.Lazy = _annotations.Lazy;
   exports.All = _annotations.All;
   exports.Optional = _annotations.Optional;
+  exports.Parent = _annotations.Parent;
   exports.Container = _container.Container;
 });

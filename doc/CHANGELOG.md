@@ -1,3 +1,17 @@
+## 0.3.0 (2015-01-12)
+
+
+#### Bug Fixes
+
+* **container:** remove bogus createTypedChild api ([42b2ae2a](http://github.com/aurelia/dependency-injection/commit/42b2ae2a1507672f95503c0bc9257c755324a520))
+* **package:** update Aurelia dependencies ([ccf09589](http://github.com/aurelia/dependency-injection/commit/ccf09589cfdd76ac77df12fad7e4ae6383000f48))
+
+
+#### Features
+
+* **resolver:** add parent resolver ([f035f1f5](http://github.com/aurelia/dependency-injection/commit/f035f1f5dece5c0316f18500e28ad37bdf9ac066))
+
+
 ### 0.2.1 (2015-01-06)
 
 

@@ -18,6 +18,8 @@ System.register(["./annotations", "./container"], function (_export) {
       _export("All", _annotations.All);
 
       _export("Optional", _annotations.Optional);
+
+      _export("Parent", _annotations.Parent);
     }, function (_container) {
       _export("Container", _container.Container);
     }],

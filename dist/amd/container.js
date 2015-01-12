@@ -108,12 +108,6 @@ define(["exports", "aurelia-metadata", "./annotations", "./util"], function (exp
     return childContainer;
   };
 
-  Container.prototype.createTypedChild = function (childContainerType) {
-    var childContainer = new childContainerType(this.constructionInfo);
-    childContainer.parent = this;
-    return childContainer;
-  };
-
   Container.prototype.invoke = function (fn) {
     var info = this.getOrCreateConstructionInfo(fn), keys = info.keys, args = new Array(keys.length), context, i, ii;
 

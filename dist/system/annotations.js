@@ -1,7 +1,7 @@
 "use strict";
 
 System.register([], function (_export) {
-  var _slice, _inherits, Inject, Registration, Transient, Singleton, Resolver, Lazy, All, Optional;
+  var _slice, _inherits, Inject, Registration, Transient, Singleton, Resolver, Lazy, All, Optional, Parent;
   return {
     setters: [],
     execute: function () {
@@ -143,6 +143,26 @@ System.register([], function (_export) {
         return Optional;
       })();
       _export("Optional", Optional);
+
+      Parent = (function () {
+        var _Resolver4 = Resolver;
+        var Parent = function Parent(key) {
+          this.key = key;
+        };
+
+        _inherits(Parent, _Resolver4);
+
+        Parent.prototype.get = function (container) {
+          return container.parent ? container.parent.get(this.key) : null;
+        };
+
+        Parent.of = function (key) {
+          return new Parent(key);
+        };
+
+        return Parent;
+      })();
+      _export("Parent", Parent);
     }
   };
 });
