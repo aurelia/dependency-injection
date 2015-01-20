@@ -1,5 +1,10 @@
+/**
+ * A lightweight, extensible dependency injection container for JavaScript.
+ *
+ * @module dependency-injection
+ */
+
 export {
-  Inject,
   Registration,
   Transient,
   Singleton,
@@ -8,6 +13,6 @@ export {
   All,
   Optional,
   Parent
-} from './annotations';
+} from './metadata';
 
 export {Container} from './container';

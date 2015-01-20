@@ -53,9 +53,11 @@ describe('container', () => {
         }
       }
 
-      App.parameters = [[Logger]]; //Note: Normally provided by the AtScript compiler.
+      App.parameters = [{is:Logger}]; //Note: Normally provided by the AtScript compiler.
 
       var container = new Container();
+      container.supportAtScript();
+
       var app = container.get(App);
 
       expect(app.logger).toEqual(jasmine.any(Logger));
@@ -113,9 +115,9 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures singleton via annotations method (ES6)', () => {
+    it('configures singleton via metadata method (ES6)', () => {
       class Logger {
-        static annotations() { return [new Singleton()] };
+        static metadata() { return [new Singleton()] };
       }
 
       class App1 {
@@ -139,9 +141,9 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures singleton via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
+    it('configures singleton via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
-      Logger.annotations = [new Singleton()];
+      Logger.metadata = [new Singleton()];
 
       class App1 {
         static inject() { return [Logger]; };
@@ -190,9 +192,9 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via annotations method (ES6)', () => {
+    it('configures transient (non singleton) via metadata method (ES6)', () => {
       class Logger {
-        static annotations() { return [new Transient()] };
+        static metadata() { return [new Transient()] };
       }
 
       class App1 {
@@ -216,9 +218,9 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via annotations property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
+    it('configures transient (non singleton) via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
-      Logger.annotations = [new Transient()];
+      Logger.metadata = [new Transient()];
 
       class App1 {
         static inject() { return [Logger]; };
@@ -296,9 +298,9 @@ describe('container', () => {
       expect(app2.logger).toEqual("something strange");
     });
 
-    it('uses base annotations method (ES6) when derived does not specify', () => {
+    it('uses base metadata method (ES6) when derived does not specify', () => {
       class LoggerBase {
-        static annotations() { return [new Transient()] };
+        static metadata() { return [new Transient()] };
       }
 
       class Logger extends LoggerBase {
@@ -326,9 +328,9 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('uses base annotations property (ES5, AtScript, TypeScript, CoffeeScript) when derived does not specify', () => {
+    it('uses base metadata property (ES5, AtScript, TypeScript, CoffeeScript) when derived does not specify', () => {
       class LoggerBase {}
-      LoggerBase.annotations = [new Transient()];
+      LoggerBase.metadata = [new Transient()];
 
       class Logger extends LoggerBase {
         
@@ -355,13 +357,13 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('overrides base annotations method (ES6) with derived configuration', () => {
+    it('overrides base metadata method (ES6) with derived configuration', () => {
       class LoggerBase {
-        static annotations() { return [new Singleton()] };
+        static metadata() { return [new Singleton()] };
       }
 
       class Logger extends LoggerBase {
-        static annotations() { return [new Transient()] };
+        static metadata() { return [new Transient()] };
       }
 
       class App1 {
@@ -385,13 +387,13 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('overrides base annotations property (ES5, AtScript, TypeScript, CoffeeScript) with derived configuration', () => {
+    it('overrides base metadata property (ES5, AtScript, TypeScript, CoffeeScript) with derived configuration', () => {
       class LoggerBase {
-        static annotations() { return [new Singleton()] };
+        static metadata() { return [new Singleton()] };
       }
 
       class Logger extends LoggerBase {}
-      Logger.annotations = [new Transient()];
+      Logger.metadata = [new Transient()];
 
       class App1 {
         static inject() { return [Logger]; };
@@ -480,13 +482,13 @@ describe('container', () => {
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
 
-    it('doesn\'t get hidden when a super class adds annotations which don\'t include the base registration type', () => {
+    it('doesn\'t get hidden when a super class adds metadata which don\'t include the base registration type', () => {
       class LoggerBase {
-        static annotations() { return [new Transient()]; };
+        static metadata() { return [new Transient()]; };
       }
 
       class Logger extends LoggerBase {
-        static annotations() { return ['goofy', 'mickey']; };
+        static metadata() { return ['goofy', 'mickey']; };
       }
 
       class App1 {

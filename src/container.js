@@ -1,12 +1,8 @@
-/**
- * A lightweight, extensible dependency injection container for JavaScript.
- *
- * @module dependency-injection
- */
-
-import {getAnnotation} from 'aurelia-metadata';
-import {Inject, Resolver, Registration} from './annotations';
+import {getFunctionMetadata} from 'aurelia-metadata';
+import {Resolver, Registration} from './metadata';
 import {isClass} from './util';
+
+var emptyParameters = Object.freeze([]);
 
 /**
 * A lightweight, extensible dependency injection container.
@@ -18,6 +14,38 @@ export class Container {
   constructor(constructionInfo) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
+  }
+
+  /**
+  * Add support for AtScript RTTI according to spec at http://www.atscript.org
+  *
+  * @method useAtScript
+  */
+  supportAtScript(){
+    this.addParameterInfoLocator(function(fn){
+      var parameters = fn.parameters,
+          keys, i, ii;
+
+      if (parameters) {
+        keys = new Array(parameters.length);
+
+        for(i = 0, ii = parameters.length; i < ii; ++i){
+          keys[i] = parameters[i].is;
+        }
+      }
+
+      return keys;
+    });
+  }
+
+  addParameterInfoLocator(locator){
+    if(this.locateParameterInfoElsewhere === undefined){
+      this.locateParameterInfoElsewhere = locator;
+      return;
+    }
+
+    var original = this.locateParameterInfoElsewhere;
+    this.locateParameterInfoElsewhere = (fn) => {return original(fn) || locator(fn);};
   }
 
   /**
@@ -64,10 +92,10 @@ export class Container {
   * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
   */
   autoRegister(fn, key){
-    var registrationAnnotation = getAnnotation(fn, Registration, true);
+    var registration = getFunctionMetadata(fn, Registration, true);
     
-    if(registrationAnnotation){
-      registrationAnnotation.register(this, key || fn, fn);
+    if(registration){
+      registration.register(this, key || fn, fn);
     }else{
       this.registerSingleton(key || fn, fn);
     }
@@ -174,6 +202,7 @@ export class Container {
   createChild(){
     var childContainer = new Container(this.constructionInfo);
     childContainer.parent = this;
+    childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
     return childContainer;
   }
 
@@ -225,8 +254,7 @@ export class Container {
   }
 
   createConstructionInfo(fn){
-    var info = {isClass: isClass(fn)}, injectAnnotation,
-        keys = [], i, ii, j, jj, param, parameters = fn.parameters, paramAnnotation;
+    var info = {isClass: isClass(fn)};
 
     if(fn.inject !== undefined){
       if(typeof fn.inject === 'function'){
@@ -238,28 +266,12 @@ export class Container {
       return info;
     }
 
-    injectAnnotation = getAnnotation(fn, Inject);
-    if(injectAnnotation){
-      keys = keys.concat(injectAnnotation.keys);
+    if(this.locateParameterInfoElsewhere !== undefined){
+      info.keys = this.locateParameterInfoElsewhere(fn) || emptyParameters;
+    }else{
+      info.keys = emptyParameters;
     }
 
-    if (parameters) {
-      for(i = 0, ii = parameters.length; i < ii; ++i){
-        param = parameters[i];
-
-        for(j = 0, jj = param.length; j < jj; ++j){
-          paramAnnotation = param[j];
-
-          if(paramAnnotation instanceof Inject) {
-            keys[i] = paramAnnotation.keys[0];
-          }else if(!keys[i]){ // Type Annotation
-            keys[i] = paramAnnotation;
-          }
-        }
-      }
-    }
-
-    info.keys = keys;
     return info;
   }
 }

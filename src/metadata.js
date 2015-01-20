@@ -1,17 +1,4 @@
 /**
-* An annotation which specifies what needs to be injected into the annotated function/class.
-*
-* @class Inject
-* @constructor
-* @param {Object} ...keys The keys for the requested instances.
-*/
-export class Inject {
-  constructor(...keys) {
-    this.keys = keys;
-  }
-}
-
-/**
 * An abstract annotation used to allow functions/classes to indicate how they should be registered with the container.
 *
 * @class Registration
