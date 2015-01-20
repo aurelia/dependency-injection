@@ -38,6 +38,12 @@ export class Container {
     });
   }
 
+ /**
+ * Adds an additional location to search for constructor parameter type info.
+ *
+ * @method addParameterInfoLocator
+ * @param {Function} locator Configures a locator function to use when searching for parameter info. It should return undefined if no parameter info is found.
+ */
   addParameterInfoLocator(locator){
     if(this.locateParameterInfoElsewhere === undefined){
       this.locateParameterInfoElsewhere = locator;
