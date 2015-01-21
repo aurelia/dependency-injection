@@ -231,6 +231,11 @@ export class Container {
 
     if(info.isClass){
       context = Object.create(fn.prototype);
+
+      if('initialize' in fn){
+        fn.initialize(context);
+      }
+
       return fn.apply(context, args) || context;
     }else{
       return fn.apply(undefined, args);
