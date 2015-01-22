@@ -1,4 +1,4 @@
-import {getFunctionMetadata} from 'aurelia-metadata';
+import {Metadata} from 'aurelia-metadata';
 import {Resolver, Registration} from './metadata';
 import {isClass} from './util';
 
@@ -98,7 +98,7 @@ export class Container {
   * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
   */
   autoRegister(fn, key){
-    var registration = getFunctionMetadata(fn, Registration, true);
+    var registration = Metadata.on(fn).first(Registration, true);
     
     if(registration){
       registration.register(this, key || fn, fn);

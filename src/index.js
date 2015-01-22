@@ -3,7 +3,8 @@
  *
  * @module dependency-injection
  */
-
+import {Metadata} from 'aurelia-metadata';
+import {Transient, Singleton} from './metadata';
 export {
   Registration,
   Transient,
@@ -16,3 +17,6 @@ export {
 } from './metadata';
 
 export {Container} from './container';
+
+Metadata.configure.classHelper('transient', Transient);
+Metadata.configure.classHelper('singleton', Singleton);
