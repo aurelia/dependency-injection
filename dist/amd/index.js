@@ -1,14 +1,20 @@
-define(["exports", "./annotations", "./container"], function (exports, _annotations, _container) {
+define(["exports", "aurelia-metadata", "./metadata", "./container"], function (exports, _aureliaMetadata, _metadata, _container) {
   "use strict";
 
-  exports.Inject = _annotations.Inject;
-  exports.Registration = _annotations.Registration;
-  exports.Transient = _annotations.Transient;
-  exports.Singleton = _annotations.Singleton;
-  exports.Resolver = _annotations.Resolver;
-  exports.Lazy = _annotations.Lazy;
-  exports.All = _annotations.All;
-  exports.Optional = _annotations.Optional;
-  exports.Parent = _annotations.Parent;
+  var Metadata = _aureliaMetadata.Metadata;
+  var Transient = _metadata.Transient;
+  var Singleton = _metadata.Singleton;
+  exports.Registration = _metadata.Registration;
+  exports.Transient = _metadata.Transient;
+  exports.Singleton = _metadata.Singleton;
+  exports.Resolver = _metadata.Resolver;
+  exports.Lazy = _metadata.Lazy;
+  exports.All = _metadata.All;
+  exports.Optional = _metadata.Optional;
+  exports.Parent = _metadata.Parent;
   exports.Container = _container.Container;
+
+
+  Metadata.configure.classHelper("transient", Transient);
+  Metadata.configure.classHelper("singleton", Singleton);
 });

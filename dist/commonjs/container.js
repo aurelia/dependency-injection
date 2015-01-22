@@ -5,20 +5,62 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
   if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
 };
 
-var getAnnotation = require("aurelia-metadata").getAnnotation;
-var Inject = require("./annotations").Inject;
-var Resolver = require("./annotations").Resolver;
-var Registration = require("./annotations").Registration;
+var Metadata = require("aurelia-metadata").Metadata;
+var Resolver = require("./metadata").Resolver;
+var Registration = require("./metadata").Registration;
 var isClass = require("./util").isClass;
+
+
+var emptyParameters = Object.freeze([]);
+
 var Container = (function () {
-  var Container = function Container(constructionInfo) {
+  function Container(constructionInfo) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
-  };
+  }
 
   _prototypeProperties(Container, null, {
+    supportAtScript: {
+      value: function supportAtScript() {
+        this.addParameterInfoLocator(function (fn) {
+          var parameters = fn.parameters,
+              keys,
+              i,
+              ii;
+
+          if (parameters) {
+            keys = new Array(parameters.length);
+
+            for (i = 0, ii = parameters.length; i < ii; ++i) {
+              keys[i] = parameters[i].is;
+            }
+          }
+
+          return keys;
+        });
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    addParameterInfoLocator: {
+      value: function addParameterInfoLocator(locator) {
+        if (this.locateParameterInfoElsewhere === undefined) {
+          this.locateParameterInfoElsewhere = locator;
+          return;
+        }
+
+        var original = this.locateParameterInfoElsewhere;
+        this.locateParameterInfoElsewhere = function (fn) {
+          return original(fn) || locator(fn);
+        };
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
     registerInstance: {
-      value: function (key, instance) {
+      value: function registerInstance(key, instance) {
         this.registerHandler(key, function (x) {
           return instance;
         });
@@ -28,7 +70,7 @@ var Container = (function () {
       configurable: true
     },
     registerTransient: {
-      value: function (key, fn) {
+      value: function registerTransient(key, fn) {
         fn = fn || key;
         this.registerHandler(key, function (x) {
           return x.invoke(fn);
@@ -39,7 +81,7 @@ var Container = (function () {
       configurable: true
     },
     registerSingleton: {
-      value: function (key, fn) {
+      value: function registerSingleton(key, fn) {
         var singleton = null;
         fn = fn || key;
         this.registerHandler(key, function (x) {
@@ -51,11 +93,11 @@ var Container = (function () {
       configurable: true
     },
     autoRegister: {
-      value: function (fn, key) {
-        var registrationAnnotation = getAnnotation(fn, Registration, true);
+      value: function autoRegister(fn, key) {
+        var registration = Metadata.on(fn).first(Registration, true);
 
-        if (registrationAnnotation) {
-          registrationAnnotation.register(this, key || fn, fn);
+        if (registration) {
+          registration.register(this, key || fn, fn);
         } else {
           this.registerSingleton(key || fn, fn);
         }
@@ -65,7 +107,7 @@ var Container = (function () {
       configurable: true
     },
     autoRegisterAll: {
-      value: function (fns) {
+      value: function autoRegisterAll(fns) {
         var i = fns.length;
         while (i--) {
           this.autoRegister(fns[i]);
@@ -76,7 +118,7 @@ var Container = (function () {
       configurable: true
     },
     registerHandler: {
-      value: function (key, handler) {
+      value: function registerHandler(key, handler) {
         this.getOrCreateEntry(key).push(handler);
       },
       writable: true,
@@ -84,7 +126,7 @@ var Container = (function () {
       configurable: true
     },
     get: {
-      value: function (key) {
+      value: function get(key) {
         var entry;
 
         if (key instanceof Resolver) {
@@ -115,7 +157,7 @@ var Container = (function () {
       configurable: true
     },
     getAll: {
-      value: function (key) {
+      value: function getAll(key) {
         var _this = this;
         var entry = this.entries.get(key);
 
@@ -136,7 +178,7 @@ var Container = (function () {
       configurable: true
     },
     hasHandler: {
-      value: function (key) {
+      value: function hasHandler(key) {
         var checkParent = arguments[1] === undefined ? false : arguments[1];
         return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
       },
@@ -145,9 +187,10 @@ var Container = (function () {
       configurable: true
     },
     createChild: {
-      value: function () {
+      value: function createChild() {
         var childContainer = new Container(this.constructionInfo);
         childContainer.parent = this;
+        childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
         return childContainer;
       },
       writable: true,
@@ -155,8 +198,13 @@ var Container = (function () {
       configurable: true
     },
     invoke: {
-      value: function (fn) {
-        var info = this.getOrCreateConstructionInfo(fn), keys = info.keys, args = new Array(keys.length), context, i, ii;
+      value: function invoke(fn) {
+        var info = this.getOrCreateConstructionInfo(fn),
+            keys = info.keys,
+            args = new Array(keys.length),
+            context,
+            i,
+            ii;
 
         for (i = 0, ii = keys.length; i < ii; ++i) {
           args[i] = this.get(keys[i]);
@@ -164,6 +212,11 @@ var Container = (function () {
 
         if (info.isClass) {
           context = Object.create(fn.prototype);
+
+          if ("initialize" in fn) {
+            fn.initialize(context);
+          }
+
           return fn.apply(context, args) || context;
         } else {
           return fn.apply(undefined, args);
@@ -174,7 +227,7 @@ var Container = (function () {
       configurable: true
     },
     getOrCreateEntry: {
-      value: function (key) {
+      value: function getOrCreateEntry(key) {
         var entry = this.entries.get(key);
 
         if (entry === undefined) {
@@ -189,7 +242,7 @@ var Container = (function () {
       configurable: true
     },
     getOrCreateConstructionInfo: {
-      value: function (fn) {
+      value: function getOrCreateConstructionInfo(fn) {
         var info = this.constructionInfo.get(fn);
 
         if (info === undefined) {
@@ -204,8 +257,8 @@ var Container = (function () {
       configurable: true
     },
     createConstructionInfo: {
-      value: function (fn) {
-        var info = { isClass: isClass(fn) }, injectAnnotation, keys = [], i, ii, j, jj, param, parameters = fn.parameters, paramAnnotation;
+      value: function createConstructionInfo(fn) {
+        var info = { isClass: isClass(fn) };
 
         if (fn.inject !== undefined) {
           if (typeof fn.inject === "function") {
@@ -217,28 +270,12 @@ var Container = (function () {
           return info;
         }
 
-        injectAnnotation = getAnnotation(fn, Inject);
-        if (injectAnnotation) {
-          keys = keys.concat(injectAnnotation.keys);
+        if (this.locateParameterInfoElsewhere !== undefined) {
+          info.keys = this.locateParameterInfoElsewhere(fn) || emptyParameters;
+        } else {
+          info.keys = emptyParameters;
         }
 
-        if (parameters) {
-          for (i = 0, ii = parameters.length; i < ii; ++i) {
-            param = parameters[i];
-
-            for (j = 0, jj = param.length; j < jj; ++j) {
-              paramAnnotation = param[j];
-
-              if (paramAnnotation instanceof Inject) {
-                keys[i] = paramAnnotation.keys[0];
-              } else if (!keys[i]) {
-                keys[i] = paramAnnotation;
-              }
-            }
-          }
-        }
-
-        info.keys = keys;
         return info;
       },
       writable: true,

@@ -1,14 +1,13 @@
-System.register(["aurelia-metadata", "./annotations", "./util"], function (_export) {
+System.register(["aurelia-metadata", "./metadata", "./util"], function (_export) {
   "use strict";
 
-  var getAnnotation, Inject, Resolver, Registration, isClass, _prototypeProperties, Container;
+  var Metadata, Resolver, Registration, isClass, _prototypeProperties, emptyParameters, Container;
   return {
     setters: [function (_aureliaMetadata) {
-      getAnnotation = _aureliaMetadata.getAnnotation;
-    }, function (_annotations) {
-      Inject = _annotations.Inject;
-      Resolver = _annotations.Resolver;
-      Registration = _annotations.Registration;
+      Metadata = _aureliaMetadata.Metadata;
+    }, function (_metadata) {
+      Resolver = _metadata.Resolver;
+      Registration = _metadata.Registration;
     }, function (_util) {
       isClass = _util.isClass;
     }],
@@ -18,15 +17,55 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
         if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
       };
 
+      emptyParameters = Object.freeze([]);
       Container = (function () {
-        var Container = function Container(constructionInfo) {
+        function Container(constructionInfo) {
           this.constructionInfo = constructionInfo || new Map();
           this.entries = new Map();
-        };
+        }
 
         _prototypeProperties(Container, null, {
+          supportAtScript: {
+            value: function supportAtScript() {
+              this.addParameterInfoLocator(function (fn) {
+                var parameters = fn.parameters,
+                    keys,
+                    i,
+                    ii;
+
+                if (parameters) {
+                  keys = new Array(parameters.length);
+
+                  for (i = 0, ii = parameters.length; i < ii; ++i) {
+                    keys[i] = parameters[i].is;
+                  }
+                }
+
+                return keys;
+              });
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          },
+          addParameterInfoLocator: {
+            value: function addParameterInfoLocator(locator) {
+              if (this.locateParameterInfoElsewhere === undefined) {
+                this.locateParameterInfoElsewhere = locator;
+                return;
+              }
+
+              var original = this.locateParameterInfoElsewhere;
+              this.locateParameterInfoElsewhere = function (fn) {
+                return original(fn) || locator(fn);
+              };
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          },
           registerInstance: {
-            value: function (key, instance) {
+            value: function registerInstance(key, instance) {
               this.registerHandler(key, function (x) {
                 return instance;
               });
@@ -36,7 +75,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           registerTransient: {
-            value: function (key, fn) {
+            value: function registerTransient(key, fn) {
               fn = fn || key;
               this.registerHandler(key, function (x) {
                 return x.invoke(fn);
@@ -47,7 +86,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           registerSingleton: {
-            value: function (key, fn) {
+            value: function registerSingleton(key, fn) {
               var singleton = null;
               fn = fn || key;
               this.registerHandler(key, function (x) {
@@ -59,11 +98,11 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           autoRegister: {
-            value: function (fn, key) {
-              var registrationAnnotation = getAnnotation(fn, Registration, true);
+            value: function autoRegister(fn, key) {
+              var registration = Metadata.on(fn).first(Registration, true);
 
-              if (registrationAnnotation) {
-                registrationAnnotation.register(this, key || fn, fn);
+              if (registration) {
+                registration.register(this, key || fn, fn);
               } else {
                 this.registerSingleton(key || fn, fn);
               }
@@ -73,7 +112,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           autoRegisterAll: {
-            value: function (fns) {
+            value: function autoRegisterAll(fns) {
               var i = fns.length;
               while (i--) {
                 this.autoRegister(fns[i]);
@@ -84,7 +123,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           registerHandler: {
-            value: function (key, handler) {
+            value: function registerHandler(key, handler) {
               this.getOrCreateEntry(key).push(handler);
             },
             writable: true,
@@ -92,7 +131,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           get: {
-            value: function (key) {
+            value: function get(key) {
               var entry;
 
               if (key instanceof Resolver) {
@@ -123,7 +162,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           getAll: {
-            value: function (key) {
+            value: function getAll(key) {
               var _this = this;
               var entry = this.entries.get(key);
 
@@ -144,7 +183,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           hasHandler: {
-            value: function (key) {
+            value: function hasHandler(key) {
               var checkParent = arguments[1] === undefined ? false : arguments[1];
               return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
             },
@@ -153,9 +192,10 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           createChild: {
-            value: function () {
+            value: function createChild() {
               var childContainer = new Container(this.constructionInfo);
               childContainer.parent = this;
+              childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
               return childContainer;
             },
             writable: true,
@@ -163,8 +203,13 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           invoke: {
-            value: function (fn) {
-              var info = this.getOrCreateConstructionInfo(fn), keys = info.keys, args = new Array(keys.length), context, i, ii;
+            value: function invoke(fn) {
+              var info = this.getOrCreateConstructionInfo(fn),
+                  keys = info.keys,
+                  args = new Array(keys.length),
+                  context,
+                  i,
+                  ii;
 
               for (i = 0, ii = keys.length; i < ii; ++i) {
                 args[i] = this.get(keys[i]);
@@ -172,6 +217,11 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
 
               if (info.isClass) {
                 context = Object.create(fn.prototype);
+
+                if ("initialize" in fn) {
+                  fn.initialize(context);
+                }
+
                 return fn.apply(context, args) || context;
               } else {
                 return fn.apply(undefined, args);
@@ -182,7 +232,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           getOrCreateEntry: {
-            value: function (key) {
+            value: function getOrCreateEntry(key) {
               var entry = this.entries.get(key);
 
               if (entry === undefined) {
@@ -197,7 +247,7 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           getOrCreateConstructionInfo: {
-            value: function (fn) {
+            value: function getOrCreateConstructionInfo(fn) {
               var info = this.constructionInfo.get(fn);
 
               if (info === undefined) {
@@ -212,8 +262,8 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
             configurable: true
           },
           createConstructionInfo: {
-            value: function (fn) {
-              var info = { isClass: isClass(fn) }, injectAnnotation, keys = [], i, ii, j, jj, param, parameters = fn.parameters, paramAnnotation;
+            value: function createConstructionInfo(fn) {
+              var info = { isClass: isClass(fn) };
 
               if (fn.inject !== undefined) {
                 if (typeof fn.inject === "function") {
@@ -225,28 +275,12 @@ System.register(["aurelia-metadata", "./annotations", "./util"], function (_expo
                 return info;
               }
 
-              injectAnnotation = getAnnotation(fn, Inject);
-              if (injectAnnotation) {
-                keys = keys.concat(injectAnnotation.keys);
+              if (this.locateParameterInfoElsewhere !== undefined) {
+                info.keys = this.locateParameterInfoElsewhere(fn) || emptyParameters;
+              } else {
+                info.keys = emptyParameters;
               }
 
-              if (parameters) {
-                for (i = 0, ii = parameters.length; i < ii; ++i) {
-                  param = parameters[i];
-
-                  for (j = 0, jj = param.length; j < jj; ++j) {
-                    paramAnnotation = param[j];
-
-                    if (paramAnnotation instanceof Inject) {
-                      keys[i] = paramAnnotation.keys[0];
-                    } else if (!keys[i]) {
-                      keys[i] = paramAnnotation;
-                    }
-                  }
-                }
-              }
-
-              info.keys = keys;
               return info;
             },
             writable: true,

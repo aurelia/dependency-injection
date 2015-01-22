@@ -1,3 +1,18 @@
+## 0.4.0 (2015-01-22)
+
+
+#### Bug Fixes
+
+* **all:** switch to metadata api ([19c60ad9](http://github.com/aurelia/dependency-injection/commit/19c60ad976a6bd8216dfbddbe8f7ac12ca1325d2))
+* **package:** update dependencies ([247d9ff9](http://github.com/aurelia/dependency-injection/commit/247d9ff925af07488d9ce6337e64e977370ab43a))
+
+
+#### Features
+
+* **all:** update to fluent metadata and add helpers ([8e3b7576](http://github.com/aurelia/dependency-injection/commit/8e3b7576bd7fda89bec4b2c79154c6a7a296a6aa))
+* **container:** enable custom class init before constructor ([33b4cc1c](http://github.com/aurelia/dependency-injection/commit/33b4cc1c48502d5a321aced22111b4f5251f648d))
+
+
 ### 0.3.1 (2015-01-12)
 
 * Update compiled output.
