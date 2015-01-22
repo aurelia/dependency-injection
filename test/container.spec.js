@@ -1,4 +1,4 @@
-import {Container, Transient, Singleton} from '../src/index';
+import {Container, Transient, Singleton, Lazy, All, Optional, Parent} from '../src/index';
 
 describe('container', () => {
   describe('injection', () => {
@@ -510,6 +510,196 @@ describe('container', () => {
       var app2 = container.get(App2);
 
       expect(app1.logger).not.toBe(app2.logger);
+    });
+
+    describe('Custom resolvers', () => {
+      describe('Lazy', () => {
+        it('provides a function which, when called, will return the instance', () => {
+          class Logger {}
+
+          class App1 {
+            static inject() { return [Lazy.of(Logger)]; };
+            constructor(getLogger) {
+              this.getLogger = getLogger;
+            }
+          }
+
+          var container = new Container();
+          var app1 = container.get(App1);
+
+          var logger = app1.getLogger;
+         
+          expect(logger()).toEqual(jasmine.any(Logger));
+        });
+      });
+
+      describe('All', ()=> {
+        it('resolves all matching dependencies as an array of instances', () => {
+          class LoggerBase {}
+
+          class VerboseLogger extends LoggerBase {}
+          
+          class Logger extends LoggerBase{}
+
+          class App {
+            static inject() { return [All.of(LoggerBase)]; };
+            constructor(loggers) {
+              this.loggers = loggers;
+            }
+          }
+
+          var container = new Container();
+          container.registerSingleton(LoggerBase, VerboseLogger);
+          container.registerTransient(LoggerBase, Logger);
+          var app = container.get(App);
+         
+          expect(app.loggers).toEqual(jasmine.any(Array));
+          expect(app.loggers.length).toBe(2);
+          expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
+          expect(app.loggers[1]).toEqual(jasmine.any(Logger));
+        });
+      });
+
+      describe('Optional', ()=> {
+        it('injects the instance if its registered in the container', () => {
+          class Logger{}
+
+          class App {
+            static inject() { return [Optional.of(Logger)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var container = new Container();
+          container.registerSingleton(Logger, Logger);       
+          var app = container.get(App);
+         
+          expect(app.logger).toEqual(jasmine.any(Logger));
+        });
+
+        it('injects null if key is not registered in the container', () => {
+          class VerboseLogger{}
+          class Logger{}
+
+          class App {
+            static inject() { return [Optional.of(Logger)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var container = new Container();
+          container.registerSingleton(VerboseLogger, Logger);       
+          var app = container.get(App);
+         
+          expect(app.logger).toBe(null);
+        });
+
+        it('injects null if key nor function is registered in the container', () => {
+          class VerboseLogger{}
+          class Logger{}
+
+          class App {
+            static inject() { return [Optional.of(Logger)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var container = new Container();      
+          var app = container.get(App);
+         
+          expect(app.logger).toBe(null);
+        });
+
+        it('doesn\'t check the parent container hierarchy when checkParent is false or default', () => {          
+          class Logger {}
+
+          class App {
+            static inject() { return [Optional.of(Logger)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var parentContainer = new Container();
+          parentContainer.registerSingleton(Logger, Logger); 
+
+          var childContainer = parentContainer.createChild(); 
+          childContainer.registerSingleton(App, App);
+    
+          var app = childContainer.get(App);
+         
+          expect(app.logger).toBe(null);
+        });
+
+        it('checks the parent container hierarchy when checkParent is true', () => {          
+          class Logger {}
+
+          class App {
+            static inject() { return [Optional.of(Logger, true)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var parentContainer = new Container();
+          parentContainer.registerSingleton(Logger, Logger); 
+
+          var childContainer = parentContainer.createChild(); 
+          childContainer.registerSingleton(App, App);
+    
+          var app = childContainer.get(App);
+         
+          expect(app.logger).toEqual(jasmine.any(Logger));
+        });
+      });
+
+      describe('Parent', ()=> {
+        it('bypasses the current container and injects instance from parent container', () =>{
+          class Logger {}
+
+          class App {
+            static inject() { return [Parent.of(Logger)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var parentContainer = new Container();
+          var parentInstance = new Logger();
+          parentContainer.registerInstance(Logger, parentInstance); 
+
+          var childContainer = parentContainer.createChild(); 
+          var childInstance = new Logger();
+          childContainer.registerInstance(Logger, childInstance);
+          childContainer.registerSingleton(App, App);
+    
+          var app = childContainer.get(App);
+         
+          expect(app.logger).toBe(parentInstance);
+        });
+
+        it('returns null when no parent container exists', () =>{
+          class Logger {}
+
+          class App {
+            static inject() { return [Parent.of(Logger)]; };
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          var container = new Container();
+          var instance = new Logger();
+          container.registerInstance(Logger, instance); 
+
+          var app = container.get(App);
+         
+          expect(app.logger).toBe(null);
+        });
+      });
     });
   });
 });
