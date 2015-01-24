@@ -18,7 +18,7 @@
     "url": "http://github.com/aurelia/dependency-injection"
   },
   "dependencies": {
-    "aurelia-metadata": "0.3.0",
+    "aurelia-metadata": "^0.3.0",
     "core-js": "zloirock/core-js"
   }
 }
