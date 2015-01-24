@@ -1,3 +1,11 @@
+### 0.4.1 (2015-01-24)
+
+
+#### Bug Fixes
+
+* **bower:** correct semver range ([3b7670c3](http://github.com/aurelia/dependency-injection/commit/3b7670c3ead8cc1b5e41874029f1e6fef86ed187))
+
+
 ## 0.4.0 (2015-01-22)
 
 
