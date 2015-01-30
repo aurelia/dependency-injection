@@ -14,6 +14,7 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 
 ## Used By
 
+* [aurelia-binding](https://github.com/aurelia/binding)
 * [aurelia-framework](https://github.com/aurelia/framework)
 * [aurelia-router](https://github.com/aurelia/router)
 * [aurelia-templating](https://github.com/aurelia/templating)
