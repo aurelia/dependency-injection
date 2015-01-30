@@ -52,12 +52,12 @@
   },
   "aurelia": {
     "usedBy": [
+      "aurelia-binding",
       "aurelia-framework",
       "aurelia-router",
       "aurelia-templating",
       "aurelia-templating-resources",
-      "aurelia-templating-router",
-      "aurelia-binding"
+      "aurelia-templating-router
     ],
     "documentation": {
       "links": [
