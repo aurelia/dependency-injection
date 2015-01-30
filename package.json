@@ -57,7 +57,7 @@
       "aurelia-router",
       "aurelia-templating",
       "aurelia-templating-resources",
-      "aurelia-templating-router
+      "aurelia-templating-router"
     ],
     "documentation": {
       "links": [
