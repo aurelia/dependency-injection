@@ -30,7 +30,7 @@ export class Container {
         keys = new Array(parameters.length);
 
         for(i = 0, ii = parameters.length; i < ii; ++i){
-          keys[i] = parameters[i].is;
+          keys[i] = parameters[i].is || parameters[i][0];
         }
       }
 

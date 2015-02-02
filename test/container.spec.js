@@ -62,6 +62,25 @@ describe('container', () => {
 
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
+
+    it('uses static parameters property as array (AtScript)', function() {
+      class Logger {}
+
+      class App {
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+
+      App.parameters = [[Logger]]; //Note: Normally provided by the AtScript compiler.
+
+      var container = new Container();
+      container.supportAtScript();
+
+      var app = container.get(App);
+
+      expect(app.logger).toEqual(jasmine.any(Logger));
+    });
   });
 
   describe('registration', () => {
