@@ -1,10 +1,7 @@
 define(["exports", "aurelia-metadata", "./metadata", "./util"], function (exports, _aureliaMetadata, _metadata, _util) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   var Metadata = _aureliaMetadata.Metadata;
   var Resolver = _metadata.Resolver;
@@ -14,7 +11,7 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
 
   var emptyParameters = Object.freeze([]);
 
-  var Container = (function () {
+  var Container = exports.Container = (function () {
     function Container(constructionInfo) {
       this.constructionInfo = constructionInfo || new Map();
       this.entries = new Map();
@@ -33,7 +30,7 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
               keys = new Array(parameters.length);
 
               for (i = 0, ii = parameters.length; i < ii; ++i) {
-                keys[i] = parameters[i].is;
+                keys[i] = parameters[i].is || parameters[i][0];
               }
             }
 
@@ -41,7 +38,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           });
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       addParameterInfoLocator: {
@@ -57,7 +53,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           };
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       registerInstance: {
@@ -67,7 +62,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           });
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       registerTransient: {
@@ -78,7 +72,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           });
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       registerSingleton: {
@@ -90,7 +83,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           });
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       autoRegister: {
@@ -104,7 +96,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       autoRegisterAll: {
@@ -115,7 +106,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       registerHandler: {
@@ -123,7 +113,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           this.getOrCreateEntry(key).push(handler);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       get: {
@@ -154,7 +143,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return entry[0](this);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       getAll: {
@@ -175,7 +163,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return [];
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       hasHandler: {
@@ -184,7 +171,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       createChild: {
@@ -195,7 +181,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return childContainer;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       invoke: {
@@ -224,7 +209,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       getOrCreateEntry: {
@@ -239,7 +223,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return entry;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       getOrCreateConstructionInfo: {
@@ -254,7 +237,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return info;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       createConstructionInfo: {
@@ -280,13 +262,11 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
           return info;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Container;
   })();
-
-  exports.Container = Container;
+  exports.__esModule = true;
 });

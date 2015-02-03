@@ -17,4 +17,5 @@ define(["exports", "aurelia-metadata", "./metadata", "./container"], function (e
 
   Metadata.configure.classHelper("transient", Transient);
   Metadata.configure.classHelper("singleton", Singleton);
+  exports.__esModule = true;
 });

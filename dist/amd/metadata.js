@@ -1,27 +1,11 @@
 define(["exports"], function (exports) {
   "use strict";
 
-  var _inherits = function (subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) subClass.__proto__ = superClass;
-  };
+  var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-  var Registration = (function () {
+  var Registration = exports.Registration = (function () {
     function Registration() {}
 
     _prototypeProperties(Registration, null, {
@@ -30,16 +14,13 @@ define(["exports"], function (exports) {
           throw new Error("A custom Registration must implement register(container, key, fn).");
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Registration;
   })();
-
-  exports.Registration = Registration;
-  var Transient = (function (Registration) {
+  var Transient = exports.Transient = (function (Registration) {
     function Transient(key) {
       this.key = key;
     }
@@ -52,16 +33,13 @@ define(["exports"], function (exports) {
           container.registerTransient(this.key || key, fn);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Transient;
   })(Registration);
-
-  exports.Transient = Transient;
-  var Singleton = (function (Registration) {
+  var Singleton = exports.Singleton = (function (Registration) {
     function Singleton(key) {
       this.key = key;
     }
@@ -74,16 +52,13 @@ define(["exports"], function (exports) {
           container.registerSingleton(this.key || key, fn);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Singleton;
   })(Registration);
-
-  exports.Singleton = Singleton;
-  var Resolver = (function () {
+  var Resolver = exports.Resolver = (function () {
     function Resolver() {}
 
     _prototypeProperties(Resolver, null, {
@@ -92,16 +67,13 @@ define(["exports"], function (exports) {
           throw new Error("A custom Resolver must implement get(container) and return the resolved instance(s).");
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Resolver;
   })();
-
-  exports.Resolver = Resolver;
-  var Lazy = (function (Resolver) {
+  var Lazy = exports.Lazy = (function (Resolver) {
     function Lazy(key) {
       this.key = key;
     }
@@ -114,7 +86,6 @@ define(["exports"], function (exports) {
           return new Lazy(key);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     }, {
@@ -126,16 +97,13 @@ define(["exports"], function (exports) {
           };
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Lazy;
   })(Resolver);
-
-  exports.Lazy = Lazy;
-  var All = (function (Resolver) {
+  var All = exports.All = (function (Resolver) {
     function All(key) {
       this.key = key;
     }
@@ -148,7 +116,6 @@ define(["exports"], function (exports) {
           return new All(key);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     }, {
@@ -157,16 +124,13 @@ define(["exports"], function (exports) {
           return container.getAll(this.key);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return All;
   })(Resolver);
-
-  exports.All = All;
-  var Optional = (function (Resolver) {
+  var Optional = exports.Optional = (function (Resolver) {
     function Optional(key) {
       var checkParent = arguments[1] === undefined ? false : arguments[1];
       this.key = key;
@@ -182,7 +146,6 @@ define(["exports"], function (exports) {
           return new Optional(key, checkParent);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     }, {
@@ -195,16 +158,13 @@ define(["exports"], function (exports) {
           return null;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Optional;
   })(Resolver);
-
-  exports.Optional = Optional;
-  var Parent = (function (Resolver) {
+  var Parent = exports.Parent = (function (Resolver) {
     function Parent(key) {
       this.key = key;
     }
@@ -217,7 +177,6 @@ define(["exports"], function (exports) {
           return new Parent(key);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     }, {
@@ -226,13 +185,11 @@ define(["exports"], function (exports) {
           return container.parent ? container.parent.get(this.key) : null;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Parent;
   })(Resolver);
-
-  exports.Parent = Parent;
+  exports.__esModule = true;
 });

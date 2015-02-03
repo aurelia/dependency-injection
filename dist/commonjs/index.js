@@ -1,18 +1,21 @@
 "use strict";
 
 var Metadata = require("aurelia-metadata").Metadata;
-var Transient = require("./metadata").Transient;
-var Singleton = require("./metadata").Singleton;
-exports.Registration = require("./metadata").Registration;
-exports.Transient = require("./metadata").Transient;
-exports.Singleton = require("./metadata").Singleton;
-exports.Resolver = require("./metadata").Resolver;
-exports.Lazy = require("./metadata").Lazy;
-exports.All = require("./metadata").All;
-exports.Optional = require("./metadata").Optional;
-exports.Parent = require("./metadata").Parent;
+var _metadata = require("./metadata");
+
+var Transient = _metadata.Transient;
+var Singleton = _metadata.Singleton;
+exports.Registration = _metadata.Registration;
+exports.Transient = _metadata.Transient;
+exports.Singleton = _metadata.Singleton;
+exports.Resolver = _metadata.Resolver;
+exports.Lazy = _metadata.Lazy;
+exports.All = _metadata.All;
+exports.Optional = _metadata.Optional;
+exports.Parent = _metadata.Parent;
 exports.Container = require("./container").Container;
 
 
 Metadata.configure.classHelper("transient", Transient);
 Metadata.configure.classHelper("singleton", Singleton);
+exports.__esModule = true;

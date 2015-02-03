@@ -1,3 +1,18 @@
+### 0.4.2 (2015-02-03)
+
+
+#### Bug Fixes
+
+* **util:**
+  * fix ridiculously dumb error ([8cfe89f0](http://github.com/aurelia/dependency-injection/commit/8cfe89f0de5d2d6101f5421bf941dc84352bba9d))
+  * function name polyfill should minify correctly ([85358c53](http://github.com/aurelia/dependency-injection/commit/85358c5359ddc0a069c4d049fd28d760052cb437))
+
+
+#### Features
+
+* **container:** consume atscript annotation parameters as arrays ([7303cb36](http://github.com/aurelia/dependency-injection/commit/7303cb36599873ec14fac9dd020b7aafe1e7d756), closes [#15](http://github.com/aurelia/dependency-injection/issues/15))
+
+
 ### 0.4.1 (2015-01-24)
 
 

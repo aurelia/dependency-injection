@@ -2,7 +2,8 @@ define(["exports"], function (exports) {
   "use strict";
 
   exports.isClass = isClass;
-  if (!(function f() {}).name) {
+  function test() {}
+  if (!test.name) {
     Object.defineProperty(Function.prototype, "name", {
       get: function () {
         var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
@@ -23,4 +24,5 @@ define(["exports"], function (exports) {
 
     return Object.keys(clsOrFunction.prototype).length > 0;
   }
+  exports.__esModule = true;
 });

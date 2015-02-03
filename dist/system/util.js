@@ -3,6 +3,9 @@ System.register([], function (_export) {
 
   _export("isClass", isClass);
 
+  function test() {}
+
+
   function isUpperCase(char) {
     return char.toUpperCase() === char;
   }
@@ -17,7 +20,7 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      if (!(function f() {}).name) {
+      if (!test.name) {
         Object.defineProperty(Function.prototype, "name", {
           get: function () {
             var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];

@@ -1,19 +1,18 @@
 "use strict";
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var Metadata = require("aurelia-metadata").Metadata;
-var Resolver = require("./metadata").Resolver;
-var Registration = require("./metadata").Registration;
+var _metadata = require("./metadata");
+
+var Resolver = _metadata.Resolver;
+var Registration = _metadata.Registration;
 var isClass = require("./util").isClass;
 
 
 var emptyParameters = Object.freeze([]);
 
-var Container = (function () {
+var Container = exports.Container = (function () {
   function Container(constructionInfo) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
@@ -32,7 +31,7 @@ var Container = (function () {
             keys = new Array(parameters.length);
 
             for (i = 0, ii = parameters.length; i < ii; ++i) {
-              keys[i] = parameters[i].is;
+              keys[i] = parameters[i].is || parameters[i][0];
             }
           }
 
@@ -40,7 +39,6 @@ var Container = (function () {
         });
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     addParameterInfoLocator: {
@@ -56,7 +54,6 @@ var Container = (function () {
         };
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     registerInstance: {
@@ -66,7 +63,6 @@ var Container = (function () {
         });
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     registerTransient: {
@@ -77,7 +73,6 @@ var Container = (function () {
         });
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     registerSingleton: {
@@ -89,7 +84,6 @@ var Container = (function () {
         });
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     autoRegister: {
@@ -103,7 +97,6 @@ var Container = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     autoRegisterAll: {
@@ -114,7 +107,6 @@ var Container = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     registerHandler: {
@@ -122,7 +114,6 @@ var Container = (function () {
         this.getOrCreateEntry(key).push(handler);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     get: {
@@ -153,7 +144,6 @@ var Container = (function () {
         return entry[0](this);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     getAll: {
@@ -174,7 +164,6 @@ var Container = (function () {
         return [];
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     hasHandler: {
@@ -183,7 +172,6 @@ var Container = (function () {
         return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     createChild: {
@@ -194,7 +182,6 @@ var Container = (function () {
         return childContainer;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     invoke: {
@@ -223,7 +210,6 @@ var Container = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     getOrCreateEntry: {
@@ -238,7 +224,6 @@ var Container = (function () {
         return entry;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     getOrCreateConstructionInfo: {
@@ -253,7 +238,6 @@ var Container = (function () {
         return info;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     createConstructionInfo: {
@@ -279,12 +263,10 @@ var Container = (function () {
         return info;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return Container;
 })();
-
-exports.Container = Container;
+exports.__esModule = true;

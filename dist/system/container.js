@@ -12,13 +12,10 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
       isClass = _util.isClass;
     }],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
       emptyParameters = Object.freeze([]);
-      Container = (function () {
+      Container = _export("Container", (function () {
         function Container(constructionInfo) {
           this.constructionInfo = constructionInfo || new Map();
           this.entries = new Map();
@@ -37,7 +34,7 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
                   keys = new Array(parameters.length);
 
                   for (i = 0, ii = parameters.length; i < ii; ++i) {
-                    keys[i] = parameters[i].is;
+                    keys[i] = parameters[i].is || parameters[i][0];
                   }
                 }
 
@@ -45,7 +42,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           addParameterInfoLocator: {
@@ -61,7 +57,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               };
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           registerInstance: {
@@ -71,7 +66,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           registerTransient: {
@@ -82,7 +76,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           registerSingleton: {
@@ -94,7 +87,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           autoRegister: {
@@ -108,7 +100,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           autoRegisterAll: {
@@ -119,7 +110,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           registerHandler: {
@@ -127,7 +117,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               this.getOrCreateEntry(key).push(handler);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           get: {
@@ -158,7 +147,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return entry[0](this);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           getAll: {
@@ -179,7 +167,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return [];
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           hasHandler: {
@@ -188,7 +175,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           createChild: {
@@ -199,7 +185,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return childContainer;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           invoke: {
@@ -228,7 +213,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           getOrCreateEntry: {
@@ -243,7 +227,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return entry;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           getOrCreateConstructionInfo: {
@@ -258,7 +241,6 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return info;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           createConstructionInfo: {
@@ -284,14 +266,12 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
               return info;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return Container;
-      })();
-      _export("Container", Container);
+      })());
     }
   };
 });
