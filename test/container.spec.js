@@ -84,6 +84,37 @@ describe('container', () => {
   });
 
   describe('registration', () => {
+    it('asserts keys are defined', () => {
+      var container = new Container();
+
+      expect(() => container.get(null)).toThrow();
+      expect(() => container.get(undefined)).toThrow();
+
+      expect(() => container.get(null)).toThrow();
+      expect(() => container.get(undefined)).toThrow();
+
+      expect(() => container.registerInstance(null, {})).toThrow();
+      expect(() => container.registerInstance(undefined, {})).toThrow();
+
+      expect(() => container.registerSingleton(null)).toThrow();
+      expect(() => container.registerSingleton(undefined)).toThrow();
+
+      expect(() => container.registerTransient(null)).toThrow();
+      expect(() => container.registerTransient(undefined)).toThrow();
+
+      expect(() => container.autoRegister(null)).toThrow();
+      expect(() => container.autoRegister(undefined)).toThrow();
+
+      expect(() => container.autoRegisterAll([null])).toThrow();
+      expect(() => container.autoRegisterAll([undefined])).toThrow();
+
+      expect(() => container.registerHandler(null)).toThrow();
+      expect(() => container.registerHandler(undefined)).toThrow();
+
+      expect(() => container.hasHandler(null)).toThrow();
+      expect(() => container.hasHandler(undefined)).toThrow();
+    });
+
     it('automatically configures as singleton', () => {
       class Logger {}
 
