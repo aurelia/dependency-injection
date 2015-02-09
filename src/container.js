@@ -100,11 +100,12 @@ export class Container {
   autoRegister(fn, key){
     var registration;
 
-    if (fn === null || fn === undefined)
+    if (fn === null || fn === undefined){
       throw new Error('fn cannot be null or undefined.')
+    }
 
     registration = Metadata.on(fn).first(Registration, true);
-    
+
     if(registration){
       registration.register(this, key || fn, fn);
     }else{
@@ -146,8 +147,9 @@ export class Container {
   get(key) {
     var entry;
 
-    if (key === null || key === undefined)
+    if (key === null || key === undefined){
       throw new Error('key cannot be null or undefined.');
+    }
 
     if(key instanceof Resolver){
       return key.get(this);
@@ -183,8 +185,9 @@ export class Container {
   getAll(key) {
     var entry;
 
-    if (key === null || key === undefined)
+    if (key === null || key === undefined){
       throw new Error('key cannot be null or undefined.');
+    }
 
     entry = this.entries.get(key);
 
@@ -208,10 +211,11 @@ export class Container {
   * @return {Boolean} Returns true if the key has been registred; false otherwise.
   */
   hasHandler(key, checkParent=false) {
-    if (key === null || key === undefined)
+    if (key === null || key === undefined){
       throw new Error('key cannot be null or undefined.');
+    }
 
-    return this.entries.has(key) 
+    return this.entries.has(key)
       || (checkParent && this.parent && this.parent.hasHandler(key, checkParent));
   }
 
@@ -261,8 +265,9 @@ export class Container {
   getOrCreateEntry(key) {
     var entry;
 
-    if (key === null || key === undefined)
+    if (key === null || key === undefined){
       throw new Error('key cannot be null or undefined.');
+    }
 
     entry = this.entries.get(key);
 
@@ -276,7 +281,7 @@ export class Container {
 
   getOrCreateConstructionInfo(fn){
     var info = this.constructionInfo.get(fn);
-    
+
     if(info === undefined){
       info = this.createConstructionInfo(fn);
       this.constructionInfo.set(fn, info);
