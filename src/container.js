@@ -14,6 +14,7 @@ export class Container {
   constructor(constructionInfo) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
+    this.root = this;
   }
 
   /**
@@ -228,6 +229,7 @@ export class Container {
   createChild(){
     var childContainer = new Container(this.constructionInfo);
     childContainer.parent = this;
+    childContainer.root = this.root;
     childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
     return childContainer;
   }

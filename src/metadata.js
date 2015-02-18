@@ -53,8 +53,13 @@ export class Transient extends Registration {
 * @param {Object} [key] The key to register as.
 */
 export class Singleton extends Registration {
-  constructor(key){
-    this.key = key;
+  constructor(keyOrRegisterInRoot, registerInRoot=false){
+    if(typeof keyOrRegisterInRoot === 'boolean'){
+      this.registerInRoot = keyOrRegisterInRoot;
+    }else{
+      this.key = keyOrRegisterInRoot;
+      this.registerInRoot = registerInRoot;
+    }
   }
 
   /**
@@ -66,7 +71,8 @@ export class Singleton extends Registration {
   * @param {Object} fn The function to register (target of the annotation).
   */
   register(container, key, fn){
-    container.registerSingleton(this.key || key, fn);
+    var destination = this.registerInRoot ? container.root : container;
+    destination.registerSingleton(this.key || key, fn);
   }
 }
 
@@ -231,7 +237,7 @@ export class Parent extends Resolver {
   * @return {Function} Returns the matching instance from the parent container
   */
   get(container){
-    return container.parent 
+    return container.parent
       ? container.parent.get(this.key)
       : null;
   }
