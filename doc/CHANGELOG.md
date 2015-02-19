@@ -1,3 +1,16 @@
+### 0.4.3 (2015-02-18)
+
+
+#### Bug Fixes
+
+* **build:** add missing bower bump ([39ab3d07](http://github.com/aurelia/dependency-injection/commit/39ab3d07d0c0d893206f61ebfe4f658a66303895))
+
+
+#### Features
+
+* **metadata:**  singleton metadata can now indicate root container target ([4a99d4f5](http://github.com/aurelia/dependency-injection/commit/4a99d4f5694ddeeba89a63331f1fb651b7df4b8c))
+
+
 ### 0.4.2 (2015-02-03)
 
 

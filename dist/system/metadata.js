@@ -44,8 +44,14 @@ System.register([], function (_export) {
         return Transient;
       })(Registration));
       Singleton = _export("Singleton", (function (Registration) {
-        function Singleton(key) {
-          this.key = key;
+        function Singleton(keyOrRegisterInRoot) {
+          var registerInRoot = arguments[1] === undefined ? false : arguments[1];
+          if (typeof keyOrRegisterInRoot === "boolean") {
+            this.registerInRoot = keyOrRegisterInRoot;
+          } else {
+            this.key = keyOrRegisterInRoot;
+            this.registerInRoot = registerInRoot;
+          }
         }
 
         _inherits(Singleton, Registration);
@@ -53,7 +59,8 @@ System.register([], function (_export) {
         _prototypeProperties(Singleton, null, {
           register: {
             value: function register(container, key, fn) {
-              container.registerSingleton(this.key || key, fn);
+              var destination = this.registerInRoot ? container.root : container;
+              destination.registerSingleton(this.key || key, fn);
             },
             writable: true,
             configurable: true

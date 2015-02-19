@@ -39,8 +39,14 @@ var Transient = exports.Transient = (function (Registration) {
   return Transient;
 })(Registration);
 var Singleton = exports.Singleton = (function (Registration) {
-  function Singleton(key) {
-    this.key = key;
+  function Singleton(keyOrRegisterInRoot) {
+    var registerInRoot = arguments[1] === undefined ? false : arguments[1];
+    if (typeof keyOrRegisterInRoot === "boolean") {
+      this.registerInRoot = keyOrRegisterInRoot;
+    } else {
+      this.key = keyOrRegisterInRoot;
+      this.registerInRoot = registerInRoot;
+    }
   }
 
   _inherits(Singleton, Registration);
@@ -48,7 +54,8 @@ var Singleton = exports.Singleton = (function (Registration) {
   _prototypeProperties(Singleton, null, {
     register: {
       value: function register(container, key, fn) {
-        container.registerSingleton(this.key || key, fn);
+        var destination = this.registerInRoot ? container.root : container;
+        destination.registerSingleton(this.key || key, fn);
       },
       writable: true,
       configurable: true

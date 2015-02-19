@@ -16,6 +16,7 @@ var Container = exports.Container = (function () {
   function Container(constructionInfo) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
+    this.root = this;
   }
 
   _prototypeProperties(Container, null, {
@@ -88,7 +89,13 @@ var Container = exports.Container = (function () {
     },
     autoRegister: {
       value: function autoRegister(fn, key) {
-        var registration = Metadata.on(fn).first(Registration, true);
+        var registration;
+
+        if (fn === null || fn === undefined) {
+          throw new Error("fn cannot be null or undefined.");
+        }
+
+        registration = Metadata.on(fn).first(Registration, true);
 
         if (registration) {
           registration.register(this, key || fn, fn);
@@ -120,6 +127,10 @@ var Container = exports.Container = (function () {
       value: function get(key) {
         var entry;
 
+        if (key === null || key === undefined) {
+          throw new Error("key cannot be null or undefined.");
+        }
+
         if (key instanceof Resolver) {
           return key.get(this);
         }
@@ -149,7 +160,13 @@ var Container = exports.Container = (function () {
     getAll: {
       value: function getAll(key) {
         var _this = this;
-        var entry = this.entries.get(key);
+        var entry;
+
+        if (key === null || key === undefined) {
+          throw new Error("key cannot be null or undefined.");
+        }
+
+        entry = this.entries.get(key);
 
         if (entry !== undefined) {
           return entry.map(function (x) {
@@ -169,6 +186,10 @@ var Container = exports.Container = (function () {
     hasHandler: {
       value: function hasHandler(key) {
         var checkParent = arguments[1] === undefined ? false : arguments[1];
+        if (key === null || key === undefined) {
+          throw new Error("key cannot be null or undefined.");
+        }
+
         return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
       },
       writable: true,
@@ -178,6 +199,7 @@ var Container = exports.Container = (function () {
       value: function createChild() {
         var childContainer = new Container(this.constructionInfo);
         childContainer.parent = this;
+        childContainer.root = this.root;
         childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
         return childContainer;
       },
@@ -214,7 +236,13 @@ var Container = exports.Container = (function () {
     },
     getOrCreateEntry: {
       value: function getOrCreateEntry(key) {
-        var entry = this.entries.get(key);
+        var entry;
+
+        if (key === null || key === undefined) {
+          throw new Error("key cannot be null or undefined.");
+        }
+
+        entry = this.entries.get(key);
 
         if (entry === undefined) {
           entry = [];

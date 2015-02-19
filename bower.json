@@ -1,6 +1,6 @@
 {
   "name": "aurelia-dependency-injection",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A lightweight, extensible dependency injection container for JavaScript.",
   "keywords": [
     "aurelia",
