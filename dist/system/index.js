@@ -1,6 +1,4 @@
 System.register(["aurelia-metadata", "./metadata", "./container"], function (_export) {
-  "use strict";
-
   var Metadata, Transient, Singleton;
   return {
     setters: [function (_aureliaMetadata) {
@@ -8,6 +6,7 @@ System.register(["aurelia-metadata", "./metadata", "./container"], function (_ex
     }, function (_metadata) {
       Transient = _metadata.Transient;
       Singleton = _metadata.Singleton;
+
       _export("Registration", _metadata.Registration);
 
       _export("Transient", _metadata.Transient);
@@ -27,8 +26,15 @@ System.register(["aurelia-metadata", "./metadata", "./container"], function (_ex
       _export("Container", _container.Container);
     }],
     execute: function () {
+      "use strict";
+
       Metadata.configure.classHelper("transient", Transient);
       Metadata.configure.classHelper("singleton", Singleton);
     }
   };
 });
+/**
+ * A lightweight, extensible dependency injection container for JavaScript.
+ *
+ * @module dependency-injection
+ */

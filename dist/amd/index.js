@@ -1,6 +1,11 @@
 define(["exports", "aurelia-metadata", "./metadata", "./container"], function (exports, _aureliaMetadata, _metadata, _container) {
   "use strict";
 
+  /**
+   * A lightweight, extensible dependency injection container for JavaScript.
+   *
+   * @module dependency-injection
+   */
   var Metadata = _aureliaMetadata.Metadata;
   var Transient = _metadata.Transient;
   var Singleton = _metadata.Singleton;
@@ -14,8 +19,9 @@ define(["exports", "aurelia-metadata", "./metadata", "./container"], function (e
   exports.Parent = _metadata.Parent;
   exports.Container = _container.Container;
 
-
   Metadata.configure.classHelper("transient", Transient);
   Metadata.configure.classHelper("singleton", Singleton);
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

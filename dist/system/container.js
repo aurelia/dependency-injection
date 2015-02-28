@@ -1,7 +1,6 @@
 System.register(["aurelia-metadata", "./metadata", "./util"], function (_export) {
-  "use strict";
+  var Metadata, Resolver, Registration, isClass, _prototypeProperties, _classCallCheck, emptyParameters, Container;
 
-  var Metadata, Resolver, Registration, isClass, _prototypeProperties, emptyParameters, Container;
   return {
     setters: [function (_aureliaMetadata) {
       Metadata = _aureliaMetadata.Metadata;
@@ -12,11 +11,24 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
       isClass = _util.isClass;
     }],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
       emptyParameters = Object.freeze([]);
+
+      /**
+      * A lightweight, extensible dependency injection container.
+      *
+      * @class Container
+      * @constructor
+      */
       Container = _export("Container", (function () {
         function Container(constructionInfo) {
+          _classCallCheck(this, Container);
+
           this.constructionInfo = constructionInfo || new Map();
           this.entries = new Map();
           this.root = this;
@@ -24,6 +36,13 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
 
         _prototypeProperties(Container, null, {
           supportAtScript: {
+
+            /**
+            * Add support for AtScript RTTI according to spec at http://www.atscript.org
+            *
+            * @method useAtScript
+            */
+
             value: function supportAtScript() {
               this.addParameterInfoLocator(function (fn) {
                 var parameters = fn.parameters,
@@ -46,6 +65,14 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           addParameterInfoLocator: {
+
+            /**
+            * Adds an additional location to search for constructor parameter type info.
+            *
+            * @method addParameterInfoLocator
+            * @param {Function} locator Configures a locator function to use when searching for parameter info. It should return undefined if no parameter info is found.
+            */
+
             value: function addParameterInfoLocator(locator) {
               if (this.locateParameterInfoElsewhere === undefined) {
                 this.locateParameterInfoElsewhere = locator;
@@ -61,6 +88,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           registerInstance: {
+
+            /**
+            * Registers an existing object instance with the container.
+            *
+            * @method registerInstance
+            * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+            * @param {Object} instance The instance that will be resolved when the key is matched.
+            */
+
             value: function registerInstance(key, instance) {
               this.registerHandler(key, function (x) {
                 return instance;
@@ -70,6 +106,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           registerTransient: {
+
+            /**
+            * Registers a type (constructor function) such that the container returns a new instance for each request.
+            *
+            * @method registerTransient
+            * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+            * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
+            */
+
             value: function registerTransient(key, fn) {
               fn = fn || key;
               this.registerHandler(key, function (x) {
@@ -80,6 +125,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           registerSingleton: {
+
+            /**
+            * Registers a type (constructor function) such that the container always returns the same instance for each request.
+            *
+            * @method registerSingleton
+            * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+            * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
+            */
+
             value: function registerSingleton(key, fn) {
               var singleton = null;
               fn = fn || key;
@@ -91,6 +145,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           autoRegister: {
+
+            /**
+            * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
+            *
+            * @method autoRegister
+            * @param {Function} fn The constructor function to use when the dependency needs to be instantiated.
+            * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
+            */
+
             value: function autoRegister(fn, key) {
               var registration;
 
@@ -110,6 +173,14 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           autoRegisterAll: {
+
+            /**
+            * Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used.
+            *
+            * @method autoRegisterAll
+            * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
+            */
+
             value: function autoRegisterAll(fns) {
               var i = fns.length;
               while (i--) {
@@ -120,6 +191,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           registerHandler: {
+
+            /**
+            * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
+            *
+            * @method registerHandler
+            * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+            * @param {Function} handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
+            */
+
             value: function registerHandler(key, handler) {
               this.getOrCreateEntry(key).push(handler);
             },
@@ -127,6 +207,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           get: {
+
+            /**
+            * Resolves a single instance based on the provided key.
+            *
+            * @method get
+            * @param {Object} key The key that identifies the object to resolve.
+            * @return {Object} Returns the resolved instance.
+            */
+
             value: function get(key) {
               var entry;
 
@@ -161,8 +250,18 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           getAll: {
+
+            /**
+            * Resolves all instance registered under the provided key.
+            *
+            * @method getAll
+            * @param {Object} key The key that identifies the objects to resolve.
+            * @return {Object[]} Returns an array of the resolved instances.
+            */
+
             value: function getAll(key) {
               var _this = this;
+
               var entry;
 
               if (key === null || key === undefined) {
@@ -187,8 +286,19 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           hasHandler: {
+
+            /**
+            * Inspects the container to determine if a particular key has been registred.
+            *
+            * @method hasHandler
+            * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+            * @param {Boolean} [checkParent=false] Indicates whether or not to check the parent container hierarchy.
+            * @return {Boolean} Returns true if the key has been registred; false otherwise.
+            */
+
             value: function hasHandler(key) {
               var checkParent = arguments[1] === undefined ? false : arguments[1];
+
               if (key === null || key === undefined) {
                 throw new Error("key cannot be null or undefined.");
               }
@@ -199,6 +309,14 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           createChild: {
+
+            /**
+            * Creates a new dependency injection container whose parent is the current container.
+            *
+            * @method createChild
+            * @return {Container} Returns a new container instance parented to this.
+            */
+
             value: function createChild() {
               var childContainer = new Container(this.constructionInfo);
               childContainer.parent = this;
@@ -210,6 +328,15 @@ System.register(["aurelia-metadata", "./metadata", "./util"], function (_export)
             configurable: true
           },
           invoke: {
+
+            /**
+            * Invokes a function, recursively resolving its dependencies.
+            *
+            * @method invoke
+            * @param {Function} fn The function to invoke with the auto-resolved dependencies.
+            * @return {Object} Returns the instance resulting from calling the function.
+            */
+
             value: function invoke(fn) {
               var info = this.getOrCreateConstructionInfo(fn),
                   keys = info.keys,

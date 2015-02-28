@@ -1,3 +1,11 @@
+### 0.4.4 (2015-02-27)
+
+
+#### Bug Fixes
+
+* **package:** update dependencies ([25e924ca](http://github.com/aurelia/dependency-injection/commit/25e924caccdfd033657047a22b93428b90363700))
+
+
 ### 0.4.3 (2015-02-18)
 
 
