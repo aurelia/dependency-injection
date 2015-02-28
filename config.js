@@ -9,7 +9,7 @@ System.config({
 
 System.config({
   "map": {
-    "aurelia-metadata": "github:aurelia/metadata@0.3.0",
+    "aurelia-metadata": "github:aurelia/metadata@0.3.2",
     "core-js": "npm:core-js@0.4.6",
     "github:jspm/nodelibs-process@0.1.0": {
       "process": "npm:process@0.10.0"
