@@ -20,13 +20,13 @@
     "url": "http://github.com/aurelia/dependency-injection"
   },
   "jspm": {
-    "main": "system/index",
+    "main": "index",
     "format": "register",
     "directories": {
-      "lib": "dist"
+      "lib": "dist/system"
     },
     "dependencies": {
-      "aurelia-metadata": "github:aurelia/metadata@^0.3.2",
+      "aurelia-metadata": "github:aurelia/metadata@^0.3.3",
       "core-js": "npm:core-js@^0.4.1"
     }
   },
