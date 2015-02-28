@@ -1,3 +1,11 @@
+### 0.4.5 (2015-02-28)
+
+
+#### Bug Fixes
+
+* **package:** change jspm directories ([cef0da35](http://github.com/aurelia/dependency-injection/commit/cef0da351e26aa549e45b48dc6cd98e3e6b6fcaa))
+
+
 ### 0.4.4 (2015-02-27)
 
 
