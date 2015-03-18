@@ -245,10 +245,19 @@ export class Container {
     var info = this.getOrCreateConstructionInfo(fn),
         keys = info.keys,
         args = new Array(keys.length),
-        context, i, ii;
+        context, key, keyName, error, i, ii;
 
-    for(i = 0, ii = keys.length; i < ii; ++i){
-      args[i] = this.get(keys[i]);
+    try{
+      for(i = 0, ii = keys.length; i < ii; ++i){
+        key = keys[i];
+        args[i] = this.get(key);
+      }
+    }
+    catch(e){
+      keyName = typeof key === 'function' ? key.name : key;
+      error = new Error(`Error resolving dependency [${keyName}] required by [${fn.name}].`);
+      error.innerError = e;
+      throw error;
     }
 
     if(info.isClass){
