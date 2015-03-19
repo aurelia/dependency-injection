@@ -139,6 +139,16 @@ export class Container {
   }
 
   /**
+  * Unregisters based on key.
+  *
+  * @method unregister
+  * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+  */
+  unregister(key) {
+    this.entries.delete(key);
+  }
+
+  /**
   * Resolves a single instance based on the provided key.
   *
   * @method get
