@@ -13,7 +13,8 @@ export {
   Lazy,
   All,
   Optional,
-  Parent
+  Parent,
+  Factory
 } from './metadata';
 
 export {Container} from './container';

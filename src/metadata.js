@@ -254,3 +254,11 @@ export class Parent extends Resolver {
     return new Parent(key);
   }
 }
+
+/**
+* An annotation used to indicate that a particular function is a factory rather than a constructor.
+*
+* @class Factory
+* @constructor
+*/
+export class Factory {}
