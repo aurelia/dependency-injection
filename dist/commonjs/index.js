@@ -20,6 +20,7 @@ exports.Lazy = _metadata.Lazy;
 exports.All = _metadata.All;
 exports.Optional = _metadata.Optional;
 exports.Parent = _metadata.Parent;
+exports.Factory = _metadata.Factory;
 exports.Container = require("./container").Container;
 
 Metadata.configure.classHelper("transient", Transient);

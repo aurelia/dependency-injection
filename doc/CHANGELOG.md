@@ -1,3 +1,19 @@
+## 0.5.0 (2015-03-24)
+
+
+#### Bug Fixes
+
+* **container:** factories are explicit ([667a16e4](http://github.com/aurelia/dependency-injection/commit/667a16e4dbd07b75493e0690ac4232d8c0cb508c), closes [#13](http://github.com/aurelia/dependency-injection/issues/13))
+* **singleton:** always register in the root container ([186b573e](http://github.com/aurelia/dependency-injection/commit/186b573e0e3d09f57bedf8fd7c37ab862dc2f5d1), closes [#22](http://github.com/aurelia/dependency-injection/issues/22))
+
+
+#### Features
+
+* **container:**
+  * use new logging AggregateError ([6e2548ef](http://github.com/aurelia/dependency-injection/commit/6e2548ef6f6b0e339f53793db1c76dc81ef6650c))
+  * add unregister method ([2755688c](http://github.com/aurelia/dependency-injection/commit/2755688ce0a2bd13ef71adcda5ed7fa05092d3b4), closes [#19](http://github.com/aurelia/dependency-injection/issues/19))
+
+
 ### 0.4.5 (2015-02-28)
 
 
@@ -123,4 +139,3 @@
 #### Bug Fixes
 
 * **package:** add es6-shim polyfill ([4732acee](http://github.com/aurelia/dependency-injection/commit/4732acee560080be01ea579ac5124e63079e8571))
-

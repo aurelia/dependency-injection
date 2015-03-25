@@ -1,5 +1,5 @@
 System.register([], function (_export) {
-  var _inherits, _prototypeProperties, _classCallCheck, Registration, Transient, Singleton, Resolver, Lazy, All, Optional, Parent;
+  var _inherits, _prototypeProperties, _classCallCheck, Registration, Transient, Singleton, Resolver, Lazy, All, Optional, Parent, Factory;
 
   return {
     setters: [],
@@ -94,16 +94,16 @@ System.register([], function (_export) {
       * @param {Object} [key] The key to register as.
       */
       Singleton = _export("Singleton", (function (Registration) {
-        function Singleton(keyOrRegisterInRoot) {
-          var registerInRoot = arguments[1] === undefined ? false : arguments[1];
+        function Singleton(keyOrRegisterInChild) {
+          var registerInChild = arguments[1] === undefined ? false : arguments[1];
 
           _classCallCheck(this, Singleton);
 
-          if (typeof keyOrRegisterInRoot === "boolean") {
-            this.registerInRoot = keyOrRegisterInRoot;
+          if (typeof keyOrRegisterInChild === "boolean") {
+            this.registerInChild = keyOrRegisterInChild;
           } else {
-            this.key = keyOrRegisterInRoot;
-            this.registerInRoot = registerInRoot;
+            this.key = keyOrRegisterInChild;
+            this.registerInChild = registerInChild;
           }
         }
 
@@ -122,7 +122,7 @@ System.register([], function (_export) {
             */
 
             value: function register(container, key, fn) {
-              var destination = this.registerInRoot ? container.root : container;
+              var destination = this.registerInChild ? container : container.root;
               destination.registerSingleton(this.key || key, fn);
             },
             writable: true,
@@ -407,6 +407,16 @@ System.register([], function (_export) {
 
         return Parent;
       })(Resolver));
+
+      /**
+      * An annotation used to indicate that a particular function is a factory rather than a constructor.
+      *
+      * @class Factory
+      * @constructor
+      */
+      Factory = _export("Factory", function Factory() {
+        _classCallCheck(this, Factory);
+      });
     }
   };
 });

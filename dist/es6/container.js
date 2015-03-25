@@ -1,8 +1,22 @@
 import {Metadata} from 'aurelia-metadata';
-import {Resolver, Registration} from './metadata';
-import {isClass} from './util';
+import {AggregateError} from 'aurelia-logging';
+import {Resolver, Registration, Factory} from './metadata';
 
 var emptyParameters = Object.freeze([]);
+
+// Fix Function#name on browsers that do not support it (IE):
+function test(){}
+if (!test.name) {
+  Object.defineProperty(Function.prototype, 'name', {
+    get: function() {
+      var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
+      // For better performance only parse once, and then cache the
+      // result through a new accessor for repeated access.
+      Object.defineProperty(this, 'name', { value: name });
+      return name;
+    }
+  });
+}
 
 /**
 * A lightweight, extensible dependency injection container.
@@ -139,6 +153,16 @@ export class Container {
   }
 
   /**
+  * Unregisters based on key.
+  *
+  * @method unregister
+  * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+  */
+  unregister(key) {
+    this.entries.delete(key);
+  }
+
+  /**
   * Resolves a single instance based on the provided key.
   *
   * @method get
@@ -245,13 +269,22 @@ export class Container {
     var info = this.getOrCreateConstructionInfo(fn),
         keys = info.keys,
         args = new Array(keys.length),
-        context, i, ii;
+        context, key, keyName, i, ii;
 
-    for(i = 0, ii = keys.length; i < ii; ++i){
-      args[i] = this.get(keys[i]);
+    try{
+      for(i = 0, ii = keys.length; i < ii; ++i){
+        key = keys[i];
+        args[i] = this.get(key);
+      }
+    }
+    catch(e){
+      keyName = typeof key === 'function' ? key.name : key;
+      throw new AggregateError(`Error resolving dependency [${keyName}] required by [${fn.name}].`, e);
     }
 
-    if(info.isClass){
+    if(info.isFactory){
+      return fn.apply(undefined, args);
+    }else{
       context = Object.create(fn.prototype);
 
       if('initialize' in fn){
@@ -259,8 +292,6 @@ export class Container {
       }
 
       return fn.apply(context, args) || context;
-    }else{
-      return fn.apply(undefined, args);
     }
   }
 
@@ -293,7 +324,7 @@ export class Container {
   }
 
   createConstructionInfo(fn){
-    var info = {isClass: isClass(fn)};
+    var info = {isFactory: Metadata.on(fn).has(Factory)};
 
     if(fn.inject !== undefined){
       if(typeof fn.inject === 'function'){

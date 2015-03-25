@@ -17,6 +17,7 @@ define(["exports", "aurelia-metadata", "./metadata", "./container"], function (e
   exports.All = _metadata.All;
   exports.Optional = _metadata.Optional;
   exports.Parent = _metadata.Parent;
+  exports.Factory = _metadata.Factory;
   exports.Container = _container.Container;
 
   Metadata.configure.classHelper("transient", Transient);

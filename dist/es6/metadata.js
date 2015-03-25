@@ -53,12 +53,12 @@ export class Transient extends Registration {
 * @param {Object} [key] The key to register as.
 */
 export class Singleton extends Registration {
-  constructor(keyOrRegisterInRoot, registerInRoot=false){
-    if(typeof keyOrRegisterInRoot === 'boolean'){
-      this.registerInRoot = keyOrRegisterInRoot;
+  constructor(keyOrRegisterInChild, registerInChild=false){
+    if(typeof keyOrRegisterInChild === 'boolean'){
+      this.registerInChild = keyOrRegisterInChild;
     }else{
-      this.key = keyOrRegisterInRoot;
-      this.registerInRoot = registerInRoot;
+      this.key = keyOrRegisterInChild;
+      this.registerInChild = registerInChild;
     }
   }
 
@@ -71,7 +71,7 @@ export class Singleton extends Registration {
   * @param {Object} fn The function to register (target of the annotation).
   */
   register(container, key, fn){
-    var destination = this.registerInRoot ? container.root : container;
+    var destination = this.registerInChild ? container : container.root;
     destination.registerSingleton(this.key || key, fn);
   }
 }
@@ -254,3 +254,11 @@ export class Parent extends Resolver {
     return new Parent(key);
   }
 }
+
+/**
+* An annotation used to indicate that a particular function is a factory rather than a constructor.
+*
+* @class Factory
+* @constructor
+*/
+export class Factory {}

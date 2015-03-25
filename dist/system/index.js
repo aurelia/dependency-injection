@@ -22,6 +22,8 @@ System.register(["aurelia-metadata", "./metadata", "./container"], function (_ex
       _export("Optional", _metadata.Optional);
 
       _export("Parent", _metadata.Parent);
+
+      _export("Factory", _metadata.Factory);
     }, function (_container) {
       _export("Container", _container.Container);
     }],

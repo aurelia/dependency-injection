@@ -1,4 +1,4 @@
-define(["exports", "aurelia-metadata", "./metadata", "./util"], function (exports, _aureliaMetadata, _metadata, _util) {
+define(["exports", "aurelia-metadata", "aurelia-logging", "./metadata"], function (exports, _aureliaMetadata, _aureliaLogging, _metadata) {
   "use strict";
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
@@ -6,11 +6,26 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
   var Metadata = _aureliaMetadata.Metadata;
+  var AggregateError = _aureliaLogging.AggregateError;
   var Resolver = _metadata.Resolver;
   var Registration = _metadata.Registration;
-  var isClass = _util.isClass;
+  var Factory = _metadata.Factory;
 
   var emptyParameters = Object.freeze([]);
+
+  // Fix Function#name on browsers that do not support it (IE):
+  function test() {}
+  if (!test.name) {
+    Object.defineProperty(Function.prototype, "name", {
+      get: function get() {
+        var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
+        // For better performance only parse once, and then cache the
+        // result through a new accessor for repeated access.
+        Object.defineProperty(this, "name", { value: name });
+        return name;
+      }
+    });
+  }
 
   /**
   * A lightweight, extensible dependency injection container.
@@ -200,6 +215,21 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
         writable: true,
         configurable: true
       },
+      unregister: {
+
+        /**
+        * Unregisters based on key.
+        *
+        * @method unregister
+        * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+        */
+
+        value: function unregister(key) {
+          this.entries["delete"](key);
+        },
+        writable: true,
+        configurable: true
+      },
       get: {
 
         /**
@@ -336,14 +366,24 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
               keys = info.keys,
               args = new Array(keys.length),
               context,
+              key,
+              keyName,
               i,
               ii;
 
-          for (i = 0, ii = keys.length; i < ii; ++i) {
-            args[i] = this.get(keys[i]);
+          try {
+            for (i = 0, ii = keys.length; i < ii; ++i) {
+              key = keys[i];
+              args[i] = this.get(key);
+            }
+          } catch (e) {
+            keyName = typeof key === "function" ? key.name : key;
+            throw new AggregateError("Error resolving dependency [" + keyName + "] required by [" + fn.name + "].", e);
           }
 
-          if (info.isClass) {
+          if (info.isFactory) {
+            return fn.apply(undefined, args);
+          } else {
             context = Object.create(fn.prototype);
 
             if ("initialize" in fn) {
@@ -351,8 +391,6 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
             }
 
             return fn.apply(context, args) || context;
-          } else {
-            return fn.apply(undefined, args);
           }
         },
         writable: true,
@@ -394,7 +432,7 @@ define(["exports", "aurelia-metadata", "./metadata", "./util"], function (export
       },
       createConstructionInfo: {
         value: function createConstructionInfo(fn) {
-          var info = { isClass: isClass(fn) };
+          var info = { isFactory: Metadata.on(fn).has(Factory) };
 
           if (fn.inject !== undefined) {
             if (typeof fn.inject === "function") {

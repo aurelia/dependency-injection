@@ -6,14 +6,29 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var Metadata = require("aurelia-metadata").Metadata;
 
+var AggregateError = require("aurelia-logging").AggregateError;
+
 var _metadata = require("./metadata");
 
 var Resolver = _metadata.Resolver;
 var Registration = _metadata.Registration;
-
-var isClass = require("./util").isClass;
+var Factory = _metadata.Factory;
 
 var emptyParameters = Object.freeze([]);
+
+// Fix Function#name on browsers that do not support it (IE):
+function test() {}
+if (!test.name) {
+  Object.defineProperty(Function.prototype, "name", {
+    get: function get() {
+      var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
+      // For better performance only parse once, and then cache the
+      // result through a new accessor for repeated access.
+      Object.defineProperty(this, "name", { value: name });
+      return name;
+    }
+  });
+}
 
 /**
 * A lightweight, extensible dependency injection container.
@@ -203,6 +218,21 @@ var Container = exports.Container = (function () {
       writable: true,
       configurable: true
     },
+    unregister: {
+
+      /**
+      * Unregisters based on key.
+      *
+      * @method unregister
+      * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
+      */
+
+      value: function unregister(key) {
+        this.entries["delete"](key);
+      },
+      writable: true,
+      configurable: true
+    },
     get: {
 
       /**
@@ -339,14 +369,24 @@ var Container = exports.Container = (function () {
             keys = info.keys,
             args = new Array(keys.length),
             context,
+            key,
+            keyName,
             i,
             ii;
 
-        for (i = 0, ii = keys.length; i < ii; ++i) {
-          args[i] = this.get(keys[i]);
+        try {
+          for (i = 0, ii = keys.length; i < ii; ++i) {
+            key = keys[i];
+            args[i] = this.get(key);
+          }
+        } catch (e) {
+          keyName = typeof key === "function" ? key.name : key;
+          throw new AggregateError("Error resolving dependency [" + keyName + "] required by [" + fn.name + "].", e);
         }
 
-        if (info.isClass) {
+        if (info.isFactory) {
+          return fn.apply(undefined, args);
+        } else {
           context = Object.create(fn.prototype);
 
           if ("initialize" in fn) {
@@ -354,8 +394,6 @@ var Container = exports.Container = (function () {
           }
 
           return fn.apply(context, args) || context;
-        } else {
-          return fn.apply(undefined, args);
         }
       },
       writable: true,
@@ -397,7 +435,7 @@ var Container = exports.Container = (function () {
     },
     createConstructionInfo: {
       value: function createConstructionInfo(fn) {
-        var info = { isClass: isClass(fn) };
+        var info = { isFactory: Metadata.on(fn).has(Factory) };
 
         if (fn.inject !== undefined) {
           if (typeof fn.inject === "function") {

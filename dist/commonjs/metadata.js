@@ -91,16 +91,16 @@ var Transient = exports.Transient = (function (Registration) {
 */
 
 var Singleton = exports.Singleton = (function (Registration) {
-  function Singleton(keyOrRegisterInRoot) {
-    var registerInRoot = arguments[1] === undefined ? false : arguments[1];
+  function Singleton(keyOrRegisterInChild) {
+    var registerInChild = arguments[1] === undefined ? false : arguments[1];
 
     _classCallCheck(this, Singleton);
 
-    if (typeof keyOrRegisterInRoot === "boolean") {
-      this.registerInRoot = keyOrRegisterInRoot;
+    if (typeof keyOrRegisterInChild === "boolean") {
+      this.registerInChild = keyOrRegisterInChild;
     } else {
-      this.key = keyOrRegisterInRoot;
-      this.registerInRoot = registerInRoot;
+      this.key = keyOrRegisterInChild;
+      this.registerInChild = registerInChild;
     }
   }
 
@@ -119,7 +119,7 @@ var Singleton = exports.Singleton = (function (Registration) {
       */
 
       value: function register(container, key, fn) {
-        var destination = this.registerInRoot ? container.root : container;
+        var destination = this.registerInChild ? container : container.root;
         destination.registerSingleton(this.key || key, fn);
       },
       writable: true,
@@ -409,6 +409,17 @@ var Parent = exports.Parent = (function (Resolver) {
 
   return Parent;
 })(Resolver);
+
+/**
+* An annotation used to indicate that a particular function is a factory rather than a constructor.
+*
+* @class Factory
+* @constructor
+*/
+
+var Factory = exports.Factory = function Factory() {
+  _classCallCheck(this, Factory);
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
