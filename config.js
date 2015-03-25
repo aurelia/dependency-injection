@@ -9,6 +9,7 @@ System.config({
 
 System.config({
   "map": {
+    "aurelia-logging": "github:aurelia/logging@0.2.5",
     "aurelia-metadata": "github:aurelia/metadata@0.3.3",
     "core-js": "npm:core-js@0.4.6",
     "github:jspm/nodelibs-process@0.1.0": {

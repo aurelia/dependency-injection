@@ -1,4 +1,5 @@
 import {Metadata} from 'aurelia-metadata';
+import {AggregateError} from 'aurelia-logging';
 import {Resolver, Registration, Factory} from './metadata';
 
 var emptyParameters = Object.freeze([]);
@@ -268,7 +269,7 @@ export class Container {
     var info = this.getOrCreateConstructionInfo(fn),
         keys = info.keys,
         args = new Array(keys.length),
-        context, key, keyName, error, i, ii;
+        context, key, keyName, i, ii;
 
     try{
       for(i = 0, ii = keys.length; i < ii; ++i){
@@ -278,9 +279,7 @@ export class Container {
     }
     catch(e){
       keyName = typeof key === 'function' ? key.name : key;
-      error = new Error(`Error resolving dependency [${keyName}] required by [${fn.name}].`);
-      error.innerError = e;
-      throw error;
+      throw new AggregateError(`Error resolving dependency [${keyName}] required by [${fn.name}].`, e);
     }
 
     if(info.isFactory){

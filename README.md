@@ -11,6 +11,7 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 ## Dependencies
 
 * [aurelia-metadata](https://github.com/aurelia/metadata)
+* [aurelia-logging](https://github.com/aurelia/logging)
 
 ## Used By
 
