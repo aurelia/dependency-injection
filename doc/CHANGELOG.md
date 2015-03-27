@@ -1,3 +1,11 @@
+### 0.5.1 (2015-03-27)
+
+
+#### Bug Fixes
+
+* **container:** better errors for instantiation failures ([8c5e3a64](http://github.com/aurelia/dependency-injection/commit/8c5e3a647bb4354f2c420d37e405792b9cc8601f))
+
+
 ## 0.5.0 (2015-03-24)
 
 

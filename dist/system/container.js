@@ -367,35 +367,33 @@ System.register(["aurelia-metadata", "aurelia-logging", "./metadata"], function 
             */
 
             value: function invoke(fn) {
-              var info = this.getOrCreateConstructionInfo(fn),
-                  keys = info.keys,
-                  args = new Array(keys.length),
-                  context,
-                  key,
-                  keyName,
-                  i,
-                  ii;
-
               try {
+                var info = this.getOrCreateConstructionInfo(fn),
+                    keys = info.keys,
+                    args = new Array(keys.length),
+                    context,
+                    i,
+                    ii;
+
                 for (i = 0, ii = keys.length; i < ii; ++i) {
-                  key = keys[i];
-                  args[i] = this.get(key);
+                  args[i] = this.get(keys[i]);
+                }
+
+                if (info.isFactory) {
+                  return fn.apply(undefined, args);
+                } else {
+                  //TODO: this entire else block should be switched to Reflect.construct
+                  //TODO: do not change it until after issue with behavior props is addressed and 'initialize' hook is not needed
+                  context = Object.create(fn.prototype);
+
+                  if ("initialize" in fn) {
+                    fn.initialize(context);
+                  }
+
+                  return fn.apply(context, args) || context;
                 }
               } catch (e) {
-                keyName = typeof key === "function" ? key.name : key;
-                throw new AggregateError("Error resolving dependency [" + keyName + "] required by [" + fn.name + "].", e);
-              }
-
-              if (info.isFactory) {
-                return fn.apply(undefined, args);
-              } else {
-                context = Object.create(fn.prototype);
-
-                if ("initialize" in fn) {
-                  fn.initialize(context);
-                }
-
-                return fn.apply(context, args) || context;
+                throw new AggregateError("Error instantiating " + fn.name + ".", e, true);
               }
             },
             writable: true,
