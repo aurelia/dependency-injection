@@ -21,12 +21,12 @@ export class Registration {
 /**
 * An annotation used to allow functions/classes to indicate that they should be registered as transients with the container.
 *
-* @class Transient
+* @class TransientRegistration
 * @constructor
 * @extends Registration
 * @param {Object} [key] The key to register as.
 */
-export class Transient extends Registration {
+export class TransientRegistration extends Registration {
   constructor(key){
     this.key = key;
   }
@@ -47,12 +47,12 @@ export class Transient extends Registration {
 /**
 * An annotation used to allow functions/classes to indicate that they should be registered as singletons with the container.
 *
-* @class Singleton
+* @class SingletonRegistration
 * @constructor
 * @extends Registration
 * @param {Object} [key] The key to register as.
 */
-export class Singleton extends Registration {
+export class SingletonRegistration extends Registration {
   constructor(keyOrRegisterInChild, registerInChild=false){
     if(typeof keyOrRegisterInChild === 'boolean'){
       this.registerInChild = keyOrRegisterInChild;

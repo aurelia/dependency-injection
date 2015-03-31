@@ -1,4 +1,5 @@
-import {Container, Transient, Singleton, Lazy, All, Optional, Parent} from '../src/index';
+import {Container, inject, transient, singleton, Lazy, All, Optional, Parent} from '../src/index';
+import {Decorators} from 'aurelia-metadata';
 
 describe('container', () => {
   describe('injection', () => {
@@ -119,18 +120,20 @@ describe('container', () => {
       class Logger {}
 
       class App1 {
-        static inject() { return [Logger]; };
         constructor(logger) {
           this.logger = logger;
         }
       }
 
+      inject(Logger)(App1);
+
       class App2 {
-        static inject() { return [Logger]; };
         constructor(logger) {
           this.logger = logger;
         }
       }
+
+      inject(Logger)(App2);
 
       var container = new Container();
       var app1 = container.get(App1);
@@ -143,18 +146,20 @@ describe('container', () => {
       class Logger {}
 
       class App1 {
-        static inject() { return [Logger]; };
         constructor(logger) {
           this.logger = logger;
         }
       }
 
+      inject(Logger)(App1);
+
       class App2 {
-        static inject() { return [Logger]; };
         constructor(logger) {
           this.logger = logger;
         }
       }
+
+      inject(Logger)(App2);
 
       var container = new Container();
       container.registerSingleton(Logger, Logger);
@@ -167,7 +172,7 @@ describe('container', () => {
 
     it('configures singleton via metadata method (ES6)', () => {
       class Logger {
-        static metadata() { return [new Singleton()] };
+        static decorators() { return Decorators.singleton(); };
       }
 
       class App1 {
@@ -193,7 +198,7 @@ describe('container', () => {
 
     it('configures singleton via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
-      Logger.metadata = [new Singleton()];
+      Logger.decorators = Decorators.singleton();
 
       class App1 {
         static inject() { return [Logger]; };
@@ -244,7 +249,7 @@ describe('container', () => {
 
     it('configures transient (non singleton) via metadata method (ES6)', () => {
       class Logger {
-        static metadata() { return [new Transient()] };
+        static decorators() { return Decorators.transient(); };
       }
 
       class App1 {
@@ -270,7 +275,7 @@ describe('container', () => {
 
     it('configures transient (non singleton) via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
-      Logger.metadata = [new Transient()];
+      Logger.decorators = Decorators.transient();
 
       class App1 {
         static inject() { return [Logger]; };
@@ -350,11 +355,11 @@ describe('container', () => {
 
     it('uses base metadata method (ES6) when derived does not specify', () => {
       class LoggerBase {
-        static metadata() { return [new Transient()] };
+        static decorators() { return Decorators.transient(); };
       }
 
       class Logger extends LoggerBase {
-        
+
       }
 
       class App1 {
@@ -380,10 +385,10 @@ describe('container', () => {
 
     it('uses base metadata property (ES5, AtScript, TypeScript, CoffeeScript) when derived does not specify', () => {
       class LoggerBase {}
-      LoggerBase.metadata = [new Transient()];
+      LoggerBase.decorators = Decorators.transient();
 
       class Logger extends LoggerBase {
-        
+
       }
 
       class App1 {
@@ -409,11 +414,11 @@ describe('container', () => {
 
     it('overrides base metadata method (ES6) with derived configuration', () => {
       class LoggerBase {
-        static metadata() { return [new Singleton()] };
+        static decorators() { return Decorators.singleton(); };
       }
 
       class Logger extends LoggerBase {
-        static metadata() { return [new Transient()] };
+        static decorators() { return Decorators.transient(); };
       }
 
       class App1 {
@@ -439,11 +444,11 @@ describe('container', () => {
 
     it('overrides base metadata property (ES5, AtScript, TypeScript, CoffeeScript) with derived configuration', () => {
       class LoggerBase {
-        static metadata() { return [new Singleton()] };
+        static decorators() { return Decorators.singleton(); };
       }
 
       class Logger extends LoggerBase {}
-      Logger.metadata = [new Transient()];
+      Logger.decorators = Decorators.transient();
 
       class App1 {
         static inject() { return [Logger]; };
@@ -534,11 +539,11 @@ describe('container', () => {
 
     it('doesn\'t get hidden when a super class adds metadata which don\'t include the base registration type', () => {
       class LoggerBase {
-        static metadata() { return [new Transient()]; };
+        static decorators() { return Decorators.transient(); };
       }
 
       class Logger extends LoggerBase {
-        static metadata() { return ['goofy', 'mickey']; };
+        static decorators() { return Decorators.metadata('goofy').metadata('mickey'); };
       }
 
       class App1 {
@@ -578,7 +583,7 @@ describe('container', () => {
           var app1 = container.get(App1);
 
           var logger = app1.getLogger;
-         
+
           expect(logger()).toEqual(jasmine.any(Logger));
         });
       });
@@ -588,7 +593,7 @@ describe('container', () => {
           class LoggerBase {}
 
           class VerboseLogger extends LoggerBase {}
-          
+
           class Logger extends LoggerBase{}
 
           class App {
@@ -602,7 +607,7 @@ describe('container', () => {
           container.registerSingleton(LoggerBase, VerboseLogger);
           container.registerTransient(LoggerBase, Logger);
           var app = container.get(App);
-         
+
           expect(app.loggers).toEqual(jasmine.any(Array));
           expect(app.loggers.length).toBe(2);
           expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
@@ -622,9 +627,9 @@ describe('container', () => {
           }
 
           var container = new Container();
-          container.registerSingleton(Logger, Logger);       
+          container.registerSingleton(Logger, Logger);
           var app = container.get(App);
-         
+
           expect(app.logger).toEqual(jasmine.any(Logger));
         });
 
@@ -640,9 +645,9 @@ describe('container', () => {
           }
 
           var container = new Container();
-          container.registerSingleton(VerboseLogger, Logger);       
+          container.registerSingleton(VerboseLogger, Logger);
           var app = container.get(App);
-         
+
           expect(app.logger).toBe(null);
         });
 
@@ -657,13 +662,13 @@ describe('container', () => {
             }
           }
 
-          var container = new Container();      
+          var container = new Container();
           var app = container.get(App);
-         
+
           expect(app.logger).toBe(null);
         });
 
-        it('doesn\'t check the parent container hierarchy when checkParent is false or default', () => {          
+        it('doesn\'t check the parent container hierarchy when checkParent is false or default', () => {
           class Logger {}
 
           class App {
@@ -674,17 +679,17 @@ describe('container', () => {
           }
 
           var parentContainer = new Container();
-          parentContainer.registerSingleton(Logger, Logger); 
+          parentContainer.registerSingleton(Logger, Logger);
 
-          var childContainer = parentContainer.createChild(); 
+          var childContainer = parentContainer.createChild();
           childContainer.registerSingleton(App, App);
-    
+
           var app = childContainer.get(App);
-         
+
           expect(app.logger).toBe(null);
         });
 
-        it('checks the parent container hierarchy when checkParent is true', () => {          
+        it('checks the parent container hierarchy when checkParent is true', () => {
           class Logger {}
 
           class App {
@@ -695,13 +700,13 @@ describe('container', () => {
           }
 
           var parentContainer = new Container();
-          parentContainer.registerSingleton(Logger, Logger); 
+          parentContainer.registerSingleton(Logger, Logger);
 
-          var childContainer = parentContainer.createChild(); 
+          var childContainer = parentContainer.createChild();
           childContainer.registerSingleton(App, App);
-    
+
           var app = childContainer.get(App);
-         
+
           expect(app.logger).toEqual(jasmine.any(Logger));
         });
       });
@@ -719,15 +724,15 @@ describe('container', () => {
 
           var parentContainer = new Container();
           var parentInstance = new Logger();
-          parentContainer.registerInstance(Logger, parentInstance); 
+          parentContainer.registerInstance(Logger, parentInstance);
 
-          var childContainer = parentContainer.createChild(); 
+          var childContainer = parentContainer.createChild();
           var childInstance = new Logger();
           childContainer.registerInstance(Logger, childInstance);
           childContainer.registerSingleton(App, App);
-    
+
           var app = childContainer.get(App);
-         
+
           expect(app.logger).toBe(parentInstance);
         });
 
@@ -743,10 +748,10 @@ describe('container', () => {
 
           var container = new Container();
           var instance = new Logger();
-          container.registerInstance(Logger, instance); 
+          container.registerInstance(Logger, instance);
 
           var app = container.get(App);
-         
+
           expect(app.logger).toBe(null);
         });
       });
