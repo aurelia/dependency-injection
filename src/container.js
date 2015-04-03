@@ -290,7 +290,7 @@ export class Container {
         return fn.apply(context, args) || context;
       }
     }catch(e){
-      throw new AggregateError(`Error instantiating ${fn.name}.`, e, true);
+      throw AggregateError(`Error instantiating ${fn.name}.`, e, true);
     }
   }
 
