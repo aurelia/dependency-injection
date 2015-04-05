@@ -280,13 +280,7 @@ export class Container {
         return fn.apply(undefined, args);
       }else{
         //TODO: this entire else block should be switched to Reflect.construct
-        //TODO: do not change it until after issue with behavior props is addressed and 'initialize' hook is not needed
         context = Object.create(fn.prototype);
-
-        if('initialize' in fn){
-          fn.initialize(context);
-        }
-
         return fn.apply(context, args) || context;
       }
     }catch(e){
