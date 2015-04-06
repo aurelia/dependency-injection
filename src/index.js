@@ -13,7 +13,9 @@ export {
   Lazy,
   All,
   Optional,
-  Parent
+  Parent,
+  InstanceActivator,
+  FactoryActivator
 } from './metadata';
 
 export {Container} from './container';

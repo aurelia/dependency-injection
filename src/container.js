@@ -1,3 +1,4 @@
+import core from 'core-js';
 import {Metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-logging';
 import {Resolver, Registration, InstanceActivator, ClassActivator} from './metadata';

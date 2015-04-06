@@ -1,3 +1,5 @@
+import core from 'core-js';
+
 /**
 * Used to allow functions/classes to indicate how they should be registered with the container.
 *
@@ -275,9 +277,7 @@ export class InstanceActivator {
 */
 export class ClassActivator extends InstanceActivator {
   invoke(fn, args){
-    var context = Object.create(fn.prototype);
-    return fn.apply(context, args) || context;
-    //return Reflect.construct(fn, args);
+    return Reflect.construct(fn, args);
   }
 }
 
