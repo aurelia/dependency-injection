@@ -1,5 +1,5 @@
 /**
-* An abstract annotation used to allow functions/classes to indicate how they should be registered with the container.
+* Used to allow functions/classes to indicate how they should be registered with the container.
 *
 * @class Registration
 * @constructor
@@ -19,7 +19,7 @@ export class Registration {
 }
 
 /**
-* An annotation used to allow functions/classes to indicate that they should be registered as transients with the container.
+* Used to allow functions/classes to indicate that they should be registered as transients with the container.
 *
 * @class TransientRegistration
 * @constructor
@@ -45,7 +45,7 @@ export class TransientRegistration extends Registration {
 }
 
 /**
-* An annotation used to allow functions/classes to indicate that they should be registered as singletons with the container.
+* Used to allow functions/classes to indicate that they should be registered as singletons with the container.
 *
 * @class SingletonRegistration
 * @constructor
@@ -77,7 +77,7 @@ export class SingletonRegistration extends Registration {
 }
 
 /**
-* An abstract annotation used to allow functions/classes to specify custom dependency resolution logic.
+* An abstract resolver used to allow functions/classes to specify custom dependency resolution logic.
 *
 * @class Resolver
 * @constructor
@@ -96,7 +96,7 @@ export class Resolver {
 }
 
 /**
-* An annotation used to allow functions/classes to specify lazy resolution logic.
+* Used to allow functions/classes to specify lazy resolution logic.
 *
 * @class Lazy
 * @constructor
@@ -135,7 +135,7 @@ export class Lazy extends Resolver {
 }
 
 /**
-* An annotation used to allow functions/classes to specify resolution of all matches to a key.
+* Used to allow functions/classes to specify resolution of all matches to a key.
 *
 * @class All
 * @constructor
@@ -172,7 +172,7 @@ export class All extends Resolver {
 }
 
 /**
-* An annotation used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container.
+* Used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container.
 *
 * @class Optional
 * @constructor
@@ -217,7 +217,7 @@ export class Optional extends Resolver {
 
 
 /**
-* An annotation used to inject the dependency from the parent container instead of the current one.
+* Used to inject the dependency from the parent container instead of the current one.
 *
 * @class Parent
 * @constructor
@@ -256,9 +256,39 @@ export class Parent extends Resolver {
 }
 
 /**
-* An annotation used to indicate that a particular function is a factory rather than a constructor.
+* Used to construct instances.
 *
-* @class Factory
+* @class InstanceActivator
 * @constructor
 */
-export class Factory {}
+export class InstanceActivator {
+  invoke(fn, args){
+    throw new Error('A custom Activator must implement invoke(fn, args).');
+  }
+}
+
+/**
+* Used to instantiate a class.
+*
+* @class ClassActivator
+* @constructor
+*/
+export class ClassActivator extends InstanceActivator {
+  invoke(fn, args){
+    var context = Object.create(fn.prototype);
+    return fn.apply(context, args) || context;
+    //return Reflect.construct(fn, args);
+  }
+}
+
+/**
+* Used to invoke a factory method.
+*
+* @class FactoryActivator
+* @constructor
+*/
+export class FactoryActivator extends InstanceActivator {
+  invoke(fn, args){
+    return fn.apply(undefined, args);
+  }
+}

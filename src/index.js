@@ -4,7 +4,7 @@
  * @module dependency-injection
  */
 import {Decorators, Metadata} from 'aurelia-metadata';
-import {TransientRegistration, SingletonRegistration} from './metadata';
+import {TransientRegistration, SingletonRegistration, FactoryActivator} from './metadata';
 export {
   Registration,
   TransientRegistration,
@@ -13,8 +13,7 @@ export {
   Lazy,
   All,
   Optional,
-  Parent,
-  Factory
+  Parent
 } from './metadata';
 
 export {Container} from './container';
@@ -40,6 +39,12 @@ export function singleton(keyOrRegisterInChild, registerInChild=false){
   }
 }
 
+export function factory(target){
+  Metadata.on(target).add(new FactoryActivator());
+  return target;
+}
+
 Decorators.configure.parameterizedDecorator('inject', inject);
 Decorators.configure.parameterizedDecorator('transient', transient);
 Decorators.configure.parameterizedDecorator('singleton', singleton);
+Decorators.configure.parameterizedDecorator('factory', factory);

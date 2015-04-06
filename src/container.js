@@ -1,8 +1,9 @@
 import {Metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-logging';
-import {Resolver, Registration, Factory} from './metadata';
+import {Resolver, Registration, InstanceActivator, ClassActivator} from './metadata';
 
-var emptyParameters = Object.freeze([]);
+var emptyParameters = Object.freeze([]),
+    defaultActivator = new ClassActivator();
 
 // Fix Function#name on browsers that do not support it (IE):
 function test(){}
@@ -270,19 +271,13 @@ export class Container {
       var info = this.getOrCreateConstructionInfo(fn),
           keys = info.keys,
           args = new Array(keys.length),
-          context, i, ii;
+          i, ii;
 
       for(i = 0, ii = keys.length; i < ii; ++i){
         args[i] = this.get(keys[i]);
       }
 
-      if(info.isFactory){
-        return fn.apply(undefined, args);
-      }else{
-        //TODO: this entire else block should be switched to Reflect.construct
-        context = Object.create(fn.prototype);
-        return fn.apply(context, args) || context;
-      }
+      return info.activator.invoke(fn, args);
     }catch(e){
       throw AggregateError(`Error instantiating ${fn.name}.`, e, true);
     }
@@ -317,7 +312,7 @@ export class Container {
   }
 
   createConstructionInfo(fn){
-    var info = {isFactory: Metadata.on(fn).has(Factory)};
+    var info = {activator: Metadata.on(fn).first(InstanceActivator) || defaultActivator};
 
     if(fn.inject !== undefined){
       if(typeof fn.inject === 'function'){
