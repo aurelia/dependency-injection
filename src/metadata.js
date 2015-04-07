@@ -30,6 +30,7 @@ export class Registration {
 */
 export class TransientRegistration extends Registration {
   constructor(key){
+    super();
     this.key = key;
   }
 
@@ -56,6 +57,8 @@ export class TransientRegistration extends Registration {
 */
 export class SingletonRegistration extends Registration {
   constructor(keyOrRegisterInChild, registerInChild=false){
+    super();
+
     if(typeof keyOrRegisterInChild === 'boolean'){
       this.registerInChild = keyOrRegisterInChild;
     }else{
@@ -107,6 +110,7 @@ export class Resolver {
 */
 export class Lazy extends Resolver {
   constructor(key){
+    super();
     this.key = key;
   }
 
@@ -146,6 +150,7 @@ export class Lazy extends Resolver {
 */
 export class All extends Resolver {
   constructor(key){
+    super();
     this.key = key;
   }
 
@@ -184,6 +189,7 @@ export class All extends Resolver {
 */
 export class Optional extends Resolver {
   constructor(key, checkParent=false){
+    super();
     this.key = key;
     this.checkParent = checkParent;
   }
@@ -228,6 +234,7 @@ export class Optional extends Resolver {
 */
 export class Parent extends Resolver {
   constructor(key){
+    super();
     this.key = key;
   }
 
