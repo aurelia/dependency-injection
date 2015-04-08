@@ -33,28 +33,6 @@ export class Container {
     this.root = this;
   }
 
-  /**
-  * Add support for AtScript RTTI according to spec at http://www.atscript.org
-  *
-  * @method useAtScript
-  */
-  supportAtScript(){
-    this.addParameterInfoLocator(function(fn){
-      var parameters = fn.parameters,
-          keys, i, ii;
-
-      if (parameters) {
-        keys = new Array(parameters.length);
-
-        for(i = 0, ii = parameters.length; i < ii; ++i){
-          keys[i] = parameters[i].is || parameters[i][0];
-        }
-      }
-
-      return keys;
-    });
-  }
-
  /**
  * Adds an additional location to search for constructor parameter type info.
  *
