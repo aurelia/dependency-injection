@@ -1,102 +1,71 @@
-"use strict";
+'use strict';
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-/**
-* An abstract annotation used to allow functions/classes to indicate how they should be registered with the container.
-*
-* @class Registration
-* @constructor
-*/
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-var Registration = exports.Registration = (function () {
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _core = require('core-js');
+
+var _core2 = _interopRequireWildcard(_core);
+
+var Registration = (function () {
   function Registration() {
     _classCallCheck(this, Registration);
   }
 
-  _prototypeProperties(Registration, null, {
-    register: {
-      /**
-      * Called by the container to allow custom registration logic for the annotated function/class.
-      *
-      * @method register
-      * @param {Container} container The container to register with.
-      * @param {Object} key The key to register as.
-      * @param {Object} fn The function to register (target of the annotation).
-      */
-
-      value: function register(container, key, fn) {
-        throw new Error("A custom Registration must implement register(container, key, fn).");
-      },
-      writable: true,
-      configurable: true
+  _createClass(Registration, [{
+    key: 'register',
+    value: function register(container, key, fn) {
+      throw new Error('A custom Registration must implement register(container, key, fn).');
     }
-  });
+  }]);
 
   return Registration;
 })();
 
-/**
-* An annotation used to allow functions/classes to indicate that they should be registered as transients with the container.
-*
-* @class Transient
-* @constructor
-* @extends Registration
-* @param {Object} [key] The key to register as.
-*/
+exports.Registration = Registration;
 
-var Transient = exports.Transient = (function (Registration) {
-  function Transient(key) {
-    _classCallCheck(this, Transient);
+var TransientRegistration = (function (_Registration) {
+  function TransientRegistration(key) {
+    _classCallCheck(this, TransientRegistration);
 
+    _get(Object.getPrototypeOf(TransientRegistration.prototype), 'constructor', this).call(this);
     this.key = key;
   }
 
-  _inherits(Transient, Registration);
+  _inherits(TransientRegistration, _Registration);
 
-  _prototypeProperties(Transient, null, {
-    register: {
-
-      /**
-      * Called by the container to register the annotated function/class as transient.
-      *
-      * @method register
-      * @param {Container} container The container to register with.
-      * @param {Object} key The key to register as.
-      * @param {Object} fn The function to register (target of the annotation).
-      */
-
-      value: function register(container, key, fn) {
-        container.registerTransient(this.key || key, fn);
-      },
-      writable: true,
-      configurable: true
+  _createClass(TransientRegistration, [{
+    key: 'register',
+    value: function register(container, key, fn) {
+      container.registerTransient(this.key || key, fn);
     }
-  });
+  }]);
 
-  return Transient;
+  return TransientRegistration;
 })(Registration);
 
-/**
-* An annotation used to allow functions/classes to indicate that they should be registered as singletons with the container.
-*
-* @class Singleton
-* @constructor
-* @extends Registration
-* @param {Object} [key] The key to register as.
-*/
+exports.TransientRegistration = TransientRegistration;
 
-var Singleton = exports.Singleton = (function (Registration) {
-  function Singleton(keyOrRegisterInChild) {
+var SingletonRegistration = (function (_Registration2) {
+  function SingletonRegistration(keyOrRegisterInChild) {
     var registerInChild = arguments[1] === undefined ? false : arguments[1];
 
-    _classCallCheck(this, Singleton);
+    _classCallCheck(this, SingletonRegistration);
 
-    if (typeof keyOrRegisterInChild === "boolean") {
+    _get(Object.getPrototypeOf(SingletonRegistration.prototype), 'constructor', this).call(this);
+
+    if (typeof keyOrRegisterInChild === 'boolean') {
       this.registerInChild = keyOrRegisterInChild;
     } else {
       this.key = keyOrRegisterInChild;
@@ -104,323 +73,218 @@ var Singleton = exports.Singleton = (function (Registration) {
     }
   }
 
-  _inherits(Singleton, Registration);
+  _inherits(SingletonRegistration, _Registration2);
 
-  _prototypeProperties(Singleton, null, {
-    register: {
-
-      /**
-      * Called by the container to register the annotated function/class as a singleton.
-      *
-      * @method register
-      * @param {Container} container The container to register with.
-      * @param {Object} key The key to register as.
-      * @param {Object} fn The function to register (target of the annotation).
-      */
-
-      value: function register(container, key, fn) {
-        var destination = this.registerInChild ? container : container.root;
-        destination.registerSingleton(this.key || key, fn);
-      },
-      writable: true,
-      configurable: true
+  _createClass(SingletonRegistration, [{
+    key: 'register',
+    value: function register(container, key, fn) {
+      var destination = this.registerInChild ? container : container.root;
+      destination.registerSingleton(this.key || key, fn);
     }
-  });
+  }]);
 
-  return Singleton;
+  return SingletonRegistration;
 })(Registration);
 
-/**
-* An abstract annotation used to allow functions/classes to specify custom dependency resolution logic.
-*
-* @class Resolver
-* @constructor
-*/
+exports.SingletonRegistration = SingletonRegistration;
 
-var Resolver = exports.Resolver = (function () {
+var Resolver = (function () {
   function Resolver() {
     _classCallCheck(this, Resolver);
   }
 
-  _prototypeProperties(Resolver, null, {
-    get: {
-      /**
-      * Called by the container to allow custom resolution of dependencies for a function/class.
-      *
-      * @method get
-      * @param {Container} container The container to resolve from.
-      * @return {Object} Returns the resolved object.
-      */
-
-      value: function get(container) {
-        throw new Error("A custom Resolver must implement get(container) and return the resolved instance(s).");
-      },
-      writable: true,
-      configurable: true
+  _createClass(Resolver, [{
+    key: 'get',
+    value: function get(container) {
+      throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
     }
-  });
+  }]);
 
   return Resolver;
 })();
 
-/**
-* An annotation used to allow functions/classes to specify lazy resolution logic.
-*
-* @class Lazy
-* @constructor
-* @extends Resolver
-* @param {Object} key The key to lazily resolve.
-*/
+exports.Resolver = Resolver;
 
-var Lazy = exports.Lazy = (function (Resolver) {
+var Lazy = (function (_Resolver) {
   function Lazy(key) {
     _classCallCheck(this, Lazy);
 
+    _get(Object.getPrototypeOf(Lazy.prototype), 'constructor', this).call(this);
     this.key = key;
   }
 
-  _inherits(Lazy, Resolver);
+  _inherits(Lazy, _Resolver);
 
-  _prototypeProperties(Lazy, {
-    of: {
+  _createClass(Lazy, [{
+    key: 'get',
+    value: function get(container) {
+      var _this = this;
 
-      /**
-      * Creates a Lazy Resolver for the supplied key.
-      *
-      * @method of
-      * @static
-      * @param {Object} key The key to lazily resolve.
-      * @return {Lazy} Returns an insance of Lazy for the key.
-      */
-
-      value: function of(key) {
-        return new Lazy(key);
-      },
-      writable: true,
-      configurable: true
+      return function () {
+        return container.get(_this.key);
+      };
     }
-  }, {
-    get: {
-
-      /**
-      * Called by the container to lazily resolve the dependency into a lazy locator function.
-      *
-      * @method get
-      * @param {Container} container The container to resolve from.
-      * @return {Function} Returns a function which can be invoked at a later time to obtain the actual dependency.
-      */
-
-      value: function get(container) {
-        var _this = this;
-
-        return function () {
-          return container.get(_this.key);
-        };
-      },
-      writable: true,
-      configurable: true
+  }], [{
+    key: 'of',
+    value: function of(key) {
+      return new Lazy(key);
     }
-  });
+  }]);
 
   return Lazy;
 })(Resolver);
 
-/**
-* An annotation used to allow functions/classes to specify resolution of all matches to a key.
-*
-* @class All
-* @constructor
-* @extends Resolver
-* @param {Object} key The key to lazily resolve all matches for.
-*/
+exports.Lazy = Lazy;
 
-var All = exports.All = (function (Resolver) {
+var All = (function (_Resolver2) {
   function All(key) {
     _classCallCheck(this, All);
 
+    _get(Object.getPrototypeOf(All.prototype), 'constructor', this).call(this);
     this.key = key;
   }
 
-  _inherits(All, Resolver);
+  _inherits(All, _Resolver2);
 
-  _prototypeProperties(All, {
-    of: {
-
-      /**
-      * Creates an All Resolver for the supplied key.
-      *
-      * @method of
-      * @static
-      * @param {Object} key The key to resolve all instances for.
-      * @return {All} Returns an insance of All for the key.
-      */
-
-      value: function of(key) {
-        return new All(key);
-      },
-      writable: true,
-      configurable: true
+  _createClass(All, [{
+    key: 'get',
+    value: function get(container) {
+      return container.getAll(this.key);
     }
-  }, {
-    get: {
-
-      /**
-      * Called by the container to resolve all matching dependencies as an array of instances.
-      *
-      * @method get
-      * @param {Container} container The container to resolve from.
-      * @return {Object[]} Returns an array of all matching instances.
-      */
-
-      value: function get(container) {
-        return container.getAll(this.key);
-      },
-      writable: true,
-      configurable: true
+  }], [{
+    key: 'of',
+    value: function of(key) {
+      return new All(key);
     }
-  });
+  }]);
 
   return All;
 })(Resolver);
 
-/**
-* An annotation used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container.
-*
-* @class Optional
-* @constructor
-* @extends Resolver
-* @param {Object} key The key to optionally resolve for.
-* @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
-*/
+exports.All = All;
 
-var Optional = exports.Optional = (function (Resolver) {
+var Optional = (function (_Resolver3) {
   function Optional(key) {
     var checkParent = arguments[1] === undefined ? false : arguments[1];
 
     _classCallCheck(this, Optional);
 
+    _get(Object.getPrototypeOf(Optional.prototype), 'constructor', this).call(this);
     this.key = key;
     this.checkParent = checkParent;
   }
 
-  _inherits(Optional, Resolver);
+  _inherits(Optional, _Resolver3);
 
-  _prototypeProperties(Optional, {
-    of: {
+  _createClass(Optional, [{
+    key: 'get',
+    value: function get(container) {
+      if (container.hasHandler(this.key, this.checkParent)) {
+        return container.get(this.key);
+      }
 
-      /**
-      * Creates an Optional Resolver for the supplied key.
-      *
-      * @method of
-      * @static
-      * @param {Object} key The key to optionally resolve for.
-      * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
-      * @return {Optional} Returns an insance of Optional for the key.
-      */
-
-      value: function of(key) {
-        var checkParent = arguments[1] === undefined ? false : arguments[1];
-
-        return new Optional(key, checkParent);
-      },
-      writable: true,
-      configurable: true
+      return null;
     }
-  }, {
-    get: {
+  }], [{
+    key: 'of',
+    value: function of(key) {
+      var checkParent = arguments[1] === undefined ? false : arguments[1];
 
-      /**
-      * Called by the container to provide optional resolution of the key.
-      *
-      * @method get
-      * @param {Container} container The container to resolve from.
-      * @return {Object} Returns the instance if found; otherwise null.
-      */
-
-      value: function get(container) {
-        if (container.hasHandler(this.key, this.checkParent)) {
-          return container.get(this.key);
-        }
-
-        return null;
-      },
-      writable: true,
-      configurable: true
+      return new Optional(key, checkParent);
     }
-  });
+  }]);
 
   return Optional;
 })(Resolver);
 
-/**
-* An annotation used to inject the dependency from the parent container instead of the current one.
-*
-* @class Parent
-* @constructor
-* @extends Resolver
-* @param {Object} key The key to resolve from the parent container.
-*/
+exports.Optional = Optional;
 
-var Parent = exports.Parent = (function (Resolver) {
+var Parent = (function (_Resolver4) {
   function Parent(key) {
     _classCallCheck(this, Parent);
 
+    _get(Object.getPrototypeOf(Parent.prototype), 'constructor', this).call(this);
     this.key = key;
   }
 
-  _inherits(Parent, Resolver);
+  _inherits(Parent, _Resolver4);
 
-  _prototypeProperties(Parent, {
-    of: {
-
-      /**
-      * Creates a Parent Resolver for the supplied key.
-      *
-      * @method of
-      * @static
-      * @param {Object} key The key to resolve.
-      * @return {Parent} Returns an insance of Parent for the key.
-      */
-
-      value: function of(key) {
-        return new Parent(key);
-      },
-      writable: true,
-      configurable: true
+  _createClass(Parent, [{
+    key: 'get',
+    value: function get(container) {
+      return container.parent ? container.parent.get(this.key) : null;
     }
-  }, {
-    get: {
-
-      /**
-      * Called by the container to load the dependency from the parent container
-      *
-      * @method get
-      * @param {Container} container The container to resolve the parent from.
-      * @return {Function} Returns the matching instance from the parent container
-      */
-
-      value: function get(container) {
-        return container.parent ? container.parent.get(this.key) : null;
-      },
-      writable: true,
-      configurable: true
+  }], [{
+    key: 'of',
+    value: function of(key) {
+      return new Parent(key);
     }
-  });
+  }]);
 
   return Parent;
 })(Resolver);
 
-/**
-* An annotation used to indicate that a particular function is a factory rather than a constructor.
-*
-* @class Factory
-* @constructor
-*/
+exports.Parent = Parent;
 
-var Factory = exports.Factory = function Factory() {
-  _classCallCheck(this, Factory);
-};
+var InstanceActivator = (function () {
+  function InstanceActivator() {
+    _classCallCheck(this, InstanceActivator);
+  }
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+  _createClass(InstanceActivator, [{
+    key: 'invoke',
+    value: function invoke(fn, args) {
+      throw new Error('A custom Activator must implement invoke(fn, args).');
+    }
+  }]);
+
+  return InstanceActivator;
+})();
+
+exports.InstanceActivator = InstanceActivator;
+
+var ClassActivator = (function (_InstanceActivator) {
+  function ClassActivator() {
+    _classCallCheck(this, ClassActivator);
+
+    if (_InstanceActivator != null) {
+      _InstanceActivator.apply(this, arguments);
+    }
+  }
+
+  _inherits(ClassActivator, _InstanceActivator);
+
+  _createClass(ClassActivator, [{
+    key: 'invoke',
+    value: function invoke(fn, args) {
+      return Reflect.construct(fn, args);
+    }
+  }]);
+
+  return ClassActivator;
+})(InstanceActivator);
+
+exports.ClassActivator = ClassActivator;
+
+var FactoryActivator = (function (_InstanceActivator2) {
+  function FactoryActivator() {
+    _classCallCheck(this, FactoryActivator);
+
+    if (_InstanceActivator2 != null) {
+      _InstanceActivator2.apply(this, arguments);
+    }
+  }
+
+  _inherits(FactoryActivator, _InstanceActivator2);
+
+  _createClass(FactoryActivator, [{
+    key: 'invoke',
+    value: function invoke(fn, args) {
+      return fn.apply(undefined, args);
+    }
+  }]);
+
+  return FactoryActivator;
+})(InstanceActivator);
+
+exports.FactoryActivator = FactoryActivator;

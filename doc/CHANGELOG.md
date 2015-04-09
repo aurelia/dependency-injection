@@ -1,3 +1,23 @@
+## 0.6.0 (2015-04-09)
+
+
+#### Bug Fixes
+
+* **Container:** remove new in function call ([08cd06fd](http://github.com/aurelia/dependency-injection/commit/08cd06fd6393e8941a2a2a0df012df3a209eedda))
+* **all:**
+  * update compiler to latest version ([b6a3dd03](http://github.com/aurelia/dependency-injection/commit/b6a3dd034ce3b55a08770b969af2f113803cbd0e))
+  * explicit import of core-js and switch to Reflect.construct ([5ebe60be](http://github.com/aurelia/dependency-injection/commit/5ebe60be9170dd8ecf34b19dc9b6e88144dfc13b))
+* **container:** remove initialize hack ([5c9fdd09](http://github.com/aurelia/dependency-injection/commit/5c9fdd09dd1d0848da0b24c694c95e20ca82c01c))
+* **decorators:** remove unnecessary returns ([150607d1](http://github.com/aurelia/dependency-injection/commit/150607d1cde449b8065440d5ca90b1a0a8e07721))
+
+
+#### Features
+
+* **all:** add decorator support ([120e61a3](http://github.com/aurelia/dependency-injection/commit/120e61a3aa686cee4a2cb7008a59d3b0eab8fb1c))
+* **container:** remove AtScript support ([6ed8891a](http://github.com/aurelia/dependency-injection/commit/6ed8891a3543d800475674343869c2e34e66107f))
+* **cotainer:** add InstanceActivator abstraction ([0fc2a317](http://github.com/aurelia/dependency-injection/commit/0fc2a3178183169ebb2c067c142e9cc7b3645e02))
+
+
 ### 0.5.1 (2015-03-27)
 
 

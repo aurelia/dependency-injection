@@ -1,5 +1,5 @@
 import {Container, inject, transient, singleton, Lazy, All, Optional, Parent} from '../src/index';
-import {Decorators} from 'aurelia-metadata';
+import {Decorators,Metadata} from 'aurelia-metadata';
 
 describe('container', () => {
   describe('injection', () => {
@@ -40,44 +40,6 @@ describe('container', () => {
       App.inject = [Logger];
 
       var container = new Container();
-      var app = container.get(App);
-
-      expect(app.logger).toEqual(jasmine.any(Logger));
-    });
-
-    it('uses static parameters property (AtScript)', function() {
-      class Logger {}
-
-      class App {
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      App.parameters = [{is:Logger}]; //Note: Normally provided by the AtScript compiler.
-
-      var container = new Container();
-      container.supportAtScript();
-
-      var app = container.get(App);
-
-      expect(app.logger).toEqual(jasmine.any(Logger));
-    });
-
-    it('uses static parameters property as array (AtScript)', function() {
-      class Logger {}
-
-      class App {
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      App.parameters = [[Logger]]; //Note: Normally provided by the AtScript compiler.
-
-      var container = new Container();
-      container.supportAtScript();
-
       var app = container.get(App);
 
       expect(app.logger).toEqual(jasmine.any(Logger));
@@ -543,8 +505,9 @@ describe('container', () => {
       }
 
       class Logger extends LoggerBase {
-        static decorators() { return Decorators.metadata('goofy').metadata('mickey'); };
       }
+
+      Metadata.on(Logger).add('test');
 
       class App1 {
         static inject() { return [Logger]; };
