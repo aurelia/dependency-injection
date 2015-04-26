@@ -235,7 +235,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
+    it('configures transient (non singleton) via metadata property (ES5, ES7, TypeScript, CoffeeScript)', () => {
       class Logger {}
       Logger.decorators = Decorators.transient();
 
@@ -345,7 +345,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('uses base metadata property (ES5, AtScript, TypeScript, CoffeeScript) when derived does not specify', () => {
+    it('uses base metadata property (ES5, ES7, TypeScript, CoffeeScript) when derived does not specify', () => {
       class LoggerBase {}
       LoggerBase.decorators = Decorators.transient();
 
@@ -404,7 +404,7 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('overrides base metadata property (ES5, AtScript, TypeScript, CoffeeScript) with derived configuration', () => {
+    it('overrides base metadata property (ES5, ES7, TypeScript, CoffeeScript) with derived configuration', () => {
       class LoggerBase {
         static decorators() { return Decorators.singleton(); };
       }
@@ -499,7 +499,7 @@ describe('container', () => {
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
 
-    it('doesn\'t get hidden when a super class adds metadata which don\'t include the base registration type', () => {
+    it('doesn\'t get hidden when a super class adds metadata which doesn\'t include the base registration type', () => {
       class LoggerBase {
         static decorators() { return Decorators.transient(); };
       }
@@ -507,7 +507,7 @@ describe('container', () => {
       class Logger extends LoggerBase {
       }
 
-      Metadata.on(Logger).add('test');
+      Reflect.defineMetadata('something', 'test', Logger);
 
       class App1 {
         static inject() { return [Logger]; };

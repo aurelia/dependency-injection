@@ -13,6 +13,7 @@ module.exports = {
   code:true,
   stage:2,
   optional: [
-    "es7.decorators"
+    "es7.decorators",
+    "es7.classProperties"
   ]
 };

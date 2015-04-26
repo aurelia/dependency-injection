@@ -1,10 +1,10 @@
 import core from 'core-js';
 import {Metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-logging';
-import {Resolver, Registration, InstanceActivator, ClassActivator} from './metadata';
+import {Resolver, ClassActivator} from './metadata';
 
-var emptyParameters = Object.freeze([]),
-    defaultActivator = new ClassActivator();
+Metadata.registration = 'aurelia:registration';
+Metadata.instanceActivator = 'aurelia:instance-activator';
 
 // Fix Function#name on browsers that do not support it (IE):
 function test(){}
@@ -19,6 +19,8 @@ if (!test.name) {
     }
   });
 }
+
+export var emptyParameters = Object.freeze([]);
 
 /**
 * A lightweight, extensible dependency injection container.
@@ -99,9 +101,9 @@ export class Container {
       throw new Error('fn cannot be null or undefined.')
     }
 
-    registration = Metadata.on(fn).first(Registration, true);
+    registration = Metadata.get(Metadata.registration, fn);
 
-    if(registration){
+    if(registration !== undefined){
       registration.register(this, key || fn, fn);
     }else{
       this.registerSingleton(key || fn, fn);
@@ -156,12 +158,12 @@ export class Container {
       throw new Error('key cannot be null or undefined.');
     }
 
-    if(key instanceof Resolver){
-      return key.get(this);
-    }
-
     if(key === Container){
       return this;
+    }
+
+    if(key instanceof Resolver){
+      return key.get(this);
     }
 
     entry = this.entries.get(key);
@@ -291,7 +293,7 @@ export class Container {
   }
 
   createConstructionInfo(fn){
-    var info = {activator: Metadata.on(fn).first(InstanceActivator) || defaultActivator};
+    var info = {activator: Metadata.getOwn(Metadata.instanceActivator, fn) || ClassActivator.instance};
 
     if(fn.inject !== undefined){
       if(typeof fn.inject === 'function'){
@@ -304,9 +306,9 @@ export class Container {
     }
 
     if(this.locateParameterInfoElsewhere !== undefined){
-      info.keys = this.locateParameterInfoElsewhere(fn) || emptyParameters;
+      info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
     }else{
-      info.keys = emptyParameters;
+      info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
     }
 
     return info;

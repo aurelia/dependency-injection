@@ -1,36 +1,14 @@
 import core from 'core-js';
 
 /**
-* Used to allow functions/classes to indicate how they should be registered with the container.
-*
-* @class Registration
-* @constructor
-*/
-export class Registration {
-  /**
-  * Called by the container to allow custom registration logic for the annotated function/class.
-  *
-  * @method register
-  * @param {Container} container The container to register with.
-  * @param {Object} key The key to register as.
-  * @param {Object} fn The function to register (target of the annotation).
-  */
-  register(container, key, fn){
-    throw new Error('A custom Registration must implement register(container, key, fn).');
-  }
-}
-
-/**
 * Used to allow functions/classes to indicate that they should be registered as transients with the container.
 *
 * @class TransientRegistration
 * @constructor
-* @extends Registration
 * @param {Object} [key] The key to register as.
 */
-export class TransientRegistration extends Registration {
+export class TransientRegistration {
   constructor(key){
-    super();
     this.key = key;
   }
 
@@ -52,13 +30,10 @@ export class TransientRegistration extends Registration {
 *
 * @class SingletonRegistration
 * @constructor
-* @extends Registration
 * @param {Object} [key] The key to register as.
 */
-export class SingletonRegistration extends Registration {
+export class SingletonRegistration {
   constructor(keyOrRegisterInChild, registerInChild=false){
-    super();
-
     if(typeof keyOrRegisterInChild === 'boolean'){
       this.registerInChild = keyOrRegisterInChild;
     }else{
@@ -265,24 +240,14 @@ export class Parent extends Resolver {
 }
 
 /**
-* Used to construct instances.
-*
-* @class InstanceActivator
-* @constructor
-*/
-export class InstanceActivator {
-  invoke(fn, args){
-    throw new Error('A custom Activator must implement invoke(fn, args).');
-  }
-}
-
-/**
 * Used to instantiate a class.
 *
 * @class ClassActivator
 * @constructor
 */
-export class ClassActivator extends InstanceActivator {
+export class ClassActivator {
+  static instance = new ClassActivator();
+
   invoke(fn, args){
     return Reflect.construct(fn, args);
   }
@@ -294,7 +259,9 @@ export class ClassActivator extends InstanceActivator {
 * @class FactoryActivator
 * @constructor
 */
-export class FactoryActivator extends InstanceActivator {
+export class FactoryActivator {
+  static instance = new FactoryActivator();
+
   invoke(fn, args){
     return fn.apply(undefined, args);
   }
