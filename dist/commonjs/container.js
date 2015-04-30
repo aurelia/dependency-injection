@@ -1,27 +1,23 @@
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+exports.__esModule = true;
 
 var _core = require('core-js');
 
-var _core2 = _interopRequireWildcard(_core);
+var _core2 = _interopRequireDefault(_core);
 
 var _Metadata = require('aurelia-metadata');
 
 var _AggregateError = require('aurelia-logging');
 
-var _Resolver$Registration$InstanceActivator$ClassActivator = require('./metadata');
+var _Resolver$ClassActivator = require('./metadata');
 
-var emptyParameters = Object.freeze([]),
-    defaultActivator = new _Resolver$Registration$InstanceActivator$ClassActivator.ClassActivator();
+_Metadata.Metadata.registration = 'aurelia:registration';
+_Metadata.Metadata.instanceActivator = 'aurelia:instance-activator';
 
 function test() {}
 if (!test.name) {
@@ -35,6 +31,10 @@ if (!test.name) {
   });
 }
 
+var emptyParameters = Object.freeze([]);
+
+exports.emptyParameters = emptyParameters;
+
 var Container = (function () {
   function Container(constructionInfo) {
     _classCallCheck(this, Container);
@@ -44,228 +44,210 @@ var Container = (function () {
     this.root = this;
   }
 
-  _createClass(Container, [{
-    key: 'addParameterInfoLocator',
-    value: function addParameterInfoLocator(locator) {
-      if (this.locateParameterInfoElsewhere === undefined) {
-        this.locateParameterInfoElsewhere = locator;
-        return;
-      }
-
-      var original = this.locateParameterInfoElsewhere;
-      this.locateParameterInfoElsewhere = function (fn) {
-        return original(fn) || locator(fn);
-      };
+  Container.prototype.addParameterInfoLocator = function addParameterInfoLocator(locator) {
+    if (this.locateParameterInfoElsewhere === undefined) {
+      this.locateParameterInfoElsewhere = locator;
+      return;
     }
-  }, {
-    key: 'registerInstance',
-    value: function registerInstance(key, instance) {
-      this.registerHandler(key, function (x) {
-        return instance;
-      });
+
+    var original = this.locateParameterInfoElsewhere;
+    this.locateParameterInfoElsewhere = function (fn) {
+      return original(fn) || locator(fn);
+    };
+  };
+
+  Container.prototype.registerInstance = function registerInstance(key, instance) {
+    this.registerHandler(key, function (x) {
+      return instance;
+    });
+  };
+
+  Container.prototype.registerTransient = function registerTransient(key, fn) {
+    fn = fn || key;
+    this.registerHandler(key, function (x) {
+      return x.invoke(fn);
+    });
+  };
+
+  Container.prototype.registerSingleton = function registerSingleton(key, fn) {
+    var singleton = null;
+    fn = fn || key;
+    this.registerHandler(key, function (x) {
+      return singleton || (singleton = x.invoke(fn));
+    });
+  };
+
+  Container.prototype.autoRegister = function autoRegister(fn, key) {
+    var registration;
+
+    if (fn === null || fn === undefined) {
+      throw new Error('fn cannot be null or undefined.');
     }
-  }, {
-    key: 'registerTransient',
-    value: function registerTransient(key, fn) {
-      fn = fn || key;
-      this.registerHandler(key, function (x) {
-        return x.invoke(fn);
-      });
+
+    registration = _Metadata.Metadata.get(_Metadata.Metadata.registration, fn);
+
+    if (registration !== undefined) {
+      registration.register(this, key || fn, fn);
+    } else {
+      this.registerSingleton(key || fn, fn);
     }
-  }, {
-    key: 'registerSingleton',
-    value: function registerSingleton(key, fn) {
-      var singleton = null;
-      fn = fn || key;
-      this.registerHandler(key, function (x) {
-        return singleton || (singleton = x.invoke(fn));
-      });
+  };
+
+  Container.prototype.autoRegisterAll = function autoRegisterAll(fns) {
+    var i = fns.length;
+    while (i--) {
+      this.autoRegister(fns[i]);
     }
-  }, {
-    key: 'autoRegister',
-    value: function autoRegister(fn, key) {
-      var registration;
+  };
 
-      if (fn === null || fn === undefined) {
-        throw new Error('fn cannot be null or undefined.');
-      }
+  Container.prototype.registerHandler = function registerHandler(key, handler) {
+    this.getOrCreateEntry(key).push(handler);
+  };
 
-      registration = _Metadata.Metadata.on(fn).first(_Resolver$Registration$InstanceActivator$ClassActivator.Registration, true);
+  Container.prototype.unregister = function unregister(key) {
+    this.entries['delete'](key);
+  };
 
-      if (registration) {
-        registration.register(this, key || fn, fn);
-      } else {
-        this.registerSingleton(key || fn, fn);
-      }
+  Container.prototype.get = function get(key) {
+    var entry;
+
+    if (key === null || key === undefined) {
+      throw new Error('key cannot be null or undefined.');
     }
-  }, {
-    key: 'autoRegisterAll',
-    value: function autoRegisterAll(fns) {
-      var i = fns.length;
-      while (i--) {
-        this.autoRegister(fns[i]);
-      }
+
+    if (key === Container) {
+      return this;
     }
-  }, {
-    key: 'registerHandler',
-    value: function registerHandler(key, handler) {
-      this.getOrCreateEntry(key).push(handler);
+
+    if (key instanceof _Resolver$ClassActivator.Resolver) {
+      return key.get(this);
     }
-  }, {
-    key: 'unregister',
-    value: function unregister(key) {
-      this.entries['delete'](key);
-    }
-  }, {
-    key: 'get',
-    value: function get(key) {
-      var entry;
 
-      if (key === null || key === undefined) {
-        throw new Error('key cannot be null or undefined.');
-      }
+    entry = this.entries.get(key);
 
-      if (key instanceof _Resolver$Registration$InstanceActivator$ClassActivator.Resolver) {
-        return key.get(this);
-      }
-
-      if (key === Container) {
-        return this;
-      }
-
-      entry = this.entries.get(key);
-
-      if (entry !== undefined) {
-        return entry[0](this);
-      }
-
-      if (this.parent) {
-        return this.parent.get(key);
-      }
-
-      this.autoRegister(key);
-      entry = this.entries.get(key);
-
+    if (entry !== undefined) {
       return entry[0](this);
     }
-  }, {
-    key: 'getAll',
-    value: function getAll(key) {
-      var _this = this;
 
-      var entry;
-
-      if (key === null || key === undefined) {
-        throw new Error('key cannot be null or undefined.');
-      }
-
-      entry = this.entries.get(key);
-
-      if (entry !== undefined) {
-        return entry.map(function (x) {
-          return x(_this);
-        });
-      }
-
-      if (this.parent) {
-        return this.parent.getAll(key);
-      }
-
-      return [];
+    if (this.parent) {
+      return this.parent.get(key);
     }
-  }, {
-    key: 'hasHandler',
-    value: function hasHandler(key) {
-      var checkParent = arguments[1] === undefined ? false : arguments[1];
 
-      if (key === null || key === undefined) {
-        throw new Error('key cannot be null or undefined.');
-      }
+    this.autoRegister(key);
+    entry = this.entries.get(key);
 
-      return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
+    return entry[0](this);
+  };
+
+  Container.prototype.getAll = function getAll(key) {
+    var _this = this;
+
+    var entry;
+
+    if (key === null || key === undefined) {
+      throw new Error('key cannot be null or undefined.');
     }
-  }, {
-    key: 'createChild',
-    value: function createChild() {
-      var childContainer = new Container(this.constructionInfo);
-      childContainer.parent = this;
-      childContainer.root = this.root;
-      childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
-      return childContainer;
+
+    entry = this.entries.get(key);
+
+    if (entry !== undefined) {
+      return entry.map(function (x) {
+        return x(_this);
+      });
     }
-  }, {
-    key: 'invoke',
-    value: function invoke(fn) {
-      try {
-        var info = this.getOrCreateConstructionInfo(fn),
-            keys = info.keys,
-            args = new Array(keys.length),
-            i,
-            ii;
 
-        for (i = 0, ii = keys.length; i < ii; ++i) {
-          args[i] = this.get(keys[i]);
-        }
-
-        return info.activator.invoke(fn, args);
-      } catch (e) {
-        throw _AggregateError.AggregateError('Error instantiating ' + fn.name + '.', e, true);
-      }
+    if (this.parent) {
+      return this.parent.getAll(key);
     }
-  }, {
-    key: 'getOrCreateEntry',
-    value: function getOrCreateEntry(key) {
-      var entry;
 
-      if (key === null || key === undefined) {
-        throw new Error('key cannot be null or undefined.');
-      }
+    return [];
+  };
 
-      entry = this.entries.get(key);
+  Container.prototype.hasHandler = function hasHandler(key) {
+    var checkParent = arguments[1] === undefined ? false : arguments[1];
 
-      if (entry === undefined) {
-        entry = [];
-        this.entries.set(key, entry);
-      }
-
-      return entry;
+    if (key === null || key === undefined) {
+      throw new Error('key cannot be null or undefined.');
     }
-  }, {
-    key: 'getOrCreateConstructionInfo',
-    value: function getOrCreateConstructionInfo(fn) {
-      var info = this.constructionInfo.get(fn);
 
-      if (info === undefined) {
-        info = this.createConstructionInfo(fn);
-        this.constructionInfo.set(fn, info);
+    return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
+  };
+
+  Container.prototype.createChild = function createChild() {
+    var childContainer = new Container(this.constructionInfo);
+    childContainer.parent = this;
+    childContainer.root = this.root;
+    childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
+    return childContainer;
+  };
+
+  Container.prototype.invoke = function invoke(fn) {
+    try {
+      var info = this.getOrCreateConstructionInfo(fn),
+          keys = info.keys,
+          args = new Array(keys.length),
+          i,
+          ii;
+
+      for (i = 0, ii = keys.length; i < ii; ++i) {
+        args[i] = this.get(keys[i]);
       }
 
-      return info;
+      return info.activator.invoke(fn, args);
+    } catch (e) {
+      throw _AggregateError.AggregateError('Error instantiating ' + fn.name + '.', e, true);
     }
-  }, {
-    key: 'createConstructionInfo',
-    value: function createConstructionInfo(fn) {
-      var info = { activator: _Metadata.Metadata.on(fn).first(_Resolver$Registration$InstanceActivator$ClassActivator.InstanceActivator) || defaultActivator };
+  };
 
-      if (fn.inject !== undefined) {
-        if (typeof fn.inject === 'function') {
-          info.keys = fn.inject();
-        } else {
-          info.keys = fn.inject;
-        }
+  Container.prototype.getOrCreateEntry = function getOrCreateEntry(key) {
+    var entry;
 
-        return info;
-      }
+    if (key === null || key === undefined) {
+      throw new Error('key cannot be null or undefined.');
+    }
 
-      if (this.locateParameterInfoElsewhere !== undefined) {
-        info.keys = this.locateParameterInfoElsewhere(fn) || emptyParameters;
+    entry = this.entries.get(key);
+
+    if (entry === undefined) {
+      entry = [];
+      this.entries.set(key, entry);
+    }
+
+    return entry;
+  };
+
+  Container.prototype.getOrCreateConstructionInfo = function getOrCreateConstructionInfo(fn) {
+    var info = this.constructionInfo.get(fn);
+
+    if (info === undefined) {
+      info = this.createConstructionInfo(fn);
+      this.constructionInfo.set(fn, info);
+    }
+
+    return info;
+  };
+
+  Container.prototype.createConstructionInfo = function createConstructionInfo(fn) {
+    var info = { activator: _Metadata.Metadata.getOwn(_Metadata.Metadata.instanceActivator, fn) || _Resolver$ClassActivator.ClassActivator.instance };
+
+    if (fn.inject !== undefined) {
+      if (typeof fn.inject === 'function') {
+        info.keys = fn.inject();
       } else {
-        info.keys = emptyParameters;
+        info.keys = fn.inject;
       }
 
       return info;
     }
-  }]);
+
+    if (this.locateParameterInfoElsewhere !== undefined) {
+      info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(_Metadata.Metadata.paramTypes, fn) || emptyParameters;
+    } else {
+      info.keys = Reflect.getOwnMetadata(_Metadata.Metadata.paramTypes, fn) || emptyParameters;
+    }
+
+    return info;
+  };
 
   return Container;
 })();

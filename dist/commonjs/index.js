@@ -1,86 +1,39 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+exports.__esModule = true;
+exports.autoinject = autoinject;
 exports.inject = inject;
+exports.registration = registration;
 exports.transient = transient;
 exports.singleton = singleton;
+exports.instanceActivator = instanceActivator;
 exports.factory = factory;
 
 var _Decorators$Metadata = require('aurelia-metadata');
 
-var _TransientRegistration$SingletonRegistration$FactoryActivator = require('./metadata');
+var _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters = require('./metadata');
 
-Object.defineProperty(exports, 'Registration', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.Registration;
-  }
-});
-Object.defineProperty(exports, 'TransientRegistration', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.TransientRegistration;
-  }
-});
-Object.defineProperty(exports, 'SingletonRegistration', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.SingletonRegistration;
-  }
-});
-Object.defineProperty(exports, 'Resolver', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.Resolver;
-  }
-});
-Object.defineProperty(exports, 'Lazy', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.Lazy;
-  }
-});
-Object.defineProperty(exports, 'All', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.All;
-  }
-});
-Object.defineProperty(exports, 'Optional', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.Optional;
-  }
-});
-Object.defineProperty(exports, 'Parent', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.Parent;
-  }
-});
-Object.defineProperty(exports, 'InstanceActivator', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.InstanceActivator;
-  }
-});
-Object.defineProperty(exports, 'FactoryActivator', {
-  enumerable: true,
-  get: function get() {
-    return _TransientRegistration$SingletonRegistration$FactoryActivator.FactoryActivator;
-  }
-});
+exports.TransientRegistration = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.TransientRegistration;
+exports.SingletonRegistration = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.SingletonRegistration;
+exports.Resolver = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Resolver;
+exports.Lazy = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Lazy;
+exports.All = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.All;
+exports.Optional = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Optional;
+exports.Parent = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Parent;
+exports.ClassActivator = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.ClassActivator;
+exports.FactoryActivator = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.FactoryActivator;
 
 var _Container = require('./container');
 
-Object.defineProperty(exports, 'Container', {
-  enumerable: true,
-  get: function get() {
-    return _Container.Container;
-  }
-});
+exports.Container = _Container.Container;
+
+function autoinject(target) {
+  var deco = function deco(target) {
+    target.inject = Reflect.getOwnMetadata(_Decorators$Metadata.Metadata.paramTypes, target) || _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.emptyParameters;
+  };
+
+  return target ? deco(target) : deco;
+}
 
 function inject() {
   for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
@@ -92,25 +45,36 @@ function inject() {
   };
 }
 
-function transient(key) {
+function registration(value) {
   return function (target) {
-    _Decorators$Metadata.Metadata.on(target).add(new _TransientRegistration$SingletonRegistration$FactoryActivator.TransientRegistration(key));
+    Reflect.defineMetadata(_Decorators$Metadata.Metadata.registration, value, target);
   };
+}
+
+function transient(key) {
+  return registration(new _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.TransientRegistration(key));
 }
 
 function singleton(keyOrRegisterInChild) {
   var registerInChild = arguments[1] === undefined ? false : arguments[1];
 
+  return registration(new _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.SingletonRegistration(keyOrRegisterInChild, registerInChild));
+}
+
+function instanceActivator(value) {
   return function (target) {
-    _Decorators$Metadata.Metadata.on(target).add(new _TransientRegistration$SingletonRegistration$FactoryActivator.SingletonRegistration(keyOrRegisterInChild, registerInChild));
+    Reflect.defineMetadata(_Decorators$Metadata.Metadata.instanceActivator, value, target);
   };
 }
 
-function factory(target) {
-  _Decorators$Metadata.Metadata.on(target).add(new _TransientRegistration$SingletonRegistration$FactoryActivator.FactoryActivator());
+function factory() {
+  return instanceActivator(_TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.FactoryActivator.instance);
 }
 
+_Decorators$Metadata.Decorators.configure.simpleDecorator('autoinject', autoinject);
 _Decorators$Metadata.Decorators.configure.parameterizedDecorator('inject', inject);
+_Decorators$Metadata.Decorators.configure.parameterizedDecorator('registration', registration);
 _Decorators$Metadata.Decorators.configure.parameterizedDecorator('transient', transient);
 _Decorators$Metadata.Decorators.configure.parameterizedDecorator('singleton', singleton);
+_Decorators$Metadata.Decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
 _Decorators$Metadata.Decorators.configure.parameterizedDecorator('factory', factory);

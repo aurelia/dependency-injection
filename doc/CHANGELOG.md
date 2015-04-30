@@ -1,3 +1,20 @@
+## 0.7.0 (2015-04-30)
+
+
+#### Features
+
+* **all:** update to using the new metadata api ([51bfdd1e](http://github.com/aurelia/dependency-injection/commit/51bfdd1e1042178a301346a263b642e14aa5f394))
+
+
+#### Breaking Changes
+
+* Removed base classes for registrations and instance
+activators since metadata now uses key/value pairs rather than
+inheritance.
+
+ ([51bfdd1e](http://github.com/aurelia/dependency-injection/commit/51bfdd1e1042178a301346a263b642e14aa5f394))
+
+
 ## 0.6.0 (2015-04-09)
 
 

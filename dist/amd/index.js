@@ -1,79 +1,32 @@
 define(['exports', 'aurelia-metadata', './metadata', './container'], function (exports, _aureliaMetadata, _metadata, _container) {
   'use strict';
 
-  Object.defineProperty(exports, '__esModule', {
-    value: true
-  });
+  exports.__esModule = true;
+  exports.autoinject = autoinject;
   exports.inject = inject;
+  exports.registration = registration;
   exports.transient = transient;
   exports.singleton = singleton;
+  exports.instanceActivator = instanceActivator;
   exports.factory = factory;
-  Object.defineProperty(exports, 'Registration', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.Registration;
-    }
-  });
-  Object.defineProperty(exports, 'TransientRegistration', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.TransientRegistration;
-    }
-  });
-  Object.defineProperty(exports, 'SingletonRegistration', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.SingletonRegistration;
-    }
-  });
-  Object.defineProperty(exports, 'Resolver', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.Resolver;
-    }
-  });
-  Object.defineProperty(exports, 'Lazy', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.Lazy;
-    }
-  });
-  Object.defineProperty(exports, 'All', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.All;
-    }
-  });
-  Object.defineProperty(exports, 'Optional', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.Optional;
-    }
-  });
-  Object.defineProperty(exports, 'Parent', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.Parent;
-    }
-  });
-  Object.defineProperty(exports, 'InstanceActivator', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.InstanceActivator;
-    }
-  });
-  Object.defineProperty(exports, 'FactoryActivator', {
-    enumerable: true,
-    get: function get() {
-      return _metadata.FactoryActivator;
-    }
-  });
-  Object.defineProperty(exports, 'Container', {
-    enumerable: true,
-    get: function get() {
-      return _container.Container;
-    }
-  });
+  exports.TransientRegistration = _metadata.TransientRegistration;
+  exports.SingletonRegistration = _metadata.SingletonRegistration;
+  exports.Resolver = _metadata.Resolver;
+  exports.Lazy = _metadata.Lazy;
+  exports.All = _metadata.All;
+  exports.Optional = _metadata.Optional;
+  exports.Parent = _metadata.Parent;
+  exports.ClassActivator = _metadata.ClassActivator;
+  exports.FactoryActivator = _metadata.FactoryActivator;
+  exports.Container = _container.Container;
+
+  function autoinject(target) {
+    var deco = function deco(target) {
+      target.inject = Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, target) || _metadata.emptyParameters;
+    };
+
+    return target ? deco(target) : deco;
+  }
 
   function inject() {
     for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
@@ -85,26 +38,37 @@ define(['exports', 'aurelia-metadata', './metadata', './container'], function (e
     };
   }
 
-  function transient(key) {
+  function registration(value) {
     return function (target) {
-      _aureliaMetadata.Metadata.on(target).add(new _metadata.TransientRegistration(key));
+      Reflect.defineMetadata(_aureliaMetadata.Metadata.registration, value, target);
     };
+  }
+
+  function transient(key) {
+    return registration(new _metadata.TransientRegistration(key));
   }
 
   function singleton(keyOrRegisterInChild) {
     var registerInChild = arguments[1] === undefined ? false : arguments[1];
 
+    return registration(new _metadata.SingletonRegistration(keyOrRegisterInChild, registerInChild));
+  }
+
+  function instanceActivator(value) {
     return function (target) {
-      _aureliaMetadata.Metadata.on(target).add(new _metadata.SingletonRegistration(keyOrRegisterInChild, registerInChild));
+      Reflect.defineMetadata(_aureliaMetadata.Metadata.instanceActivator, value, target);
     };
   }
 
-  function factory(target) {
-    _aureliaMetadata.Metadata.on(target).add(new _metadata.FactoryActivator());
+  function factory() {
+    return instanceActivator(_metadata.FactoryActivator.instance);
   }
 
+  _aureliaMetadata.Decorators.configure.simpleDecorator('autoinject', autoinject);
   _aureliaMetadata.Decorators.configure.parameterizedDecorator('inject', inject);
+  _aureliaMetadata.Decorators.configure.parameterizedDecorator('registration', registration);
   _aureliaMetadata.Decorators.configure.parameterizedDecorator('transient', transient);
   _aureliaMetadata.Decorators.configure.parameterizedDecorator('singleton', singleton);
+  _aureliaMetadata.Decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
   _aureliaMetadata.Decorators.configure.parameterizedDecorator('factory', factory);
 });
