@@ -4,7 +4,8 @@
  * @module dependency-injection
  */
 import {Decorators, Metadata} from 'aurelia-metadata';
-import {TransientRegistration, SingletonRegistration, FactoryActivator, emptyParameters} from './metadata';
+import {TransientRegistration, SingletonRegistration, FactoryActivator} from './metadata';
+import {emptyParameters} from './container';
 export {
   TransientRegistration,
   SingletonRegistration,
