@@ -4,7 +4,8 @@
  * @module dependency-injection
  */
 import {Decorators, Metadata} from 'aurelia-metadata';
-import {TransientRegistration, SingletonRegistration, FactoryActivator, emptyParameters} from './metadata';
+import {TransientRegistration, SingletonRegistration, FactoryActivator} from './metadata';
+import {emptyParameters} from './container';
 export {
   TransientRegistration,
   SingletonRegistration,
@@ -19,7 +20,7 @@ export {
 
 export {Container} from './container';
 
-export function autoinject(target){
+export function autoinject(target: any): any {
   var deco = function(target){
     target.inject = Reflect.getOwnMetadata(Metadata.paramTypes, target) || emptyParameters;
   };
@@ -27,33 +28,33 @@ export function autoinject(target){
   return target ? deco(target) : deco;
 }
 
-export function inject(...rest){
+export function inject(...rest: any[]): (target: any) => void {
   return function(target){
     target.inject = rest;
-  }
+  };
 }
 
-export function registration(value){
+export function registration(value: any): (target: any) => void {
   return function(target){
     Reflect.defineMetadata(Metadata.registration, value, target);
-  }
+  };
 }
 
-export function transient(key){
+export function transient(key: any): (target: any) => void {
   return registration(new TransientRegistration(key));
 }
 
-export function singleton(keyOrRegisterInChild, registerInChild=false){
+export function singleton(keyOrRegisterInChild: any, registerInChild: boolean = false): (target: any) => void {
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
-export function instanceActivator(value){
+export function instanceActivator(value: any): (target: any) => void {
   return function(target){
     Reflect.defineMetadata(Metadata.instanceActivator, value, target);
-  }
+  };
 }
 
-export function factory(){
+export function factory(): (target: any) => void {
   return instanceActivator(FactoryActivator.instance);
 }
 

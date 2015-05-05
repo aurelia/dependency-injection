@@ -1,6 +1,8 @@
 var gulp = require('gulp');
 var runSequence = require('run-sequence');
 var to5 = require('gulp-babel');
+var concat = require('gulp-concat');
+var insert = require('gulp-insert');
 var paths = require('../paths');
 var compilerOptions = require('../babel-options');
 var assign = Object.assign || require('object.assign');
@@ -28,10 +30,18 @@ gulp.task('build-system', function () {
     .pipe(gulp.dest(paths.output + 'system'));
 });
 
+gulp.task('build-dts', function () {
+  return gulp.src(paths.dts.output + '/' + paths.dts.name + '/**/*.d.ts')
+    .pipe(concat(paths.dts.name + '.d.ts'))
+    .pipe(insert.prepend('declare module \'' + paths.dts.name + '\' { export * from \'' + paths.dts.name + '/' + paths.dts.main + '\'; }\n'))
+    .pipe(gulp.dest(paths.dts.output));
+});
+
 gulp.task('build', function(callback) {
   return runSequence(
     'clean',
     ['build-es6', 'build-commonjs', 'build-amd', 'build-system'],
+    'build-dts',
     callback
   );
 });
