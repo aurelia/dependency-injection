@@ -1,5 +1,7 @@
 System.register(['core-js', 'aurelia-metadata', 'aurelia-logging', './metadata'], function (_export) {
-  var core, Metadata, AggregateError, Resolver, ClassActivator, _classCallCheck, emptyParameters, Container;
+  var core, Metadata, AggregateError, Resolver, ClassActivator, emptyParameters, Container;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function test() {}
   return {
@@ -15,8 +17,6 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging', './metadata']
     }],
     execute: function () {
       'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
       Metadata.registration = 'aurelia:registration';
       Metadata.instanceActivator = 'aurelia:instance-activator';

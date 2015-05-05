@@ -22,7 +22,7 @@ define(['exports', 'aurelia-metadata', './metadata', './container'], function (e
 
   function autoinject(target) {
     var deco = function deco(target) {
-      target.inject = Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, target) || _metadata.emptyParameters;
+      target.inject = Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, target) || _container.emptyParameters;
     };
 
     return target ? deco(target) : deco;
