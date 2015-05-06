@@ -67,7 +67,6 @@ System.register(['aurelia-metadata', './metadata', './container'], function (_ex
       TransientRegistration = _metadata.TransientRegistration;
       SingletonRegistration = _metadata.SingletonRegistration;
       FactoryActivator = _metadata.FactoryActivator;
-      emptyParameters = _metadata.emptyParameters;
 
       _export('TransientRegistration', _metadata.TransientRegistration);
 
@@ -87,6 +86,8 @@ System.register(['aurelia-metadata', './metadata', './container'], function (_ex
 
       _export('FactoryActivator', _metadata.FactoryActivator);
     }, function (_container) {
+      emptyParameters = _container.emptyParameters;
+
       _export('Container', _container.Container);
     }],
     execute: function () {

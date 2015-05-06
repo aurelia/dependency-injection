@@ -11,25 +11,24 @@ exports.factory = factory;
 
 var _Decorators$Metadata = require('aurelia-metadata');
 
-var _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters = require('./metadata');
+var _TransientRegistration$SingletonRegistration$FactoryActivator = require('./metadata');
 
-exports.TransientRegistration = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.TransientRegistration;
-exports.SingletonRegistration = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.SingletonRegistration;
-exports.Resolver = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Resolver;
-exports.Lazy = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Lazy;
-exports.All = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.All;
-exports.Optional = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Optional;
-exports.Parent = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.Parent;
-exports.ClassActivator = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.ClassActivator;
-exports.FactoryActivator = _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.FactoryActivator;
+var _emptyParameters = require('./container');
 
-var _Container = require('./container');
-
-exports.Container = _Container.Container;
+exports.TransientRegistration = _TransientRegistration$SingletonRegistration$FactoryActivator.TransientRegistration;
+exports.SingletonRegistration = _TransientRegistration$SingletonRegistration$FactoryActivator.SingletonRegistration;
+exports.Resolver = _TransientRegistration$SingletonRegistration$FactoryActivator.Resolver;
+exports.Lazy = _TransientRegistration$SingletonRegistration$FactoryActivator.Lazy;
+exports.All = _TransientRegistration$SingletonRegistration$FactoryActivator.All;
+exports.Optional = _TransientRegistration$SingletonRegistration$FactoryActivator.Optional;
+exports.Parent = _TransientRegistration$SingletonRegistration$FactoryActivator.Parent;
+exports.ClassActivator = _TransientRegistration$SingletonRegistration$FactoryActivator.ClassActivator;
+exports.FactoryActivator = _TransientRegistration$SingletonRegistration$FactoryActivator.FactoryActivator;
+exports.Container = _emptyParameters.Container;
 
 function autoinject(target) {
   var deco = function deco(target) {
-    target.inject = Reflect.getOwnMetadata(_Decorators$Metadata.Metadata.paramTypes, target) || _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.emptyParameters;
+    target.inject = Reflect.getOwnMetadata(_Decorators$Metadata.Metadata.paramTypes, target) || _emptyParameters.emptyParameters;
   };
 
   return target ? deco(target) : deco;
@@ -52,13 +51,13 @@ function registration(value) {
 }
 
 function transient(key) {
-  return registration(new _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.TransientRegistration(key));
+  return registration(new _TransientRegistration$SingletonRegistration$FactoryActivator.TransientRegistration(key));
 }
 
 function singleton(keyOrRegisterInChild) {
   var registerInChild = arguments[1] === undefined ? false : arguments[1];
 
-  return registration(new _TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.SingletonRegistration(keyOrRegisterInChild, registerInChild));
+  return registration(new _TransientRegistration$SingletonRegistration$FactoryActivator.SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
 function instanceActivator(value) {
@@ -68,7 +67,7 @@ function instanceActivator(value) {
 }
 
 function factory() {
-  return instanceActivator(_TransientRegistration$SingletonRegistration$FactoryActivator$emptyParameters.FactoryActivator.instance);
+  return instanceActivator(_TransientRegistration$SingletonRegistration$FactoryActivator.FactoryActivator.instance);
 }
 
 _Decorators$Metadata.Decorators.configure.simpleDecorator('autoinject', autoinject);

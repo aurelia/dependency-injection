@@ -1,3 +1,11 @@
+### 0.7.1 (2015-05-06)
+
+
+#### Bug Fixes
+
+* **emptyParameters:** import from ./container ([7d4cfc92](http://github.com/aurelia/dependency-injection/commit/7d4cfc929514519138cc1af36661951dd5ff42c8))
+
+
 ## 0.7.0 (2015-04-30)
 
 
