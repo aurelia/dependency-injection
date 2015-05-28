@@ -260,7 +260,15 @@ export class Container {
 
       return info.activator.invoke(fn, args);
     }catch(e){
-      throw AggregateError(`Error instantiating ${fn.name}.`, e, true);
+      var activatingText = info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
+      var message = `Error ${activatingText} ${fn.name}.`
+      if (i < ii) {
+        message += ` The argument at index ${i} (key:${keys[i]}) could not be satisfied.`;
+      }
+
+      message += ' Check the inner error for details.'
+
+      throw AggregateError(message, e, true);
     }
   }
 
