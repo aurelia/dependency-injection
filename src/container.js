@@ -101,12 +101,16 @@ export class Container {
       throw new Error('fn cannot be null or undefined.')
     }
 
-    registration = Metadata.get(Metadata.registration, fn);
+    if(typeof fn === 'function'){
+      registration = Metadata.get(Metadata.registration, fn);
 
-    if(registration !== undefined){
-      registration.register(this, key || fn, fn);
+      if(registration !== undefined){
+        registration.register(this, key || fn, fn);
+      }else{
+        this.registerSingleton(key || fn, fn);
+      }
     }else{
-      this.registerSingleton(key || fn, fn);
+      this.registerInstance(fn, fn);
     }
   }
 

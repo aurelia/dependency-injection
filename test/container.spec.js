@@ -104,6 +104,24 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
+    it('automatically configures non-functions as instances', () => {
+      var someObject = {};
+
+      class App1 {
+        constructor(something) {
+          this.something = something;
+        }
+      }
+
+      inject(someObject)(App1);
+
+
+      var container = new Container();
+      var app1 = container.get(App1);
+
+      expect(app1.something).toBe(someObject);
+    });
+
     it('configures singleton via api', () => {
       class Logger {}
 
