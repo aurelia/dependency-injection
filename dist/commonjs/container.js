@@ -1,23 +1,23 @@
 'use strict';
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 exports.__esModule = true;
 
-var _core = require('core-js');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _core2 = _interopRequireDefault(_core);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _Metadata = require('aurelia-metadata');
+var _coreJs = require('core-js');
 
-var _AggregateError = require('aurelia-logging');
+var _coreJs2 = _interopRequireDefault(_coreJs);
 
-var _Resolver$ClassActivator = require('./metadata');
+var _aureliaMetadata = require('aurelia-metadata');
 
-_Metadata.Metadata.registration = 'aurelia:registration';
-_Metadata.Metadata.instanceActivator = 'aurelia:instance-activator';
+var _aureliaLogging = require('aurelia-logging');
+
+var _metadata = require('./metadata');
+
+_aureliaMetadata.Metadata.registration = 'aurelia:registration';
+_aureliaMetadata.Metadata.instanceActivator = 'aurelia:instance-activator';
 
 function test() {}
 if (!test.name) {
@@ -84,12 +84,16 @@ var Container = (function () {
       throw new Error('fn cannot be null or undefined.');
     }
 
-    registration = _Metadata.Metadata.get(_Metadata.Metadata.registration, fn);
+    if (typeof fn === 'function') {
+      registration = _aureliaMetadata.Metadata.get(_aureliaMetadata.Metadata.registration, fn);
 
-    if (registration !== undefined) {
-      registration.register(this, key || fn, fn);
+      if (registration !== undefined) {
+        registration.register(this, key || fn, fn);
+      } else {
+        this.registerSingleton(key || fn, fn);
+      }
     } else {
-      this.registerSingleton(key || fn, fn);
+      this.registerInstance(fn, fn);
     }
   };
 
@@ -119,7 +123,7 @@ var Container = (function () {
       return this;
     }
 
-    if (key instanceof _Resolver$ClassActivator.Resolver) {
+    if (key instanceof _metadata.Resolver) {
       return key.get(this);
     }
 
@@ -195,7 +199,15 @@ var Container = (function () {
 
       return info.activator.invoke(fn, args);
     } catch (e) {
-      throw _AggregateError.AggregateError('Error instantiating ' + fn.name + '.', e, true);
+      var activatingText = info.activator instanceof _metadata.ClassActivator ? 'instantiating' : 'invoking';
+      var message = 'Error ' + activatingText + ' ' + fn.name + '.';
+      if (i < ii) {
+        message += ' The argument at index ' + i + ' (key:' + keys[i] + ') could not be satisfied.';
+      }
+
+      message += ' Check the inner error for details.';
+
+      throw (0, _aureliaLogging.AggregateError)(message, e, true);
     }
   };
 
@@ -228,7 +240,7 @@ var Container = (function () {
   };
 
   Container.prototype.createConstructionInfo = function createConstructionInfo(fn) {
-    var info = { activator: _Metadata.Metadata.getOwn(_Metadata.Metadata.instanceActivator, fn) || _Resolver$ClassActivator.ClassActivator.instance };
+    var info = { activator: _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.instanceActivator, fn) || _metadata.ClassActivator.instance };
 
     if (fn.inject !== undefined) {
       if (typeof fn.inject === 'function') {
@@ -241,9 +253,9 @@ var Container = (function () {
     }
 
     if (this.locateParameterInfoElsewhere !== undefined) {
-      info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(_Metadata.Metadata.paramTypes, fn) || emptyParameters;
+      info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, fn) || emptyParameters;
     } else {
-      info.keys = Reflect.getOwnMetadata(_Metadata.Metadata.paramTypes, fn) || emptyParameters;
+      info.keys = Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, fn) || emptyParameters;
     }
 
     return info;

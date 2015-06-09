@@ -1,13 +1,13 @@
 define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging', './metadata'], function (exports, _coreJs, _aureliaMetadata, _aureliaLogging, _metadata) {
   'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
-
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
   exports.__esModule = true;
 
-  var _core = _interopRequire(_coreJs);
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+  var _core = _interopRequireDefault(_coreJs);
 
   _aureliaMetadata.Metadata.registration = 'aurelia:registration';
   _aureliaMetadata.Metadata.instanceActivator = 'aurelia:instance-activator';
@@ -77,12 +77,16 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging', './metadata
         throw new Error('fn cannot be null or undefined.');
       }
 
-      registration = _aureliaMetadata.Metadata.get(_aureliaMetadata.Metadata.registration, fn);
+      if (typeof fn === 'function') {
+        registration = _aureliaMetadata.Metadata.get(_aureliaMetadata.Metadata.registration, fn);
 
-      if (registration !== undefined) {
-        registration.register(this, key || fn, fn);
+        if (registration !== undefined) {
+          registration.register(this, key || fn, fn);
+        } else {
+          this.registerSingleton(key || fn, fn);
+        }
       } else {
-        this.registerSingleton(key || fn, fn);
+        this.registerInstance(fn, fn);
       }
     };
 
@@ -188,7 +192,15 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging', './metadata
 
         return info.activator.invoke(fn, args);
       } catch (e) {
-        throw _aureliaLogging.AggregateError('Error instantiating ' + fn.name + '.', e, true);
+        var activatingText = info.activator instanceof _metadata.ClassActivator ? 'instantiating' : 'invoking';
+        var message = 'Error ' + activatingText + ' ' + fn.name + '.';
+        if (i < ii) {
+          message += ' The argument at index ' + i + ' (key:' + keys[i] + ') could not be satisfied.';
+        }
+
+        message += ' Check the inner error for details.';
+
+        throw (0, _aureliaLogging.AggregateError)(message, e, true);
       }
     };
 

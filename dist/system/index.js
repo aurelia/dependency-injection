@@ -1,4 +1,6 @@
 System.register(['aurelia-metadata', './metadata', './container'], function (_export) {
+  'use strict';
+
   var Decorators, Metadata, TransientRegistration, SingletonRegistration, FactoryActivator, emptyParameters;
 
   _export('autoinject', autoinject);
@@ -91,7 +93,6 @@ System.register(['aurelia-metadata', './metadata', './container'], function (_ex
       _export('Container', _container.Container);
     }],
     execute: function () {
-      'use strict';
 
       Decorators.configure.simpleDecorator('autoinject', autoinject);
       Decorators.configure.parameterizedDecorator('inject', inject);

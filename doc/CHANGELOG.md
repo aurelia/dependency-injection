@@ -1,3 +1,16 @@
+## 0.8.0 (2015-06-08)
+
+
+#### Bug Fixes
+
+* **container:** enable autoregister of non-functions ([c40ac432](http://github.com/aurelia/dependency-injection/commit/c40ac432ca6c3d63ccddb6c6c5bcaa2ffa6c5ba9), closes [#31](http://github.com/aurelia/dependency-injection/issues/31))
+
+
+#### Features
+
+* **container:** improve helpfulness of activation errors ([47aa4871](http://github.com/aurelia/dependency-injection/commit/47aa48711a905101b83452daa5ded82242c186bd))
+
+
 ### 0.7.1 (2015-05-06)
 
 

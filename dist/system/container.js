@@ -1,5 +1,9 @@
 System.register(['core-js', 'aurelia-metadata', 'aurelia-logging', './metadata'], function (_export) {
-  var core, Metadata, AggregateError, Resolver, ClassActivator, _classCallCheck, emptyParameters, Container;
+  'use strict';
+
+  var core, Metadata, AggregateError, Resolver, ClassActivator, emptyParameters, Container;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function test() {}
   return {
@@ -14,9 +18,6 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging', './metadata']
       ClassActivator = _metadata.ClassActivator;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
       Metadata.registration = 'aurelia:registration';
       Metadata.instanceActivator = 'aurelia:instance-activator';
@@ -85,12 +86,16 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging', './metadata']
             throw new Error('fn cannot be null or undefined.');
           }
 
-          registration = Metadata.get(Metadata.registration, fn);
+          if (typeof fn === 'function') {
+            registration = Metadata.get(Metadata.registration, fn);
 
-          if (registration !== undefined) {
-            registration.register(this, key || fn, fn);
+            if (registration !== undefined) {
+              registration.register(this, key || fn, fn);
+            } else {
+              this.registerSingleton(key || fn, fn);
+            }
           } else {
-            this.registerSingleton(key || fn, fn);
+            this.registerInstance(fn, fn);
           }
         };
 
@@ -196,7 +201,15 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging', './metadata']
 
             return info.activator.invoke(fn, args);
           } catch (e) {
-            throw AggregateError('Error instantiating ' + fn.name + '.', e, true);
+            var activatingText = info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
+            var message = 'Error ' + activatingText + ' ' + fn.name + '.';
+            if (i < ii) {
+              message += ' The argument at index ' + i + ' (key:' + keys[i] + ') could not be satisfied.';
+            }
+
+            message += ' Check the inner error for details.';
+
+            throw AggregateError(message, e, true);
           }
         };
 
