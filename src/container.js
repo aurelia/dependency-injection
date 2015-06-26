@@ -35,6 +35,15 @@ export class Container {
     this.root = this;
   }
 
+  /**
+  * Makes this container instance globally reachable through Container.instance.
+  *
+  * @method makeGlobal
+  */
+  makeGlobal(){
+    Container.instance = this;
+  }
+
  /**
  * Adds an additional location to search for constructor parameter type info.
  *
