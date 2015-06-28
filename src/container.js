@@ -168,7 +168,7 @@ export class Container {
     var entry;
 
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.');
+      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
     }
 
     if(key === Container){
@@ -206,7 +206,7 @@ export class Container {
     var entry;
 
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.');
+      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
     }
 
     entry = this.entries.get(key);
@@ -232,7 +232,7 @@ export class Container {
   */
   hasHandler(key, checkParent=false) {
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.');
+      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
     }
 
     return this.entries.has(key)
@@ -289,7 +289,7 @@ export class Container {
     var entry;
 
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.');
+      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
     }
 
     entry = this.entries.get(key);
