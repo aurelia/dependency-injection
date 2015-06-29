@@ -1,7 +1,7 @@
 System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_export) {
   'use strict';
 
-  var core, AggregateError, Metadata, Decorators, badKeyError, emptyParameters, Container, TransientRegistration, SingletonRegistration, Resolver, Lazy, All, Optional, Parent, ClassActivator, FactoryActivator;
+  var core, AggregateError, Metadata, Decorators, TransientRegistration, SingletonRegistration, Resolver, Lazy, All, Optional, Parent, ClassActivator, FactoryActivator, badKeyError, emptyParameters, Container;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -79,6 +79,205 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
       Decorators = _aureliaMetadata.Decorators;
     }],
     execute: function () {
+      TransientRegistration = (function () {
+        function TransientRegistration(key) {
+          _classCallCheck(this, TransientRegistration);
+
+          this.key = key;
+        }
+
+        TransientRegistration.prototype.register = function register(container, key, fn) {
+          container.registerTransient(this.key || key, fn);
+        };
+
+        return TransientRegistration;
+      })();
+
+      _export('TransientRegistration', TransientRegistration);
+
+      SingletonRegistration = (function () {
+        function SingletonRegistration(keyOrRegisterInChild) {
+          var registerInChild = arguments[1] === undefined ? false : arguments[1];
+
+          _classCallCheck(this, SingletonRegistration);
+
+          if (typeof keyOrRegisterInChild === 'boolean') {
+            this.registerInChild = keyOrRegisterInChild;
+          } else {
+            this.key = keyOrRegisterInChild;
+            this.registerInChild = registerInChild;
+          }
+        }
+
+        SingletonRegistration.prototype.register = function register(container, key, fn) {
+          var destination = this.registerInChild ? container : container.root;
+          destination.registerSingleton(this.key || key, fn);
+        };
+
+        return SingletonRegistration;
+      })();
+
+      _export('SingletonRegistration', SingletonRegistration);
+
+      Resolver = (function () {
+        function Resolver() {
+          _classCallCheck(this, Resolver);
+        }
+
+        Resolver.prototype.get = function get(container) {
+          throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
+        };
+
+        return Resolver;
+      })();
+
+      _export('Resolver', Resolver);
+
+      Lazy = (function (_Resolver) {
+        function Lazy(key) {
+          _classCallCheck(this, Lazy);
+
+          _Resolver.call(this);
+          this.key = key;
+        }
+
+        _inherits(Lazy, _Resolver);
+
+        Lazy.prototype.get = function get(container) {
+          var _this = this;
+
+          return function () {
+            return container.get(_this.key);
+          };
+        };
+
+        Lazy.of = function of(key) {
+          return new Lazy(key);
+        };
+
+        return Lazy;
+      })(Resolver);
+
+      _export('Lazy', Lazy);
+
+      All = (function (_Resolver2) {
+        function All(key) {
+          _classCallCheck(this, All);
+
+          _Resolver2.call(this);
+          this.key = key;
+        }
+
+        _inherits(All, _Resolver2);
+
+        All.prototype.get = function get(container) {
+          return container.getAll(this.key);
+        };
+
+        All.of = function of(key) {
+          return new All(key);
+        };
+
+        return All;
+      })(Resolver);
+
+      _export('All', All);
+
+      Optional = (function (_Resolver3) {
+        function Optional(key) {
+          var checkParent = arguments[1] === undefined ? false : arguments[1];
+
+          _classCallCheck(this, Optional);
+
+          _Resolver3.call(this);
+          this.key = key;
+          this.checkParent = checkParent;
+        }
+
+        _inherits(Optional, _Resolver3);
+
+        Optional.prototype.get = function get(container) {
+          if (container.hasHandler(this.key, this.checkParent)) {
+            return container.get(this.key);
+          }
+
+          return null;
+        };
+
+        Optional.of = function of(key) {
+          var checkParent = arguments[1] === undefined ? false : arguments[1];
+
+          return new Optional(key, checkParent);
+        };
+
+        return Optional;
+      })(Resolver);
+
+      _export('Optional', Optional);
+
+      Parent = (function (_Resolver4) {
+        function Parent(key) {
+          _classCallCheck(this, Parent);
+
+          _Resolver4.call(this);
+          this.key = key;
+        }
+
+        _inherits(Parent, _Resolver4);
+
+        Parent.prototype.get = function get(container) {
+          return container.parent ? container.parent.get(this.key) : null;
+        };
+
+        Parent.of = function of(key) {
+          return new Parent(key);
+        };
+
+        return Parent;
+      })(Resolver);
+
+      _export('Parent', Parent);
+
+      ClassActivator = (function () {
+        function ClassActivator() {
+          _classCallCheck(this, ClassActivator);
+        }
+
+        ClassActivator.prototype.invoke = function invoke(fn, args) {
+          return Reflect.construct(fn, args);
+        };
+
+        _createClass(ClassActivator, null, [{
+          key: 'instance',
+          value: new ClassActivator(),
+          enumerable: true
+        }]);
+
+        return ClassActivator;
+      })();
+
+      _export('ClassActivator', ClassActivator);
+
+      FactoryActivator = (function () {
+        function FactoryActivator() {
+          _classCallCheck(this, FactoryActivator);
+        }
+
+        FactoryActivator.prototype.invoke = function invoke(fn, args) {
+          return fn.apply(undefined, args);
+        };
+
+        _createClass(FactoryActivator, null, [{
+          key: 'instance',
+          value: new FactoryActivator(),
+          enumerable: true
+        }]);
+
+        return FactoryActivator;
+      })();
+
+      _export('FactoryActivator', FactoryActivator);
+
       badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 
       Metadata.registration = 'aurelia:registration';
@@ -213,7 +412,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
         };
 
         Container.prototype.getAll = function getAll(key) {
-          var _this = this;
+          var _this2 = this;
 
           var entry;
 
@@ -225,7 +424,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
 
           if (entry !== undefined) {
             return entry.map(function (x) {
-              return x(_this);
+              return x(_this2);
             });
           }
 
@@ -342,205 +541,6 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
       Decorators.configure.parameterizedDecorator('singleton', singleton);
       Decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
       Decorators.configure.parameterizedDecorator('factory', factory);
-
-      TransientRegistration = (function () {
-        function TransientRegistration(key) {
-          _classCallCheck(this, TransientRegistration);
-
-          this.key = key;
-        }
-
-        TransientRegistration.prototype.register = function register(container, key, fn) {
-          container.registerTransient(this.key || key, fn);
-        };
-
-        return TransientRegistration;
-      })();
-
-      _export('TransientRegistration', TransientRegistration);
-
-      SingletonRegistration = (function () {
-        function SingletonRegistration(keyOrRegisterInChild) {
-          var registerInChild = arguments[1] === undefined ? false : arguments[1];
-
-          _classCallCheck(this, SingletonRegistration);
-
-          if (typeof keyOrRegisterInChild === 'boolean') {
-            this.registerInChild = keyOrRegisterInChild;
-          } else {
-            this.key = keyOrRegisterInChild;
-            this.registerInChild = registerInChild;
-          }
-        }
-
-        SingletonRegistration.prototype.register = function register(container, key, fn) {
-          var destination = this.registerInChild ? container : container.root;
-          destination.registerSingleton(this.key || key, fn);
-        };
-
-        return SingletonRegistration;
-      })();
-
-      _export('SingletonRegistration', SingletonRegistration);
-
-      Resolver = (function () {
-        function Resolver() {
-          _classCallCheck(this, Resolver);
-        }
-
-        Resolver.prototype.get = function get(container) {
-          throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
-        };
-
-        return Resolver;
-      })();
-
-      _export('Resolver', Resolver);
-
-      Lazy = (function (_Resolver) {
-        function Lazy(key) {
-          _classCallCheck(this, Lazy);
-
-          _Resolver.call(this);
-          this.key = key;
-        }
-
-        _inherits(Lazy, _Resolver);
-
-        Lazy.prototype.get = function get(container) {
-          var _this2 = this;
-
-          return function () {
-            return container.get(_this2.key);
-          };
-        };
-
-        Lazy.of = function of(key) {
-          return new Lazy(key);
-        };
-
-        return Lazy;
-      })(Resolver);
-
-      _export('Lazy', Lazy);
-
-      All = (function (_Resolver2) {
-        function All(key) {
-          _classCallCheck(this, All);
-
-          _Resolver2.call(this);
-          this.key = key;
-        }
-
-        _inherits(All, _Resolver2);
-
-        All.prototype.get = function get(container) {
-          return container.getAll(this.key);
-        };
-
-        All.of = function of(key) {
-          return new All(key);
-        };
-
-        return All;
-      })(Resolver);
-
-      _export('All', All);
-
-      Optional = (function (_Resolver3) {
-        function Optional(key) {
-          var checkParent = arguments[1] === undefined ? false : arguments[1];
-
-          _classCallCheck(this, Optional);
-
-          _Resolver3.call(this);
-          this.key = key;
-          this.checkParent = checkParent;
-        }
-
-        _inherits(Optional, _Resolver3);
-
-        Optional.prototype.get = function get(container) {
-          if (container.hasHandler(this.key, this.checkParent)) {
-            return container.get(this.key);
-          }
-
-          return null;
-        };
-
-        Optional.of = function of(key) {
-          var checkParent = arguments[1] === undefined ? false : arguments[1];
-
-          return new Optional(key, checkParent);
-        };
-
-        return Optional;
-      })(Resolver);
-
-      _export('Optional', Optional);
-
-      Parent = (function (_Resolver4) {
-        function Parent(key) {
-          _classCallCheck(this, Parent);
-
-          _Resolver4.call(this);
-          this.key = key;
-        }
-
-        _inherits(Parent, _Resolver4);
-
-        Parent.prototype.get = function get(container) {
-          return container.parent ? container.parent.get(this.key) : null;
-        };
-
-        Parent.of = function of(key) {
-          return new Parent(key);
-        };
-
-        return Parent;
-      })(Resolver);
-
-      _export('Parent', Parent);
-
-      ClassActivator = (function () {
-        function ClassActivator() {
-          _classCallCheck(this, ClassActivator);
-        }
-
-        ClassActivator.prototype.invoke = function invoke(fn, args) {
-          return Reflect.construct(fn, args);
-        };
-
-        _createClass(ClassActivator, null, [{
-          key: 'instance',
-          value: new ClassActivator(),
-          enumerable: true
-        }]);
-
-        return ClassActivator;
-      })();
-
-      _export('ClassActivator', ClassActivator);
-
-      FactoryActivator = (function () {
-        function FactoryActivator() {
-          _classCallCheck(this, FactoryActivator);
-        }
-
-        FactoryActivator.prototype.invoke = function invoke(fn, args) {
-          return fn.apply(undefined, args);
-        };
-
-        _createClass(FactoryActivator, null, [{
-          key: 'instance',
-          value: new FactoryActivator(),
-          enumerable: true
-        }]);
-
-        return FactoryActivator;
-      })();
-
-      _export('FactoryActivator', FactoryActivator);
     }
   };
 });

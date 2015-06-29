@@ -8,56 +8,23 @@ var through2 = require('through2');
 var concat = require('gulp-concat');
 var insert = require('gulp-insert');
 var rename = require('gulp-rename');
+var tools = require('aurelia-tools');
 
 gulp.task('build-index', function(){
-  var relativeImports = /import\s+{[a-zA-Z,\s]+}\s+from\s+'\.\/[a-zA-Z\-]+';\s+/g;
-  var nonRelativeImports = /import\s+{?[a-zA-Z,\s]+}?\s+from\s+'[a-zA-Z\-]+';\s+/g;
-  var importGrouper = /import\s+{([a-zA-Z,\s]+)}\s+from\s+'([a-zA-Z\-]+)';\s+/g;
   var importsToAdd = [];
+  var files = ['metadata.js', 'container.js', 'decorators.js'].map(function(file){
+    return paths.root + file;
+  });
 
-  return gulp.src(paths.source)
+  return gulp.src(files)
     .pipe(through2.obj(function(file, enc, callback) {
-      var content = file.contents.toString("utf8");
-      var matchesToKeep = content.match(nonRelativeImports);
-      if(matchesToKeep) importsToAdd = importsToAdd.concat(matchesToKeep);
-      content = content.replace(nonRelativeImports, '');
-      content = content.replace(relativeImports, '');
-      file.contents = new Buffer(content);
+      file.contents = new Buffer(tools.extractImports(file.contents.toString("utf8"), importsToAdd));
       this.push(file);
       return callback();
     }))
     .pipe(concat('index.js'))
     .pipe(insert.transform(function(contents) {
-      var finalImports = {}, importBlock = '';
-
-      importsToAdd.forEach(function(toAdd){
-        var groups = importGrouper.exec(toAdd);
-        if(!groups) {
-          toAdd = toAdd.trim();
-          if(importBlock.indexOf(toAdd) === -1){
-            importBlock += toAdd + '\n';
-          }
-
-          return;
-        };
-
-        var theImports = groups[1].split(',');
-        var theSource = groups[2];
-        var theList = finalImports[theSource] || (finalImports[theSource] = []);
-
-        theImports.forEach(function(item){
-          item = item.trim();
-          if(theList.indexOf(item) == -1){
-            theList.push(item);
-          }
-        });
-      });
-
-      Object.keys(finalImports).forEach(function(key) {
-        importBlock += 'import {' + finalImports[key].join(',') + '} from \'' + key + '\';\n';
-      });
-
-      return importBlock + '\n' + contents;
+      return tools.createImportBlock(importsToAdd) + contents;
     }))
     .pipe(gulp.dest(paths.output));
 });
