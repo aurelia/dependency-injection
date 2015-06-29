@@ -1,24 +1,6 @@
-/**
- * A lightweight, extensible dependency injection container for JavaScript.
- *
- * @module dependency-injection
- */
 import {Decorators, Metadata} from 'aurelia-metadata';
 import {TransientRegistration, SingletonRegistration, FactoryActivator} from './metadata';
 import {emptyParameters} from './container';
-export {
-  TransientRegistration,
-  SingletonRegistration,
-  Resolver,
-  Lazy,
-  All,
-  Optional,
-  Parent,
-  ClassActivator,
-  FactoryActivator
-} from './metadata';
-
-export {Container} from './container';
 
 export function autoinject(target){
   var deco = function(target){
