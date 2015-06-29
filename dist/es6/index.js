@@ -578,14 +578,14 @@ export class Container {
       return info;
     }
 
-    info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
+    info.keys = Metadata.getOwn(Metadata.paramTypes, fn) || emptyParameters;
     return info;
   }
 }
 
 export function autoinject(target){
   var deco = function(target){
-    target.inject = Reflect.getOwnMetadata(Metadata.paramTypes, target) || emptyParameters;
+    target.inject = Metadata.getOwn(Metadata.paramTypes, target) || emptyParameters;
   };
 
   return target ? deco(target) : deco;
@@ -599,7 +599,7 @@ export function inject(...rest){
 
 export function registration(value){
   return function(target){
-    Reflect.defineMetadata(Metadata.registration, value, target);
+    Metadata.define(Metadata.registration, value, target);
   }
 }
 
@@ -613,7 +613,7 @@ export function singleton(keyOrRegisterInChild, registerInChild=false){
 
 export function instanceActivator(value){
   return function(target){
-    Reflect.defineMetadata(Metadata.instanceActivator, value, target);
+    Metadata.define(Metadata.instanceActivator, value, target);
   }
 }
 

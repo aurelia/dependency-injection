@@ -1,4 +1,5 @@
-import {Container, Parent} from '../src/index';
+import {Parent} from '../src/metadata';
+import {Container} from '../src/container';
 
 describe('Parent', () => {
 	it('should return the key from the parent container when present', () => {

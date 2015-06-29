@@ -455,7 +455,7 @@ var Container = (function () {
       return info;
     }
 
-    info.keys = Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, fn) || emptyParameters;
+    info.keys = _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.paramTypes, fn) || emptyParameters;
     return info;
   };
 
@@ -466,7 +466,7 @@ exports.Container = Container;
 
 function autoinject(target) {
   var deco = function deco(target) {
-    target.inject = Reflect.getOwnMetadata(_aureliaMetadata.Metadata.paramTypes, target) || emptyParameters;
+    target.inject = _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.paramTypes, target) || emptyParameters;
   };
 
   return target ? deco(target) : deco;
@@ -484,7 +484,7 @@ function inject() {
 
 function registration(value) {
   return function (target) {
-    Reflect.defineMetadata(_aureliaMetadata.Metadata.registration, value, target);
+    _aureliaMetadata.Metadata.define(_aureliaMetadata.Metadata.registration, value, target);
   };
 }
 
@@ -500,7 +500,7 @@ function singleton(keyOrRegisterInChild) {
 
 function instanceActivator(value) {
   return function (target) {
-    Reflect.defineMetadata(_aureliaMetadata.Metadata.instanceActivator, value, target);
+    _aureliaMetadata.Metadata.define(_aureliaMetadata.Metadata.instanceActivator, value, target);
   };
 }
 

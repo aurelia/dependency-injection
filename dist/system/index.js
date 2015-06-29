@@ -27,7 +27,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
 
   function autoinject(target) {
     var deco = function deco(target) {
-      target.inject = Reflect.getOwnMetadata(Metadata.paramTypes, target) || emptyParameters;
+      target.inject = Metadata.getOwn(Metadata.paramTypes, target) || emptyParameters;
     };
 
     return target ? deco(target) : deco;
@@ -45,7 +45,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
 
   function registration(value) {
     return function (target) {
-      Reflect.defineMetadata(Metadata.registration, value, target);
+      Metadata.define(Metadata.registration, value, target);
     };
   }
 
@@ -61,7 +61,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
 
   function instanceActivator(value) {
     return function (target) {
-      Reflect.defineMetadata(Metadata.instanceActivator, value, target);
+      Metadata.define(Metadata.instanceActivator, value, target);
     };
   }
 
@@ -507,7 +507,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
             return info;
           }
 
-          info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
+          info.keys = Metadata.getOwn(Metadata.paramTypes, fn) || emptyParameters;
           return info;
         };
 

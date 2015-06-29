@@ -1,4 +1,6 @@
-import {Container, inject, transient, singleton, Lazy, All, Optional, Parent} from '../src/index';
+import {Container} from '../src/container';
+import {Lazy, All, Optional, Parent} from '../src/metadata';
+import {inject, transient, singleton} from '../src/decorators';
 import {Decorators,Metadata} from 'aurelia-metadata';
 
 describe('container', () => {

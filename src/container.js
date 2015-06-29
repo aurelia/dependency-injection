@@ -312,7 +312,7 @@ export class Container {
       return info;
     }
 
-    info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
+    info.keys = Metadata.getOwn(Metadata.paramTypes, fn) || emptyParameters;
     return info;
   }
 }
