@@ -3,6 +3,8 @@ import {Metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-logging';
 import {Resolver, ClassActivator} from './metadata';
 
+const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+
 Metadata.registration = 'aurelia:registration';
 Metadata.instanceActivator = 'aurelia:instance-activator';
 
@@ -42,6 +44,7 @@ export class Container {
   */
   makeGlobal(){
     Container.instance = this;
+    return this;
   }
 
  /**
@@ -107,7 +110,7 @@ export class Container {
     var registration;
 
     if (fn === null || fn === undefined){
-      throw new Error('fn cannot be null or undefined.')
+      throw new Error(badKeyError)
     }
 
     if(typeof fn === 'function'){
@@ -168,7 +171,7 @@ export class Container {
     var entry;
 
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
+      throw new Error(badKeyError);
     }
 
     if(key === Container){
@@ -206,7 +209,7 @@ export class Container {
     var entry;
 
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
+      throw new Error(badKeyError);
     }
 
     entry = this.entries.get(key);
@@ -232,7 +235,7 @@ export class Container {
   */
   hasHandler(key, checkParent=false) {
     if (key === null || key === undefined){
-      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
+      throw new Error(badKeyError);
     }
 
     return this.entries.has(key)
