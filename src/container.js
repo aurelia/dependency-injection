@@ -31,7 +31,7 @@ export var emptyParameters = Object.freeze([]);
 * @constructor
 */
 export class Container {
-  constructor(constructionInfo) {
+  constructor(constructionInfo?:Map) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
     this.root = this;
@@ -42,25 +42,9 @@ export class Container {
   *
   * @method makeGlobal
   */
-  makeGlobal(){
+  makeGlobal():Container{
     Container.instance = this;
     return this;
-  }
-
- /**
- * Adds an additional location to search for constructor parameter type info.
- *
- * @method addParameterInfoLocator
- * @param {Function} locator Configures a locator function to use when searching for parameter info. It should return undefined if no parameter info is found.
- */
-  addParameterInfoLocator(locator){
-    if(this.locateParameterInfoElsewhere === undefined){
-      this.locateParameterInfoElsewhere = locator;
-      return;
-    }
-
-    var original = this.locateParameterInfoElsewhere;
-    this.locateParameterInfoElsewhere = (fn) => {return original(fn) || locator(fn);};
   }
 
   /**
@@ -70,7 +54,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Object} instance The instance that will be resolved when the key is matched.
   */
-  registerInstance(key, instance) {
+  registerInstance(key:any, instance:any) {
     this.registerHandler(key, x => instance);
   }
 
@@ -81,7 +65,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerTransient(key, fn) {
+  registerTransient(key:any, fn?:Function) {
     fn = fn || key;
     this.registerHandler(key, x => x.invoke(fn));
   }
@@ -93,7 +77,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerSingleton(key, fn) {
+  registerSingleton(key:any, fn?:Function) {
     var singleton = null;
     fn = fn || key;
     this.registerHandler(key, x => singleton || (singleton = x.invoke(fn)));
@@ -106,7 +90,7 @@ export class Container {
   * @param {Function} fn The constructor function to use when the dependency needs to be instantiated.
   * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  autoRegister(fn, key){
+  autoRegister(fn:any, key?:any){
     var registration;
 
     if (fn === null || fn === undefined){
@@ -132,7 +116,7 @@ export class Container {
   * @method autoRegisterAll
   * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
   */
-  autoRegisterAll(fns){
+  autoRegisterAll(fns:any[]){
     var i = fns.length;
     while(i--) {
       this.autoRegister(fns[i]);
@@ -146,8 +130,8 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
   */
-  registerHandler(key, handler) {
-    this.getOrCreateEntry(key).push(handler);
+  registerHandler(key:any, handler:(c:Container) => any) {
+    this._getOrCreateEntry(key).push(handler);
   }
 
   /**
@@ -156,7 +140,7 @@ export class Container {
   * @method unregister
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  unregister(key) {
+  unregister(key:any) {
     this.entries.delete(key);
   }
 
@@ -167,7 +151,7 @@ export class Container {
   * @param {Object} key The key that identifies the object to resolve.
   * @return {Object} Returns the resolved instance.
   */
-  get(key) {
+  get(key:any):any {
     var entry;
 
     if (key === null || key === undefined){
@@ -205,7 +189,7 @@ export class Container {
   * @param {Object} key The key that identifies the objects to resolve.
   * @return {Object[]} Returns an array of the resolved instances.
   */
-  getAll(key) {
+  getAll(key:any):any[] {
     var entry;
 
     if (key === null || key === undefined){
@@ -233,7 +217,7 @@ export class Container {
   * @param {Boolean} [checkParent=false] Indicates whether or not to check the parent container hierarchy.
   * @return {Boolean} Returns true if the key has been registred; false otherwise.
   */
-  hasHandler(key, checkParent=false) {
+  hasHandler(key:any, checkParent?:boolean=false):boolean {
     if (key === null || key === undefined){
       throw new Error(badKeyError);
     }
@@ -248,11 +232,10 @@ export class Container {
   * @method createChild
   * @return {Container} Returns a new container instance parented to this.
   */
-  createChild(){
+  createChild():Container{
     var childContainer = new Container(this.constructionInfo);
     childContainer.parent = this;
     childContainer.root = this.root;
-    childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
     return childContainer;
   }
 
@@ -263,9 +246,9 @@ export class Container {
   * @param {Function} fn The function to invoke with the auto-resolved dependencies.
   * @return {Object} Returns the instance resulting from calling the function.
   */
-  invoke(fn) {
+  invoke(fn:Function):any {
     try{
-      var info = this.getOrCreateConstructionInfo(fn),
+      var info = this._getOrCreateConstructionInfo(fn),
           keys = info.keys,
           args = new Array(keys.length),
           i, ii;
@@ -288,7 +271,7 @@ export class Container {
     }
   }
 
-  getOrCreateEntry(key) {
+  _getOrCreateEntry(key) {
     var entry;
 
     if (key === null || key === undefined){
@@ -305,18 +288,18 @@ export class Container {
     return entry;
   }
 
-  getOrCreateConstructionInfo(fn){
+  _getOrCreateConstructionInfo(fn){
     var info = this.constructionInfo.get(fn);
 
     if(info === undefined){
-      info = this.createConstructionInfo(fn);
+      info = this._createConstructionInfo(fn);
       this.constructionInfo.set(fn, info);
     }
 
     return info;
   }
 
-  createConstructionInfo(fn){
+  _createConstructionInfo(fn){
     var info = {activator: Metadata.getOwn(Metadata.instanceActivator, fn) || ClassActivator.instance};
 
     if(fn.inject !== undefined){
@@ -329,12 +312,7 @@ export class Container {
       return info;
     }
 
-    if(this.locateParameterInfoElsewhere !== undefined){
-      info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
-    }else{
-      info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
-    }
-
+    info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
     return info;
   }
 }

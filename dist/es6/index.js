@@ -10,7 +10,7 @@ import {Metadata,Decorators} from 'aurelia-metadata';
 * @param {Object} [key] The key to register as.
 */
 export class TransientRegistration {
-  constructor(key){
+  constructor(key:any){
     this.key = key;
   }
 
@@ -22,7 +22,7 @@ export class TransientRegistration {
   * @param {Object} key The key to register as.
   * @param {Object} fn The function to register (target of the annotation).
   */
-  register(container, key, fn){
+  register(container:Container, key:any, fn:Function){
     container.registerTransient(this.key || key, fn);
   }
 }
@@ -35,7 +35,7 @@ export class TransientRegistration {
 * @param {Object} [key] The key to register as.
 */
 export class SingletonRegistration {
-  constructor(keyOrRegisterInChild, registerInChild=false){
+  constructor(keyOrRegisterInChild:any, registerInChild?:boolean=false){
     if(typeof keyOrRegisterInChild === 'boolean'){
       this.registerInChild = keyOrRegisterInChild;
     }else{
@@ -52,7 +52,7 @@ export class SingletonRegistration {
   * @param {Object} key The key to register as.
   * @param {Object} fn The function to register (target of the annotation).
   */
-  register(container, key, fn){
+  register(container:Container, key:any, fn:Function){
     var destination = this.registerInChild ? container : container.root;
     destination.registerSingleton(this.key || key, fn);
   }
@@ -72,7 +72,7 @@ export class Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Object} Returns the resolved object.
   */
-  get(container){
+  get(container:Container):any{
     throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
   }
 }
@@ -86,7 +86,7 @@ export class Resolver {
 * @param {Object} key The key to lazily resolve.
 */
 export class Lazy extends Resolver {
-  constructor(key){
+  constructor(key:any){
     super();
     this.key = key;
   }
@@ -98,7 +98,7 @@ export class Lazy extends Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Function} Returns a function which can be invoked at a later time to obtain the actual dependency.
   */
-  get(container){
+  get(container:Container):any{
     return () => {
       return container.get(this.key);
     };
@@ -112,7 +112,7 @@ export class Lazy extends Resolver {
   * @param {Object} key The key to lazily resolve.
   * @return {Lazy} Returns an insance of Lazy for the key.
   */
-  static of(key){
+  static of(key:any):Lazy{
     return new Lazy(key);
   }
 }
@@ -126,7 +126,7 @@ export class Lazy extends Resolver {
 * @param {Object} key The key to lazily resolve all matches for.
 */
 export class All extends Resolver {
-  constructor(key){
+  constructor(key:any){
     super();
     this.key = key;
   }
@@ -138,7 +138,7 @@ export class All extends Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Object[]} Returns an array of all matching instances.
   */
-  get(container){
+  get(container:Container):any[]{
     return container.getAll(this.key);
   }
 
@@ -150,7 +150,7 @@ export class All extends Resolver {
   * @param {Object} key The key to resolve all instances for.
   * @return {All} Returns an insance of All for the key.
   */
-  static of(key){
+  static of(key:any):All{
     return new All(key);
   }
 }
@@ -165,7 +165,7 @@ export class All extends Resolver {
 * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
 */
 export class Optional extends Resolver {
-  constructor(key, checkParent=false){
+  constructor(key:any, checkParent?:boolean=false){
     super();
     this.key = key;
     this.checkParent = checkParent;
@@ -178,7 +178,7 @@ export class Optional extends Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Object} Returns the instance if found; otherwise null.
   */
-  get(container){
+  get(container:Container):any{
     if(container.hasHandler(this.key, this.checkParent)){
       return container.get(this.key);
     }
@@ -195,7 +195,7 @@ export class Optional extends Resolver {
   * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
   * @return {Optional} Returns an insance of Optional for the key.
   */
-  static of(key, checkParent=false){
+  static of(key:any, checkParent?:boolean=false):Optional{
     return new Optional(key, checkParent);
   }
 }
@@ -210,7 +210,7 @@ export class Optional extends Resolver {
 * @param {Object} key The key to resolve from the parent container.
 */
 export class Parent extends Resolver {
-  constructor(key){
+  constructor(key:any){
     super();
     this.key = key;
   }
@@ -222,7 +222,7 @@ export class Parent extends Resolver {
   * @param {Container} container The container to resolve the parent from.
   * @return {Function} Returns the matching instance from the parent container
   */
-  get(container){
+  get(container:Container):any{
     return container.parent
       ? container.parent.get(this.key)
       : null;
@@ -236,7 +236,7 @@ export class Parent extends Resolver {
   * @param {Object} key The key to resolve.
   * @return {Parent} Returns an insance of Parent for the key.
   */
-  static of(key){
+  static of(key:any):Parent{
     return new Parent(key);
   }
 }
@@ -250,7 +250,7 @@ export class Parent extends Resolver {
 export class ClassActivator {
   static instance = new ClassActivator();
 
-  invoke(fn, args){
+  invoke(fn:Function, args:any[]):any{
     return Reflect.construct(fn, args);
   }
 }
@@ -264,7 +264,7 @@ export class ClassActivator {
 export class FactoryActivator {
   static instance = new FactoryActivator();
 
-  invoke(fn, args){
+  invoke(fn:Function, args:any[]):any{
     return fn.apply(undefined, args);
   }
 }
@@ -297,7 +297,7 @@ export var emptyParameters = Object.freeze([]);
 * @constructor
 */
 export class Container {
-  constructor(constructionInfo) {
+  constructor(constructionInfo?:Map) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
     this.root = this;
@@ -308,25 +308,9 @@ export class Container {
   *
   * @method makeGlobal
   */
-  makeGlobal(){
+  makeGlobal():Container{
     Container.instance = this;
     return this;
-  }
-
- /**
- * Adds an additional location to search for constructor parameter type info.
- *
- * @method addParameterInfoLocator
- * @param {Function} locator Configures a locator function to use when searching for parameter info. It should return undefined if no parameter info is found.
- */
-  addParameterInfoLocator(locator){
-    if(this.locateParameterInfoElsewhere === undefined){
-      this.locateParameterInfoElsewhere = locator;
-      return;
-    }
-
-    var original = this.locateParameterInfoElsewhere;
-    this.locateParameterInfoElsewhere = (fn) => {return original(fn) || locator(fn);};
   }
 
   /**
@@ -336,7 +320,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Object} instance The instance that will be resolved when the key is matched.
   */
-  registerInstance(key, instance) {
+  registerInstance(key:any, instance:any) {
     this.registerHandler(key, x => instance);
   }
 
@@ -347,7 +331,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerTransient(key, fn) {
+  registerTransient(key:any, fn?:Function) {
     fn = fn || key;
     this.registerHandler(key, x => x.invoke(fn));
   }
@@ -359,7 +343,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerSingleton(key, fn) {
+  registerSingleton(key:any, fn?:Function) {
     var singleton = null;
     fn = fn || key;
     this.registerHandler(key, x => singleton || (singleton = x.invoke(fn)));
@@ -372,7 +356,7 @@ export class Container {
   * @param {Function} fn The constructor function to use when the dependency needs to be instantiated.
   * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  autoRegister(fn, key){
+  autoRegister(fn:any, key?:any){
     var registration;
 
     if (fn === null || fn === undefined){
@@ -398,7 +382,7 @@ export class Container {
   * @method autoRegisterAll
   * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
   */
-  autoRegisterAll(fns){
+  autoRegisterAll(fns:any[]){
     var i = fns.length;
     while(i--) {
       this.autoRegister(fns[i]);
@@ -412,8 +396,8 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
   */
-  registerHandler(key, handler) {
-    this.getOrCreateEntry(key).push(handler);
+  registerHandler(key:any, handler:(c:Container) => any) {
+    this._getOrCreateEntry(key).push(handler);
   }
 
   /**
@@ -422,7 +406,7 @@ export class Container {
   * @method unregister
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  unregister(key) {
+  unregister(key:any) {
     this.entries.delete(key);
   }
 
@@ -433,7 +417,7 @@ export class Container {
   * @param {Object} key The key that identifies the object to resolve.
   * @return {Object} Returns the resolved instance.
   */
-  get(key) {
+  get(key:any):any {
     var entry;
 
     if (key === null || key === undefined){
@@ -471,7 +455,7 @@ export class Container {
   * @param {Object} key The key that identifies the objects to resolve.
   * @return {Object[]} Returns an array of the resolved instances.
   */
-  getAll(key) {
+  getAll(key:any):any[] {
     var entry;
 
     if (key === null || key === undefined){
@@ -499,7 +483,7 @@ export class Container {
   * @param {Boolean} [checkParent=false] Indicates whether or not to check the parent container hierarchy.
   * @return {Boolean} Returns true if the key has been registred; false otherwise.
   */
-  hasHandler(key, checkParent=false) {
+  hasHandler(key:any, checkParent?:boolean=false):boolean {
     if (key === null || key === undefined){
       throw new Error(badKeyError);
     }
@@ -514,11 +498,10 @@ export class Container {
   * @method createChild
   * @return {Container} Returns a new container instance parented to this.
   */
-  createChild(){
+  createChild():Container{
     var childContainer = new Container(this.constructionInfo);
     childContainer.parent = this;
     childContainer.root = this.root;
-    childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
     return childContainer;
   }
 
@@ -529,9 +512,9 @@ export class Container {
   * @param {Function} fn The function to invoke with the auto-resolved dependencies.
   * @return {Object} Returns the instance resulting from calling the function.
   */
-  invoke(fn) {
+  invoke(fn:Function):any {
     try{
-      var info = this.getOrCreateConstructionInfo(fn),
+      var info = this._getOrCreateConstructionInfo(fn),
           keys = info.keys,
           args = new Array(keys.length),
           i, ii;
@@ -554,7 +537,7 @@ export class Container {
     }
   }
 
-  getOrCreateEntry(key) {
+  _getOrCreateEntry(key) {
     var entry;
 
     if (key === null || key === undefined){
@@ -571,18 +554,18 @@ export class Container {
     return entry;
   }
 
-  getOrCreateConstructionInfo(fn){
+  _getOrCreateConstructionInfo(fn){
     var info = this.constructionInfo.get(fn);
 
     if(info === undefined){
-      info = this.createConstructionInfo(fn);
+      info = this._createConstructionInfo(fn);
       this.constructionInfo.set(fn, info);
     }
 
     return info;
   }
 
-  createConstructionInfo(fn){
+  _createConstructionInfo(fn){
     var info = {activator: Metadata.getOwn(Metadata.instanceActivator, fn) || ClassActivator.instance};
 
     if(fn.inject !== undefined){
@@ -595,12 +578,7 @@ export class Container {
       return info;
     }
 
-    if(this.locateParameterInfoElsewhere !== undefined){
-      info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
-    }else{
-      info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
-    }
-
+    info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
     return info;
   }
 }

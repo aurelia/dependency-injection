@@ -21,7 +21,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key to register as.
       * @param {Object} fn The function to register (target of the annotation).
       */
-    register(container: any, key: any, fn: any): any;
+    register(container: Container, key: any, fn: Function): any;
   }
   
   /**
@@ -32,7 +32,7 @@ declare module 'aurelia-dependency-injection' {
   * @param {Object} [key] The key to register as.
   */
   export class SingletonRegistration {
-    constructor(keyOrRegisterInChild: any, registerInChild?: any);
+    constructor(keyOrRegisterInChild: any, registerInChild?: boolean);
     
     /**
       * Called by the container to register the annotated function/class as a singleton.
@@ -42,7 +42,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key to register as.
       * @param {Object} fn The function to register (target of the annotation).
       */
-    register(container: any, key: any, fn: any): any;
+    register(container: Container, key: any, fn: Function): any;
   }
   
   /**
@@ -60,7 +60,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Container} container The container to resolve from.
       * @return {Object} Returns the resolved object.
       */
-    get(container: any): any;
+    get(container: Container): any;
   }
   
   /**
@@ -81,7 +81,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Container} container The container to resolve from.
       * @return {Function} Returns a function which can be invoked at a later time to obtain the actual dependency.
       */
-    get(container: any): any;
+    get(container: Container): any;
     
     /**
       * Creates a Lazy Resolver for the supplied key.
@@ -91,7 +91,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key to lazily resolve.
       * @return {Lazy} Returns an insance of Lazy for the key.
       */
-    static of(key: any): any;
+    static of(key: any): Lazy;
   }
   
   /**
@@ -112,7 +112,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Container} container The container to resolve from.
       * @return {Object[]} Returns an array of all matching instances.
       */
-    get(container: any): any;
+    get(container: Container): any[];
     
     /**
       * Creates an All Resolver for the supplied key.
@@ -122,7 +122,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key to resolve all instances for.
       * @return {All} Returns an insance of All for the key.
       */
-    static of(key: any): any;
+    static of(key: any): All;
   }
   
   /**
@@ -135,7 +135,7 @@ declare module 'aurelia-dependency-injection' {
   * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
   */
   export class Optional extends Resolver {
-    constructor(key: any, checkParent?: any);
+    constructor(key: any, checkParent?: boolean);
     
     /**
       * Called by the container to provide optional resolution of the key.
@@ -144,7 +144,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Container} container The container to resolve from.
       * @return {Object} Returns the instance if found; otherwise null.
       */
-    get(container: any): any;
+    get(container: Container): any;
     
     /**
       * Creates an Optional Resolver for the supplied key.
@@ -155,7 +155,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
       * @return {Optional} Returns an insance of Optional for the key.
       */
-    static of(key: any, checkParent?: any): any;
+    static of(key: any, checkParent?: boolean): Optional;
   }
   
   /**
@@ -176,7 +176,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Container} container The container to resolve the parent from.
       * @return {Function} Returns the matching instance from the parent container
       */
-    get(container: any): any;
+    get(container: Container): any;
     
     /**
       * Creates a Parent Resolver for the supplied key.
@@ -186,7 +186,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key to resolve.
       * @return {Parent} Returns an insance of Parent for the key.
       */
-    static of(key: any): any;
+    static of(key: any): Parent;
   }
   
   /**
@@ -197,7 +197,7 @@ declare module 'aurelia-dependency-injection' {
   */
   export class ClassActivator {
     static instance: any;
-    invoke(fn: any, args: any): any;
+    invoke(fn: Function, args: any[]): any;
   }
   
   /**
@@ -208,7 +208,7 @@ declare module 'aurelia-dependency-injection' {
   */
   export class FactoryActivator {
     static instance: any;
-    invoke(fn: any, args: any): any;
+    invoke(fn: Function, args: any[]): any;
   }
   export var emptyParameters: any;
   
@@ -219,22 +219,14 @@ declare module 'aurelia-dependency-injection' {
   * @constructor
   */
   export class Container {
-    constructor(constructionInfo: any);
+    constructor(constructionInfo: Map);
     
     /**
       * Makes this container instance globally reachable through Container.instance.
       *
       * @method makeGlobal
       */
-    makeGlobal(): any;
-    
-    /**
-     * Adds an additional location to search for constructor parameter type info.
-     *
-     * @method addParameterInfoLocator
-     * @param {Function} locator Configures a locator function to use when searching for parameter info. It should return undefined if no parameter info is found.
-     */
-    addParameterInfoLocator(locator: any): any;
+    makeGlobal(): Container;
     
     /**
       * Registers an existing object instance with the container.
@@ -252,7 +244,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
       * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
       */
-    registerTransient(key: any, fn: any): any;
+    registerTransient(key: any, fn: Function): any;
     
     /**
       * Registers a type (constructor function) such that the container always returns the same instance for each request.
@@ -261,7 +253,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
       * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
       */
-    registerSingleton(key: any, fn: any): any;
+    registerSingleton(key: any, fn: Function): any;
     
     /**
       * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
@@ -278,7 +270,7 @@ declare module 'aurelia-dependency-injection' {
       * @method autoRegisterAll
       * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
       */
-    autoRegisterAll(fns: any): any;
+    autoRegisterAll(fns: any[]): any;
     
     /**
       * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
@@ -287,7 +279,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
       * @param {Function} handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
       */
-    registerHandler(key: any, handler: any): any;
+    registerHandler(key: any, handler: (c: Container) => any): any;
     
     /**
       * Unregisters based on key.
@@ -313,7 +305,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key that identifies the objects to resolve.
       * @return {Object[]} Returns an array of the resolved instances.
       */
-    getAll(key: any): any;
+    getAll(key: any): any[];
     
     /**
       * Inspects the container to determine if a particular key has been registred.
@@ -323,7 +315,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Boolean} [checkParent=false] Indicates whether or not to check the parent container hierarchy.
       * @return {Boolean} Returns true if the key has been registred; false otherwise.
       */
-    hasHandler(key: any, checkParent?: any): any;
+    hasHandler(key: any, checkParent?: boolean): boolean;
     
     /**
       * Creates a new dependency injection container whose parent is the current container.
@@ -331,7 +323,7 @@ declare module 'aurelia-dependency-injection' {
       * @method createChild
       * @return {Container} Returns a new container instance parented to this.
       */
-    createChild(): any;
+    createChild(): Container;
     
     /**
       * Invokes a function, recursively resolving its dependencies.
@@ -340,10 +332,10 @@ declare module 'aurelia-dependency-injection' {
       * @param {Function} fn The function to invoke with the auto-resolved dependencies.
       * @return {Object} Returns the instance resulting from calling the function.
       */
-    invoke(fn: any): any;
-    getOrCreateEntry(key: any): any;
-    getOrCreateConstructionInfo(fn: any): any;
-    createConstructionInfo(fn: any): any;
+    invoke(fn: Function): any;
+    _getOrCreateEntry(key: any): any;
+    _getOrCreateConstructionInfo(fn: any): any;
+    _createConstructionInfo(fn: any): any;
   }
   export function autoinject(target: any): any;
   export function inject(...rest: any[]): any;

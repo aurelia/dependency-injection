@@ -312,18 +312,6 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
           return this;
         };
 
-        Container.prototype.addParameterInfoLocator = function addParameterInfoLocator(locator) {
-          if (this.locateParameterInfoElsewhere === undefined) {
-            this.locateParameterInfoElsewhere = locator;
-            return;
-          }
-
-          var original = this.locateParameterInfoElsewhere;
-          this.locateParameterInfoElsewhere = function (fn) {
-            return original(fn) || locator(fn);
-          };
-        };
-
         Container.prototype.registerInstance = function registerInstance(key, instance) {
           this.registerHandler(key, function (x) {
             return instance;
@@ -373,7 +361,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
         };
 
         Container.prototype.registerHandler = function registerHandler(key, handler) {
-          this.getOrCreateEntry(key).push(handler);
+          this._getOrCreateEntry(key).push(handler);
         };
 
         Container.prototype.unregister = function unregister(key) {
@@ -449,13 +437,12 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
           var childContainer = new Container(this.constructionInfo);
           childContainer.parent = this;
           childContainer.root = this.root;
-          childContainer.locateParameterInfoElsewhere = this.locateParameterInfoElsewhere;
           return childContainer;
         };
 
         Container.prototype.invoke = function invoke(fn) {
           try {
-            var info = this.getOrCreateConstructionInfo(fn),
+            var info = this._getOrCreateConstructionInfo(fn),
                 keys = info.keys,
                 args = new Array(keys.length),
                 i,
@@ -479,7 +466,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
           }
         };
 
-        Container.prototype.getOrCreateEntry = function getOrCreateEntry(key) {
+        Container.prototype._getOrCreateEntry = function _getOrCreateEntry(key) {
           var entry;
 
           if (key === null || key === undefined) {
@@ -496,18 +483,18 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
           return entry;
         };
 
-        Container.prototype.getOrCreateConstructionInfo = function getOrCreateConstructionInfo(fn) {
+        Container.prototype._getOrCreateConstructionInfo = function _getOrCreateConstructionInfo(fn) {
           var info = this.constructionInfo.get(fn);
 
           if (info === undefined) {
-            info = this.createConstructionInfo(fn);
+            info = this._createConstructionInfo(fn);
             this.constructionInfo.set(fn, info);
           }
 
           return info;
         };
 
-        Container.prototype.createConstructionInfo = function createConstructionInfo(fn) {
+        Container.prototype._createConstructionInfo = function _createConstructionInfo(fn) {
           var info = { activator: Metadata.getOwn(Metadata.instanceActivator, fn) || ClassActivator.instance };
 
           if (fn.inject !== undefined) {
@@ -520,12 +507,7 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
             return info;
           }
 
-          if (this.locateParameterInfoElsewhere !== undefined) {
-            info.keys = this.locateParameterInfoElsewhere(fn) || Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
-          } else {
-            info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
-          }
-
+          info.keys = Reflect.getOwnMetadata(Metadata.paramTypes, fn) || emptyParameters;
           return info;
         };
 
