@@ -219,7 +219,7 @@ declare module 'aurelia-dependency-injection' {
   * @constructor
   */
   export class Container {
-    constructor(constructionInfo: Map);
+    constructor(constructionInfo: Map<Function, Object>);
     
     /**
       * Makes this container instance globally reachable through Container.instance.

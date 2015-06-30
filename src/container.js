@@ -31,7 +31,7 @@ export var emptyParameters = Object.freeze([]);
 * @constructor
 */
 export class Container {
-  constructor(constructionInfo?:Map) {
+  constructor(constructionInfo?:Map<Function,Object>) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
     this.root = this;
