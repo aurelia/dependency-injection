@@ -244,9 +244,10 @@ export class Container {
   *
   * @method invoke
   * @param {Function} fn The function to invoke with the auto-resolved dependencies.
+  * @param {any[]} [deps] Additional function dependencies to use during invocation.
   * @return {Object} Returns the instance resulting from calling the function.
   */
-  invoke(fn:Function):any {
+  invoke(fn:Function, deps?:any[]):any {
     try{
       var info = this._getOrCreateConstructionInfo(fn),
           keys = info.keys,
@@ -255,6 +256,10 @@ export class Container {
 
       for(i = 0, ii = keys.length; i < ii; ++i){
         args[i] = this.get(keys[i]);
+      }
+
+      if(deps !== undefined){
+        args = args.concat(deps);
       }
 
       return info.activator.invoke(fn, args);
