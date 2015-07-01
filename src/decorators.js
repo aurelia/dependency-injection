@@ -2,7 +2,7 @@ import {Decorators, Metadata} from 'aurelia-metadata';
 import {TransientRegistration, SingletonRegistration, FactoryActivator} from './metadata';
 import {emptyParameters} from './container';
 
-export function autoinject(target){
+export function autoinject(target?:any){
   var deco = function(target){
     target.inject = Metadata.getOwn(Metadata.paramTypes, target) || emptyParameters;
   };
@@ -10,27 +10,27 @@ export function autoinject(target){
   return target ? deco(target) : deco;
 }
 
-export function inject(...rest){
+export function inject(...rest:any[]){
   return function(target){
     target.inject = rest;
   }
 }
 
-export function registration(value){
+export function registration(value:any){
   return function(target){
     Metadata.define(Metadata.registration, value, target);
   }
 }
 
-export function transient(key){
+export function transient(key?:any){
   return registration(new TransientRegistration(key));
 }
 
-export function singleton(keyOrRegisterInChild, registerInChild=false){
+export function singleton(keyOrRegisterInChild?:any, registerInChild?:boolean=false){
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
-export function instanceActivator(value){
+export function instanceActivator(value:any){
   return function(target){
     Metadata.define(Metadata.instanceActivator, value, target);
   }
