@@ -1,4 +1,4 @@
-define(['exports', 'core-js', 'aurelia-logging', 'aurelia-metadata'], function (exports, _coreJs, _aureliaLogging, _aureliaMetadata) {
+define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (exports, _coreJs, _aureliaMetadata, _aureliaLogging) {
   'use strict';
 
   exports.__esModule = true;

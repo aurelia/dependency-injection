@@ -37,8 +37,8 @@
     }
   },
   "devDependencies": {
-    "aurelia-tools": "^0.1.5",
-    "babel-dts-generator": "^0.2.4",
+    "aurelia-tools": "^0.1.6",
+    "babel-dts-generator": "^0.2.5",
     "conventional-changelog": "0.0.11",
     "del": "^1.1.0",
     "gulp": "^3.8.10",

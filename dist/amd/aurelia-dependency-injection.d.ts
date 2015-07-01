@@ -1,7 +1,7 @@
 declare module 'aurelia-dependency-injection' {
   import core from 'core-js';
-  import { AggregateError }  from 'aurelia-logging';
   import { Metadata, Decorators }  from 'aurelia-metadata';
+  import { AggregateError }  from 'aurelia-logging';
   
   /**
   * Used to allow functions/classes to indicate that they should be registered as transients with the container.
@@ -219,7 +219,7 @@ declare module 'aurelia-dependency-injection' {
   * @constructor
   */
   export class Container {
-    constructor(constructionInfo: Map<Function, Object>);
+    constructor(constructionInfo?: Map<Function, Object>);
     
     /**
       * Makes this container instance globally reachable through Container.instance.
@@ -244,7 +244,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
       * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
       */
-    registerTransient(key: any, fn: Function): any;
+    registerTransient(key: any, fn?: Function): any;
     
     /**
       * Registers a type (constructor function) such that the container always returns the same instance for each request.
@@ -253,7 +253,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
       * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
       */
-    registerSingleton(key: any, fn: Function): any;
+    registerSingleton(key: any, fn?: Function): any;
     
     /**
       * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
@@ -262,7 +262,7 @@ declare module 'aurelia-dependency-injection' {
       * @param {Function} fn The constructor function to use when the dependency needs to be instantiated.
       * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
       */
-    autoRegister(fn: any, key: any): any;
+    autoRegister(fn: any, key?: any): any;
     
     /**
       * Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used.
@@ -333,9 +333,6 @@ declare module 'aurelia-dependency-injection' {
       * @return {Object} Returns the instance resulting from calling the function.
       */
     invoke(fn: Function): any;
-    _getOrCreateEntry(key: any): any;
-    _getOrCreateConstructionInfo(fn: any): any;
-    _createConstructionInfo(fn: any): any;
   }
   export function autoinject(target: any): any;
   export function inject(...rest: any[]): any;

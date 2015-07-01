@@ -22,9 +22,9 @@ var _coreJs = require('core-js');
 
 var _coreJs2 = _interopRequireDefault(_coreJs);
 
-var _aureliaLogging = require('aurelia-logging');
-
 var _aureliaMetadata = require('aurelia-metadata');
+
+var _aureliaLogging = require('aurelia-logging');
 
 var TransientRegistration = (function () {
   function TransientRegistration(key) {

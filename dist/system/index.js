@@ -1,7 +1,7 @@
-System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_export) {
+System.register(['core-js', 'aurelia-metadata', 'aurelia-logging'], function (_export) {
   'use strict';
 
-  var core, AggregateError, Metadata, Decorators, TransientRegistration, SingletonRegistration, Resolver, Lazy, All, Optional, Parent, ClassActivator, FactoryActivator, badKeyError, emptyParameters, Container;
+  var core, Metadata, Decorators, AggregateError, TransientRegistration, SingletonRegistration, Resolver, Lazy, All, Optional, Parent, ClassActivator, FactoryActivator, badKeyError, emptyParameters, Container;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -72,11 +72,11 @@ System.register(['core-js', 'aurelia-logging', 'aurelia-metadata'], function (_e
   return {
     setters: [function (_coreJs) {
       core = _coreJs['default'];
-    }, function (_aureliaLogging) {
-      AggregateError = _aureliaLogging.AggregateError;
     }, function (_aureliaMetadata) {
       Metadata = _aureliaMetadata.Metadata;
       Decorators = _aureliaMetadata.Decorators;
+    }, function (_aureliaLogging) {
+      AggregateError = _aureliaLogging.AggregateError;
     }],
     execute: function () {
       TransientRegistration = (function () {

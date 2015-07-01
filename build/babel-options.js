@@ -24,8 +24,12 @@ module.exports = {
     "babel-dts-generator"
   ],
   extra: {
-    packageName: paths.packageName,
-    typings: '',
-    suppressModulePath: true
+    dts: {
+      packageName: paths.packageName,
+      typings: '',
+      suppressModulePath: true,
+      suppressComments: false,
+      memberOutputFilter: /^_.*/
+    }
   }
 };

@@ -1,6 +1,6 @@
 import core from 'core-js';
-import {AggregateError} from 'aurelia-logging';
 import {Metadata,Decorators} from 'aurelia-metadata';
+import {AggregateError} from 'aurelia-logging';
 
 /**
 * Used to allow functions/classes to indicate that they should be registered as transients with the container.
