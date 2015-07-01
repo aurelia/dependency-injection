@@ -21,9 +21,9 @@
   },
   "jspm": {
     "main": "index",
-    "format": "register",
+    "format": "amd",
     "directories": {
-      "lib": "dist/system"
+      "lib": "dist/amd"
     },
     "dependencies": {
       "aurelia-logging": "github:aurelia/logging@^0.5.0",
