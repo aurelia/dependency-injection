@@ -405,7 +405,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
 
         message += ' Check the inner error for details.';
 
-        throw (0, _aureliaLogging.AggregateError)(message, e, true);
+        throw _aureliaLogging.AggregateError(message, e, true);
       }
     };
 

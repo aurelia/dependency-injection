@@ -334,11 +334,11 @@ declare module 'aurelia-dependency-injection' {
       */
     invoke(fn: Function): any;
   }
-  export function autoinject(target: any): any;
+  export function autoinject(target?: any): any;
   export function inject(...rest: any[]): any;
   export function registration(value: any): any;
-  export function transient(key: any): any;
-  export function singleton(keyOrRegisterInChild: any, registerInChild?: any): any;
+  export function transient(key?: any): any;
+  export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean): any;
   export function instanceActivator(value: any): any;
   export function factory(): any;
 }
