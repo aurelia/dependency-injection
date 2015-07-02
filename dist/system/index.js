@@ -440,7 +440,7 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging'], function (_e
           return childContainer;
         };
 
-        Container.prototype.invoke = function invoke(fn) {
+        Container.prototype.invoke = function invoke(fn, deps) {
           try {
             var info = this._getOrCreateConstructionInfo(fn),
                 keys = info.keys,
@@ -450,6 +450,10 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging'], function (_e
 
             for (i = 0, ii = keys.length; i < ii; ++i) {
               args[i] = this.get(keys[i]);
+            }
+
+            if (deps !== undefined) {
+              args = args.concat(deps);
             }
 
             return info.activator.invoke(fn, args);

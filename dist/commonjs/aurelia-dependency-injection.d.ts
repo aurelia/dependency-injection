@@ -330,9 +330,10 @@ declare module 'aurelia-dependency-injection' {
       *
       * @method invoke
       * @param {Function} fn The function to invoke with the auto-resolved dependencies.
+      * @param {any[]} [deps] Additional function dependencies to use during invocation.
       * @return {Object} Returns the instance resulting from calling the function.
       */
-    invoke(fn: Function): any;
+    invoke(fn: Function, deps?: any[]): any;
   }
   export function autoinject(target?: any): any;
   export function inject(...rest: any[]): any;

@@ -1,3 +1,23 @@
+## 0.9.0 (2015-07-01)
+
+
+#### Bug Fixes
+
+* **all:** switch to new metadata abstraction ([05f3bfde](http://github.com/aurelia/dependency-injection/commit/05f3bfde7b032d83df14eb7b23b6292534c91c02))
+* **container:**
+  * add generics to Map type info ([072262ef](http://github.com/aurelia/dependency-injection/commit/072262ef7ca9656739e9bbda49fd3d75ba6c113c))
+  * dry out bad key error message ([58a1036f](http://github.com/aurelia/dependency-injection/commit/58a1036f5e52eadfc1b3bd65a22ebaebf94d715c))
+  * Improve error message on bad key for DI ([6495ad3b](http://github.com/aurelia/dependency-injection/commit/6495ad3b84938ea66749e07f8c271b87e0a53074), closes [#36](http://github.com/aurelia/dependency-injection/issues/36))
+* **package:** update aurelia tools and dts generator ([83c1e2cb](http://github.com/aurelia/dependency-injection/commit/83c1e2cb096ce8f6802d78419a5e9f0afb895776))
+
+
+#### Features
+
+* **container:**
+  * enable the invoke helper to take additional deps ([eec36d2a](http://github.com/aurelia/dependency-injection/commit/eec36d2a69e3ca35eef4798d91e66192dcb103d6))
+  * turn a container instance into a globally reachable singleton instance ([3c02164b](http://github.com/aurelia/dependency-injection/commit/3c02164bdb04c2e0b9f3927f20cec453e67e6833))
+
+
 ## 0.8.0 (2015-06-08)
 
 
