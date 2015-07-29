@@ -14,20 +14,20 @@
   },
   "license": "MIT",
   "author": "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)",
-  "main": "dist/commonjs/index.js",
+  "main": "dist/commonjs/aurelia-dependency-injection.js",
   "repository": {
     "type": "git",
     "url": "http://github.com/aurelia/dependency-injection"
   },
   "jspm": {
-    "main": "index",
+    "main": "aurelia-dependency-injection",
     "format": "amd",
     "directories": {
       "lib": "dist/amd"
     },
     "dependencies": {
-      "aurelia-logging": "github:aurelia/logging@^0.6.0",
-      "aurelia-metadata": "github:aurelia/metadata@^0.7.0",
+      "aurelia-logging": "github:aurelia/logging@^0.6.2",
+      "aurelia-metadata": "github:aurelia/metadata@^0.7.1",
       "core-js": "npm:core-js@^0.9.5"
     },
     "devDependencies": {

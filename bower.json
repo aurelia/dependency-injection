@@ -18,8 +18,8 @@
     "url": "http://github.com/aurelia/dependency-injection"
   },
   "dependencies": {
-    "aurelia-logging": "^0.6.0",
-    "aurelia-metadata": "^0.7.0",
+    "aurelia-logging": "^0.6.2",
+    "aurelia-metadata": "^0.7.1",
     "core-js": "zloirock/core-js"
   }
 }
