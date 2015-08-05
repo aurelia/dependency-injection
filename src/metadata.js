@@ -1,4 +1,4 @@
-import core from 'core-js';
+import * as core from 'core-js';
 
 /**
 * Used to allow functions/classes to indicate that they should be registered as transients with the container.
