@@ -31,9 +31,9 @@ export var emptyParameters = Object.freeze([]);
 * @constructor
 */
 export class Container {
-  static instance:Container;
+  static instance : Container;
 
-  constructor(constructionInfo?:Map<Function,Object>) {
+  constructor(constructionInfo? : Map<Function,Object>) {
     this.constructionInfo = constructionInfo || new Map();
     this.entries = new Map();
     this.root = this;
@@ -44,7 +44,7 @@ export class Container {
   *
   * @method makeGlobal
   */
-  makeGlobal():Container{
+  makeGlobal() : Container {
     Container.instance = this;
     return this;
   }
@@ -56,7 +56,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Object} instance The instance that will be resolved when the key is matched.
   */
-  registerInstance(key:any, instance:any) {
+  registerInstance(key : any, instance : any) : void {
     this.registerHandler(key, x => instance);
   }
 
@@ -67,7 +67,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerTransient(key:any, fn?:Function) {
+  registerTransient(key : any, fn? : Function) : void {
     fn = fn || key;
     this.registerHandler(key, x => x.invoke(fn));
   }
@@ -79,7 +79,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerSingleton(key:any, fn?:Function) {
+  registerSingleton(key : any, fn? : Function) : void {
     var singleton = null;
     fn = fn || key;
     this.registerHandler(key, x => singleton || (singleton = x.invoke(fn)));
@@ -92,7 +92,7 @@ export class Container {
   * @param {Function} fn The constructor function to use when the dependency needs to be instantiated.
   * @param {Object} [key] The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  autoRegister(fn:any, key?:any){
+  autoRegister(fn : any, key? : any) : void {
     var registration;
 
     if (fn === null || fn === undefined){
@@ -118,7 +118,7 @@ export class Container {
   * @method autoRegisterAll
   * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
   */
-  autoRegisterAll(fns:any[]){
+  autoRegisterAll(fns : any[]) : void {
     var i = fns.length;
     while(i--) {
       this.autoRegister(fns[i]);
@@ -132,7 +132,7 @@ export class Container {
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param {Function} handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
   */
-  registerHandler(key:any, handler:(c:Container) => any) {
+  registerHandler(key : any, handler : (c:Container) => any) : void {
     this._getOrCreateEntry(key).push(handler);
   }
 
@@ -142,7 +142,7 @@ export class Container {
   * @method unregister
   * @param {Object} key The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  unregister(key:any) {
+  unregister(key : any) : void {
     this.entries.delete(key);
   }
 
@@ -153,7 +153,7 @@ export class Container {
   * @param {Object} key The key that identifies the object to resolve.
   * @return {Object} Returns the resolved instance.
   */
-  get(key:any):any {
+  get(key : any) : any {
     var entry;
 
     if (key === null || key === undefined){
@@ -191,7 +191,7 @@ export class Container {
   * @param {Object} key The key that identifies the objects to resolve.
   * @return {Object[]} Returns an array of the resolved instances.
   */
-  getAll(key:any):any[] {
+  getAll(key : any) : any[] {
     var entry;
 
     if (key === null || key === undefined){
@@ -219,7 +219,7 @@ export class Container {
   * @param {Boolean} [checkParent=false] Indicates whether or not to check the parent container hierarchy.
   * @return {Boolean} Returns true if the key has been registred; false otherwise.
   */
-  hasHandler(key:any, checkParent?:boolean=false):boolean {
+  hasHandler(key : any, checkParent? : boolean = false) : boolean {
     if (key === null || key === undefined){
       throw new Error(badKeyError);
     }
@@ -234,7 +234,7 @@ export class Container {
   * @method createChild
   * @return {Container} Returns a new container instance parented to this.
   */
-  createChild():Container{
+  createChild() : Container {
     var childContainer = new Container(this.constructionInfo);
     childContainer.parent = this;
     childContainer.root = this.root;
@@ -249,7 +249,7 @@ export class Container {
   * @param {any[]} [deps] Additional function dependencies to use during invocation.
   * @return {Object} Returns the instance resulting from calling the function.
   */
-  invoke(fn:Function, deps?:any[]):any {
+  invoke(fn : Function, deps? : any[]) : any {
     try{
       var info = this._getOrCreateConstructionInfo(fn),
           keys = info.keys,

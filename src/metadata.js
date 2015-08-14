@@ -8,7 +8,7 @@ import * as core from 'core-js';
 * @param {Object} [key] The key to register as.
 */
 export class TransientRegistration {
-  constructor(key:any){
+  constructor(key : any){
     this.key = key;
   }
 
@@ -20,7 +20,7 @@ export class TransientRegistration {
   * @param {Object} key The key to register as.
   * @param {Object} fn The function to register (target of the annotation).
   */
-  register(container:Container, key:any, fn:Function){
+  register(container : Container, key : any, fn : Function) : void {
     container.registerTransient(this.key || key, fn);
   }
 }
@@ -33,7 +33,7 @@ export class TransientRegistration {
 * @param {Object} [key] The key to register as.
 */
 export class SingletonRegistration {
-  constructor(keyOrRegisterInChild:any, registerInChild?:boolean=false){
+  constructor(keyOrRegisterInChild : any, registerInChild? : boolean = false) {
     if(typeof keyOrRegisterInChild === 'boolean'){
       this.registerInChild = keyOrRegisterInChild;
     }else{
@@ -50,7 +50,7 @@ export class SingletonRegistration {
   * @param {Object} key The key to register as.
   * @param {Object} fn The function to register (target of the annotation).
   */
-  register(container:Container, key:any, fn:Function){
+  register(container : Container, key : any, fn : Function) : void {
     var destination = this.registerInChild ? container : container.root;
     destination.registerSingleton(this.key || key, fn);
   }
@@ -70,7 +70,7 @@ export class Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Object} Returns the resolved object.
   */
-  get(container:Container):any{
+  get(container : Container) : any {
     throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
   }
 }
@@ -84,7 +84,7 @@ export class Resolver {
 * @param {Object} key The key to lazily resolve.
 */
 export class Lazy extends Resolver {
-  constructor(key:any){
+  constructor(key : any) {
     super();
     this.key = key;
   }
@@ -96,7 +96,7 @@ export class Lazy extends Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Function} Returns a function which can be invoked at a later time to obtain the actual dependency.
   */
-  get(container:Container):any{
+  get(container : Container) : any {
     return () => {
       return container.get(this.key);
     };
@@ -110,7 +110,7 @@ export class Lazy extends Resolver {
   * @param {Object} key The key to lazily resolve.
   * @return {Lazy} Returns an insance of Lazy for the key.
   */
-  static of(key:any):Lazy{
+  static of(key : any) : Lazy {
     return new Lazy(key);
   }
 }
@@ -124,7 +124,7 @@ export class Lazy extends Resolver {
 * @param {Object} key The key to lazily resolve all matches for.
 */
 export class All extends Resolver {
-  constructor(key:any){
+  constructor(key : any) {
     super();
     this.key = key;
   }
@@ -136,7 +136,7 @@ export class All extends Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Object[]} Returns an array of all matching instances.
   */
-  get(container:Container):any[]{
+  get(container : Container) : any[] {
     return container.getAll(this.key);
   }
 
@@ -148,7 +148,7 @@ export class All extends Resolver {
   * @param {Object} key The key to resolve all instances for.
   * @return {All} Returns an insance of All for the key.
   */
-  static of(key:any):All{
+  static of(key : any) : All {
     return new All(key);
   }
 }
@@ -163,7 +163,7 @@ export class All extends Resolver {
 * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
 */
 export class Optional extends Resolver {
-  constructor(key:any, checkParent?:boolean=false){
+  constructor(key : any, checkParent? : boolean = false) {
     super();
     this.key = key;
     this.checkParent = checkParent;
@@ -176,7 +176,7 @@ export class Optional extends Resolver {
   * @param {Container} container The container to resolve from.
   * @return {Object} Returns the instance if found; otherwise null.
   */
-  get(container:Container):any{
+  get(container : Container) : any {
     if(container.hasHandler(this.key, this.checkParent)){
       return container.get(this.key);
     }
@@ -193,7 +193,7 @@ export class Optional extends Resolver {
   * @param {Boolean} [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
   * @return {Optional} Returns an insance of Optional for the key.
   */
-  static of(key:any, checkParent?:boolean=false):Optional{
+  static of(key : any, checkParent? : boolean = false) : Optional {
     return new Optional(key, checkParent);
   }
 }
@@ -208,7 +208,7 @@ export class Optional extends Resolver {
 * @param {Object} key The key to resolve from the parent container.
 */
 export class Parent extends Resolver {
-  constructor(key:any){
+  constructor(key : any){
     super();
     this.key = key;
   }
@@ -220,7 +220,7 @@ export class Parent extends Resolver {
   * @param {Container} container The container to resolve the parent from.
   * @return {Function} Returns the matching instance from the parent container
   */
-  get(container:Container):any{
+  get(container : Container) : any {
     return container.parent
       ? container.parent.get(this.key)
       : null;
@@ -234,7 +234,7 @@ export class Parent extends Resolver {
   * @param {Object} key The key to resolve.
   * @return {Parent} Returns an insance of Parent for the key.
   */
-  static of(key:any):Parent{
+  static of(key : any) : Parent {
     return new Parent(key);
   }
 }
@@ -248,7 +248,7 @@ export class Parent extends Resolver {
 export class ClassActivator {
   static instance = new ClassActivator();
 
-  invoke(fn:Function, args:any[]):any{
+  invoke(fn : Function, args : any[]) : any{
     return Reflect.construct(fn, args);
   }
 }
@@ -262,7 +262,7 @@ export class ClassActivator {
 export class FactoryActivator {
   static instance = new FactoryActivator();
 
-  invoke(fn:Function, args:any[]):any{
+  invoke(fn : Function, args : any[]) : any {
     return fn.apply(undefined, args);
   }
 }
