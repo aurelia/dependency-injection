@@ -1,3 +1,12 @@
+### 0.9.2 (2015-08-14)
+
+
+#### Bug Fixes
+
+* **all:** improve some type info ([2aa55dea](http://github.com/aurelia/dependency-injection/commit/2aa55deaedee4fbc2a948df1547449cae7d49bd5))
+* **dependency-injection:** Use correct import for core-js We were previously using `import core from core-j ([625c1eea](http://github.com/aurelia/dependency-injection/commit/625c1eea4d2b90b7fbb22ebb75fb9feec3676829))
+
+
 ### 0.9.1 (2015-07-29)
 
 * improve output file name

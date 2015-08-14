@@ -13,13 +13,9 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
   exports.instanceActivator = instanceActivator;
   exports.factory = factory;
 
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-  function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+  function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-  var _core = _interopRequireDefault(_coreJs);
 
   var TransientRegistration = (function () {
     function TransientRegistration(key) {
@@ -39,7 +35,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
 
   var SingletonRegistration = (function () {
     function SingletonRegistration(keyOrRegisterInChild) {
-      var registerInChild = arguments[1] === undefined ? false : arguments[1];
+      var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
       _classCallCheck(this, SingletonRegistration);
 
@@ -76,14 +72,14 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
   exports.Resolver = Resolver;
 
   var Lazy = (function (_Resolver) {
+    _inherits(Lazy, _Resolver);
+
     function Lazy(key) {
       _classCallCheck(this, Lazy);
 
       _Resolver.call(this);
       this.key = key;
     }
-
-    _inherits(Lazy, _Resolver);
 
     Lazy.prototype.get = function get(container) {
       var _this = this;
@@ -103,14 +99,14 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
   exports.Lazy = Lazy;
 
   var All = (function (_Resolver2) {
+    _inherits(All, _Resolver2);
+
     function All(key) {
       _classCallCheck(this, All);
 
       _Resolver2.call(this);
       this.key = key;
     }
-
-    _inherits(All, _Resolver2);
 
     All.prototype.get = function get(container) {
       return container.getAll(this.key);
@@ -126,8 +122,10 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
   exports.All = All;
 
   var Optional = (function (_Resolver3) {
+    _inherits(Optional, _Resolver3);
+
     function Optional(key) {
-      var checkParent = arguments[1] === undefined ? false : arguments[1];
+      var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
       _classCallCheck(this, Optional);
 
@@ -135,8 +133,6 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
       this.key = key;
       this.checkParent = checkParent;
     }
-
-    _inherits(Optional, _Resolver3);
 
     Optional.prototype.get = function get(container) {
       if (container.hasHandler(this.key, this.checkParent)) {
@@ -147,7 +143,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
     };
 
     Optional.of = function of(key) {
-      var checkParent = arguments[1] === undefined ? false : arguments[1];
+      var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
       return new Optional(key, checkParent);
     };
@@ -158,14 +154,14 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
   exports.Optional = Optional;
 
   var Parent = (function (_Resolver4) {
+    _inherits(Parent, _Resolver4);
+
     function Parent(key) {
       _classCallCheck(this, Parent);
 
       _Resolver4.call(this);
       this.key = key;
     }
-
-    _inherits(Parent, _Resolver4);
 
     Parent.prototype.get = function get(container) {
       return container.parent ? container.parent.get(this.key) : null;
@@ -367,7 +363,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
     };
 
     Container.prototype.hasHandler = function hasHandler(key) {
-      var checkParent = arguments[1] === undefined ? false : arguments[1];
+      var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
       if (key === null || key === undefined) {
         throw new Error(badKeyError);
@@ -492,7 +488,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
   }
 
   function singleton(keyOrRegisterInChild) {
-    var registerInChild = arguments[1] === undefined ? false : arguments[1];
+    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
     return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
   }
