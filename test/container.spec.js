@@ -308,6 +308,19 @@ describe('container', () => {
       expect(app2.logger).toBe(instance);
     });
 
+    it('configures alias via api', () => {
+      class Logger {}
+
+      var container = new Container();
+      var instance = new Logger();
+      container.registerInstance(Logger, instance);
+      container.registerAlias('logger', Logger);
+
+      var logger = container.get('logger');
+
+      expect(logger).toBe(instance);
+    });
+
     it('configures custom via api', () => {
       class Logger {}
 

@@ -86,6 +86,20 @@ export class Container {
   }
 
   /**
+  * Registers an alias for another key with the container.
+  *
+  * @method registerAlias
+  * @param {Object} alias The alias name of a key.
+  * @param {Object} original The original key that is already registered or can be auto registered with the container.
+  */
+  registerAlias(alias : any, original : any) : void {
+    if (alias === original){
+      return;
+    }
+    this.registerHandler(alias, x => x.get(original));
+  }
+
+  /**
   * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
   *
   * @method autoRegister
