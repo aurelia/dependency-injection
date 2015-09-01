@@ -1,3 +1,7 @@
 {
-  "extends": "./node_modules/aurelia-tools/.eslintrc"
+  "extends": "./node_modules/aurelia-tools/.eslintrc",
+  "rules": {
+    "no-unused-vars": 0,
+    "no-extend-native": 0
+  }
 }
