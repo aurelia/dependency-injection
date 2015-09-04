@@ -1,3 +1,17 @@
+## 0.10.0 (2015-09-04)
+
+
+#### Bug Fixes
+
+* **all:** address lint errors ([d2e36a57](http://github.com/aurelia/dependency-injection/commit/d2e36a5704a0f890142021fba4d2f0bc9d9dc67a))
+* **build:** update linting, testing and tools ([97d032c8](http://github.com/aurelia/dependency-injection/commit/97d032c85c747e25eb1bcd87d46f211916d2f239))
+
+
+#### Features
+
+* **docs:** generate api.json from .d.ts file ([c6acb7cf](http://github.com/aurelia/dependency-injection/commit/c6acb7cf6cca87343217aafdcea82321ec39ea71))
+
+
 ### 0.9.2 (2015-08-14)
 
 

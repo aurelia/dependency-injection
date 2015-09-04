@@ -14,26 +14,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to specify resolution of all matches to a key.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "All"
-          },
-          {
-            "tag": "constructor",
-            "text": ""
-          },
-          {
-            "tag": "extends",
-            "text": "Resolver"
-          },
-          {
-            "tag": "param",
-            "text": "The key to lazily resolve all matches for.\n",
-            "param": "key"
-          }
-        ]
+        "shortText": "Used to allow functions/classes to specify resolution of all matches to a key."
       },
       "children": [
         {
@@ -44,6 +25,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of the All class."
+          },
           "signatures": [
             {
               "id": 38,
@@ -51,6 +35,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of the All class."
+              },
               "parameters": [
                 {
                   "id": 39,
@@ -58,6 +45,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The key to lazily resolve all matches for.\n"
+                  },
                   "type": {
                     "type": "instrinct",
                     "name": "any"
@@ -90,13 +80,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Called by the container to resolve all matching dependencies as an array of instances.",
-                "returns": "Returns an array of all matching instances.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "get"
-                  }
-                ]
+                "returns": "Returns an array of all matching instances.\n"
               },
               "parameters": [
                 {
@@ -152,17 +136,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Creates an All Resolver for the supplied key.",
-                "returns": "Returns an insance of All for the key.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "of"
-                  },
-                  {
-                    "tag": "static",
-                    "text": ""
-                  }
-                ]
+                "returns": "Returns an insance of All for the key.\n"
               },
               "parameters": [
                 {
@@ -224,17 +198,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to instantiate a class.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "ClassActivator"
-          },
-          {
-            "tag": "constructor",
-            "text": "\n"
-          }
-        ]
+        "shortText": "Used to instantiate a class."
       },
       "children": [
         {
@@ -245,6 +209,9 @@
           "flags": {
             "isStatic": true,
             "isExported": true
+          },
+          "comment": {
+            "shortText": "The singleton instance of the ClassActivator."
           },
           "type": {
             "type": "instrinct",
@@ -266,6 +233,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Invokes the classes constructor with the provided arguments.",
+                "returns": "The newly created instance.\n"
+              },
               "parameters": [
                 {
                   "id": 72,
@@ -273,6 +244,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The constructor function."
+                  },
                   "type": {
                     "type": "reference",
                     "name": "Function"
@@ -284,6 +258,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The constructor args."
+                  },
                   "type": {
                     "type": "instrinct",
                     "isArray": true,
@@ -325,17 +302,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "A lightweight, extensible dependency injection container.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "Container"
-          },
-          {
-            "tag": "constructor",
-            "text": "\n"
-          }
-        ]
+        "shortText": "A lightweight, extensible dependency injection container."
       },
       "children": [
         {
@@ -419,13 +386,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "autoRegister"
-                  }
-                ]
+                "shortText": "Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used."
               },
               "parameters": [
                 {
@@ -479,13 +440,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "autoRegisterAll"
-                  }
-                ]
+                "shortText": "Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used."
               },
               "parameters": [
                 {
@@ -528,13 +483,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Creates a new dependency injection container whose parent is the current container.",
-                "returns": "Returns a new container instance parented to this.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "createChild"
-                  }
-                ]
+                "returns": "Returns a new container instance parented to this.\n"
               },
               "type": {
                 "type": "reference",
@@ -562,13 +511,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Resolves a single instance based on the provided key.",
-                "returns": "Returns the resolved instance.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "get"
-                  }
-                ]
+                "returns": "Returns the resolved instance.\n"
               },
               "parameters": [
                 {
@@ -610,13 +553,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Resolves all instance registered under the provided key.",
-                "returns": "Returns an array of the resolved instances.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "getAll"
-                  }
-                ]
+                "returns": "Returns an array of the resolved instances.\n"
               },
               "parameters": [
                 {
@@ -659,13 +596,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Inspects the container to determine if a particular key has been registred.",
-                "returns": "Returns true if the key has been registred; false otherwise.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "hasHandler"
-                  }
-                ]
+                "returns": "Returns true if the key has been registred; false otherwise.\n"
               },
               "parameters": [
                 {
@@ -720,13 +651,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Invokes a function, recursively resolving its dependencies.",
-                "returns": "Returns the instance resulting from calling the function.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "invoke"
-                  }
-                ]
+                "returns": "Returns the instance resulting from calling the function.\n"
               },
               "parameters": [
                 {
@@ -781,13 +706,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Makes this container instance globally reachable through Container.instance.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "makeGlobal\n"
-                  }
-                ]
+                "shortText": "Makes this container instance globally reachable through Container.instance."
               },
               "type": {
                 "type": "reference",
@@ -814,13 +733,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Registers a custom resolution function such that the container calls this function for each request to obtain the instance.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "registerHandler"
-                  }
-                ]
+                "shortText": "Registers a custom resolution function such that the container calls this function for each request to obtain the instance."
               },
               "parameters": [
                 {
@@ -908,13 +821,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Registers an existing object instance with the container.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "registerInstance"
-                  }
-                ]
+                "shortText": "Registers an existing object instance with the container."
               },
               "parameters": [
                 {
@@ -969,13 +876,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Registers a type (constructor function) such that the container always returns the same instance for each request.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "registerSingleton"
-                  }
-                ]
+                "shortText": "Registers a type (constructor function) such that the container always returns the same instance for each request."
               },
               "parameters": [
                 {
@@ -1029,13 +930,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Registers a type (constructor function) such that the container returns a new instance for each request.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "registerTransient"
-                  }
-                ]
+                "shortText": "Registers a type (constructor function) such that the container returns a new instance for each request."
               },
               "parameters": [
                 {
@@ -1089,13 +984,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Unregisters based on key.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "unregister"
-                  }
-                ]
+                "shortText": "Unregisters based on key."
               },
               "parameters": [
                 {
@@ -1166,17 +1055,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to invoke a factory method.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "FactoryActivator"
-          },
-          {
-            "tag": "constructor",
-            "text": "\n"
-          }
-        ]
+        "shortText": "Used to invoke a factory method."
       },
       "children": [
         {
@@ -1187,6 +1066,9 @@
           "flags": {
             "isStatic": true,
             "isExported": true
+          },
+          "comment": {
+            "shortText": "The singleton instance of the FactoryActivator."
           },
           "type": {
             "type": "instrinct",
@@ -1208,6 +1090,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Invokes the factory function with the provided arguments.",
+                "returns": "The newly created instance.\n"
+              },
               "parameters": [
                 {
                   "id": 78,
@@ -1215,6 +1101,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The factory function."
+                  },
                   "type": {
                     "type": "reference",
                     "name": "Function"
@@ -1226,6 +1115,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The function args."
+                  },
                   "type": {
                     "type": "instrinct",
                     "isArray": true,
@@ -1267,26 +1159,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to specify lazy resolution logic.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "Lazy"
-          },
-          {
-            "tag": "constructor",
-            "text": ""
-          },
-          {
-            "tag": "extends",
-            "text": "Resolver"
-          },
-          {
-            "tag": "param",
-            "text": "The key to lazily resolve.\n",
-            "param": "key"
-          }
-        ]
+        "shortText": "Used to allow functions/classes to specify lazy resolution logic."
       },
       "children": [
         {
@@ -1297,6 +1170,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of the Lazy class."
+          },
           "signatures": [
             {
               "id": 28,
@@ -1304,6 +1180,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of the Lazy class."
+              },
               "parameters": [
                 {
                   "id": 29,
@@ -1311,6 +1190,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The key to lazily resolve.\n"
+                  },
                   "type": {
                     "type": "instrinct",
                     "name": "any"
@@ -1343,13 +1225,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Called by the container to lazily resolve the dependency into a lazy locator function.",
-                "returns": "Returns a function which can be invoked at a later time to obtain the actual dependency.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "get"
-                  }
-                ]
+                "returns": "Returns a function which can be invoked at a later time to obtain the actual dependency.\n"
               },
               "parameters": [
                 {
@@ -1404,17 +1280,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Creates a Lazy Resolver for the supplied key.",
-                "returns": "Returns an insance of Lazy for the key.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "of"
-                  },
-                  {
-                    "tag": "static",
-                    "text": ""
-                  }
-                ]
+                "returns": "Returns an insance of Lazy for the key.\n"
               },
               "parameters": [
                 {
@@ -1476,31 +1342,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "Optional"
-          },
-          {
-            "tag": "constructor",
-            "text": ""
-          },
-          {
-            "tag": "extends",
-            "text": "Resolver"
-          },
-          {
-            "tag": "param",
-            "text": "The key to optionally resolve for.",
-            "param": "key"
-          },
-          {
-            "tag": "param",
-            "text": "Indicates whether or not the parent container hierarchy should be checked.\n",
-            "param": "[checkParent=false]"
-          }
-        ]
+        "shortText": "Used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container."
       },
       "children": [
         {
@@ -1511,6 +1353,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of the Optional class."
+          },
           "signatures": [
             {
               "id": 48,
@@ -1518,6 +1363,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of the Optional class."
+              },
               "parameters": [
                 {
                   "id": 49,
@@ -1525,6 +1373,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The key to optionally resolve for."
+                  },
                   "type": {
                     "type": "instrinct",
                     "name": "any"
@@ -1570,13 +1421,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Called by the container to provide optional resolution of the key.",
-                "returns": "Returns the instance if found; otherwise null.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "get"
-                  }
-                ]
+                "returns": "Returns the instance if found; otherwise null.\n"
               },
               "parameters": [
                 {
@@ -1631,17 +1476,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Creates an Optional Resolver for the supplied key.",
-                "returns": "Returns an insance of Optional for the key.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "of"
-                  },
-                  {
-                    "tag": "static",
-                    "text": ""
-                  }
-                ]
+                "returns": "Returns an insance of Optional for the key.\n"
               },
               "parameters": [
                 {
@@ -1716,26 +1551,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to inject the dependency from the parent container instead of the current one.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "Parent"
-          },
-          {
-            "tag": "constructor",
-            "text": ""
-          },
-          {
-            "tag": "extends",
-            "text": "Resolver"
-          },
-          {
-            "tag": "param",
-            "text": "The key to resolve from the parent container.\n",
-            "param": "key"
-          }
-        ]
+        "shortText": "Used to inject the dependency from the parent container instead of the current one."
       },
       "children": [
         {
@@ -1746,6 +1562,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of the Parent class."
+          },
           "signatures": [
             {
               "id": 60,
@@ -1753,6 +1572,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of the Parent class."
+              },
               "parameters": [
                 {
                   "id": 61,
@@ -1760,6 +1582,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The key to resolve from the parent container.\n"
+                  },
                   "type": {
                     "type": "instrinct",
                     "name": "any"
@@ -1792,13 +1617,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Called by the container to load the dependency from the parent container",
-                "returns": "Returns the matching instance from the parent container\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "get"
-                  }
-                ]
+                "returns": "Returns the matching instance from the parent container\n"
               },
               "parameters": [
                 {
@@ -1853,17 +1672,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Creates a Parent Resolver for the supplied key.",
-                "returns": "Returns an insance of Parent for the key.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "of"
-                  },
-                  {
-                    "tag": "static",
-                    "text": ""
-                  }
-                ]
+                "returns": "Returns an insance of Parent for the key.\n"
               },
               "parameters": [
                 {
@@ -1925,17 +1734,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "An abstract resolver used to allow functions/classes to specify custom dependency resolution logic.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "Resolver"
-          },
-          {
-            "tag": "constructor",
-            "text": "\n"
-          }
-        ]
+        "shortText": "An abstract resolver used to allow functions/classes to specify custom dependency resolution logic."
       },
       "children": [
         {
@@ -1955,13 +1754,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Called by the container to allow custom resolution of dependencies for a function/class.",
-                "returns": "Returns the resolved object.\n",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "get"
-                  }
-                ]
+                "returns": "Returns the resolved object.\n"
               },
               "parameters": [
                 {
@@ -2030,22 +1823,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to indicate that they should be registered as singletons with the container.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "SingletonRegistration"
-          },
-          {
-            "tag": "constructor",
-            "text": ""
-          },
-          {
-            "tag": "param",
-            "text": "The key to register as.\n",
-            "param": "[key]"
-          }
-        ]
+        "shortText": "Used to allow functions/classes to indicate that they should be registered as singletons with the container."
       },
       "children": [
         {
@@ -2056,6 +1834,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of SingletonRegistration."
+          },
           "signatures": [
             {
               "id": 14,
@@ -2063,6 +1844,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of SingletonRegistration."
+              },
               "parameters": [
                 {
                   "id": 15,
@@ -2114,13 +1898,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Called by the container to register the annotated function/class as a singleton.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "register"
-                  }
-                ]
+                "shortText": "Called by the container to register the annotated function/class as a singleton."
               },
               "parameters": [
                 {
@@ -2202,22 +1980,7 @@
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to indicate that they should be registered as transients with the container.",
-        "tags": [
-          {
-            "tag": "class",
-            "text": "TransientRegistration"
-          },
-          {
-            "tag": "constructor",
-            "text": ""
-          },
-          {
-            "tag": "param",
-            "text": "The key to register as.\n",
-            "param": "[key]"
-          }
-        ]
+        "shortText": "Used to allow functions/classes to indicate that they should be registered as transients with the container."
       },
       "children": [
         {
@@ -2228,6 +1991,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of TransientRegistration."
+          },
           "signatures": [
             {
               "id": 5,
@@ -2235,6 +2001,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of TransientRegistration."
+              },
               "parameters": [
                 {
                   "id": 6,
@@ -2273,13 +2042,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Called by the container to register the annotated function/class as transient.",
-                "tags": [
-                  {
-                    "tag": "method",
-                    "text": "register"
-                  }
-                ]
+                "shortText": "Called by the container to register the annotated function/class as transient."
               },
               "parameters": [
                 {
@@ -2383,7 +2146,7 @@
           "parameters": [
             {
               "id": 135,
-              "name": "target",
+              "name": "potentialTarget",
               "kind": 32768,
               "kindString": "Parameter",
               "flags": {

@@ -273,7 +273,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
     };
 
     Container.prototype.autoRegister = function autoRegister(fn, key) {
-      var registration;
+      var registration = undefined;
 
       if (fn === null || fn === undefined) {
         throw new Error(badKeyError);
@@ -308,7 +308,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
     };
 
     Container.prototype.get = function get(key) {
-      var entry;
+      var entry = undefined;
 
       if (key === null || key === undefined) {
         throw new Error(badKeyError);
@@ -341,7 +341,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
     Container.prototype.getAll = function getAll(key) {
       var _this2 = this;
 
-      var entry;
+      var entry = undefined;
 
       if (key === null || key === undefined) {
         throw new Error(badKeyError);
@@ -381,21 +381,21 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
 
     Container.prototype.invoke = function invoke(fn, deps) {
       try {
-        var info = this._getOrCreateConstructionInfo(fn),
-            keys = info.keys,
-            args = new Array(keys.length),
-            i,
-            ii;
+        var _info = this._getOrCreateConstructionInfo(fn);
+        var _keys = _info.keys;
+        var args = new Array(_keys.length);
+        var _i = undefined;
+        var _ii = undefined;
 
-        for (i = 0, ii = keys.length; i < ii; ++i) {
-          args[i] = this.get(keys[i]);
+        for (_i = 0, _ii = _keys.length; _i < _ii; ++_i) {
+          args[_i] = this.get(_keys[_i]);
         }
 
         if (deps !== undefined) {
           args = args.concat(deps);
         }
 
-        return info.activator.invoke(fn, args);
+        return _info.activator.invoke(fn, args);
       } catch (e) {
         var activatingText = info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
         var message = 'Error ' + activatingText + ' ' + fn.name + '.';
@@ -405,12 +405,12 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
 
         message += ' Check the inner error for details.';
 
-        throw _aureliaLogging.AggregateError(message, e, true);
+        throw new _aureliaLogging.AggregateError(message, e, true);
       }
     };
 
     Container.prototype._getOrCreateEntry = function _getOrCreateEntry(key) {
-      var entry;
+      var entry = undefined;
 
       if (key === null || key === undefined) {
         throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
@@ -459,12 +459,12 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-logging'], function (
 
   exports.Container = Container;
 
-  function autoinject(target) {
+  function autoinject(potentialTarget) {
     var deco = function deco(target) {
       target.inject = _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.paramTypes, target) || emptyParameters;
     };
 
-    return target ? deco(target) : deco;
+    return potentialTarget ? deco(potentialTarget) : deco;
   }
 
   function inject() {
