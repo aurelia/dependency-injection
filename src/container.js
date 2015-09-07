@@ -145,6 +145,13 @@ export class Container {
   }
 
   /**
+  * Deprecated. Use hasResolver instead.
+  */
+  hasHandler(key, checkParent) {
+    return this.hasResolver(key, checkParent);
+  }
+
+  /**
   * Creates a new dependency injection container whose parent is the current container.
   * @return Returns a new container instance parented to this.
   */
