@@ -441,24 +441,28 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-logging'], function (_e
         };
 
         Container.prototype.invoke = function invoke(fn, deps) {
-          try {
-            var _info = this._getOrCreateConstructionInfo(fn);
-            var _keys = _info.keys;
-            var args = new Array(_keys.length);
-            var _i = undefined;
-            var _ii = undefined;
+          var info = undefined;
+          var i = undefined;
+          var ii = undefined;
+          var keys = undefined;
+          var args = undefined;
 
-            for (_i = 0, _ii = _keys.length; _i < _ii; ++_i) {
-              args[_i] = this.get(_keys[_i]);
+          try {
+            info = this._getOrCreateConstructionInfo(fn);
+            keys = info.keys;
+            args = new Array(keys.length);
+
+            for (i = 0, ii = keys.length; i < ii; ++i) {
+              args[i] = this.get(keys[i]);
             }
 
             if (deps !== undefined) {
               args = args.concat(deps);
             }
 
-            return _info.activator.invoke(fn, args);
+            return info.activator.invoke(fn, args);
           } catch (e) {
-            var activatingText = info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
+            var activatingText = info && info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
             var message = 'Error ' + activatingText + ' ' + fn.name + '.';
             if (i < ii) {
               message += ' The argument at index ' + i + ' (key:' + keys[i] + ') could not be satisfied.';

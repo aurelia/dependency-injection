@@ -466,12 +466,16 @@ export class Container {
   * @return Returns the instance resulting from calling the function.
   */
   invoke(fn : Function, deps? : any[]) : any {
+    let info;
+    let i;
+    let ii;
+    let keys;
+    let args;
+
     try {
-      let info = this._getOrCreateConstructionInfo(fn);
-      let keys = info.keys;
-      let args = new Array(keys.length);
-      let i;
-      let ii;
+      info = this._getOrCreateConstructionInfo(fn);
+      keys = info.keys;
+      args = new Array(keys.length);
 
       for (i = 0, ii = keys.length; i < ii; ++i) {
         args[i] = this.get(keys[i]);
@@ -483,7 +487,7 @@ export class Container {
 
       return info.activator.invoke(fn, args);
     } catch(e) {
-      let activatingText = info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
+      let activatingText = info && info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
       let message = `Error ${activatingText} ${fn.name}.`;
       if (i < ii) {
         message += ` The argument at index ${i} (key:${keys[i]}) could not be satisfied.`;

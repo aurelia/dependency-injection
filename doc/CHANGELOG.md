@@ -1,3 +1,11 @@
+### 0.10.1 (2015-09-06)
+
+
+#### Bug Fixes
+
+* repair error msg for broken view model ([60880447](http://github.com/aurelia/dependency-injection/commit/60880447d758ebe2ce003bee4a5714557957045e))
+
+
 ## 0.10.0 (2015-09-04)
 
 
