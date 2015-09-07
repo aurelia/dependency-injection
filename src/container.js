@@ -226,7 +226,7 @@ export class Container {
     let ii;
     let keys;
     let args;
-    
+
     try {
       info = this._getOrCreateConstructionInfo(fn);
       keys = info.keys;
