@@ -1,5 +1,6 @@
 import {Decorators, Metadata} from 'aurelia-metadata';
-import {TransientRegistration, SingletonRegistration, FactoryActivator} from './metadata';
+import {TransientRegistration, SingletonRegistration} from './registrations';
+import {FactoryActivator} from './activators';
 import {emptyParameters} from './container';
 
 export function autoinject(potentialTarget?: any) {

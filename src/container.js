@@ -1,12 +1,8 @@
 import * as core from 'core-js';
 import {Metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-logging';
-import {Resolver, ClassActivator} from './metadata';
-
-const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
-
-Metadata.registration = 'aurelia:registration';
-Metadata.instanceActivator = 'aurelia:instance-activator';
+import {ClassActivator} from './activators';
+import {Resolver, StrategyResolver} from './resolvers';
 
 // Fix Function#name on browsers that do not support it (IE):
 function test() {}
@@ -22,7 +18,18 @@ if (!test.name) {
   });
 }
 
+const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 export const emptyParameters = Object.freeze([]);
+
+Metadata.registration = 'aurelia:registration';
+Metadata.instanceActivator = 'aurelia:instance-activator';
+
+class ConstructionInfo {
+  constructor(activator, keys) {
+    this.activator = activator;
+    this.keys = keys;
+  }
+}
 
 /**
 * A lightweight, extensible dependency injection container.
@@ -30,10 +37,13 @@ export const emptyParameters = Object.freeze([]);
 export class Container {
   static instance: Container;
 
-  constructor(constructionInfo?: Map<Function, Object>) {
-    this.constructionInfo = constructionInfo || new Map();
-    this.entries = new Map();
-    this.root = this;
+  constructor(constructionInfo?: Map<Function, Object>, parent?: Container, root?: Container) {
+    this.resolvers = new Map();
+    this.resolvers.set(Container, new StrategyResolver(0, this));
+
+    this.constructionInfo = constructionInfo === undefined ? new Map() : constructionInfo;
+    this.root = root === undefined ? this : root;
+    this.parent = parent === undefined ? null : parent;
   }
 
   /**
@@ -49,18 +59,8 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param instance The instance that will be resolved when the key is matched.
   */
-  registerInstance(key: any, instance: any): void {
-    this.registerHandler(key, x => instance);
-  }
-
-  /**
-  * Registers a type (constructor function) such that the container returns a new instance for each request.
-  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param [fn] The constructor function to use when the dependency needs to be instantiated.
-  */
-  registerTransient(key: any, fn?: Function): void {
-    fn = fn || key;
-    this.registerHandler(key, x => x.invoke(fn));
+  registerInstance(key: any, instance?: any): Resolver {
+    return this._registerStrategyResolver(key, 0, instance === undefined ? key : instance);
   }
 
   /**
@@ -68,35 +68,47 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerSingleton(key: any, fn?: Function): void {
-    let singleton = null;
-    fn = fn || key;
-    this.registerHandler(key, x => singleton || (singleton = x.invoke(fn)));
+  registerSingleton(key: any, fn?: Function): Resolver {
+    return this._registerStrategyResolver(key, 1, fn === undefined ? key : fn);
+  }
+
+  /**
+  * Registers a type (constructor function) such that the container returns a new instance for each request.
+  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+  * @param [fn] The constructor function to use when the dependency needs to be instantiated.
+  */
+  registerTransient(key: any, fn?: Function): Resolver {
+    return this._registerStrategyResolver(key, 2, fn === undefined ? key : fn);
+  }
+
+  /**
+  * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
+  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+  * @param handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
+  */
+  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): Resolver {
+    return this._registerStrategyResolver(key, 3, handler);
   }
 
   /**
   * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
   * @param fn The constructor function to use when the dependency needs to be instantiated.
-  * @param [key] The key that identifies the dependency at resolution time; usually a constructor function.
+  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   */
-  autoRegister(fn: any, key?: any): void {
-    let registration;
-
-    if (fn === null || fn === undefined) {
-      throw new Error(badKeyError);
-    }
-
+  autoRegister(fn: any, key?: any): Resolver {
     if (typeof fn === 'function') {
-      registration = Metadata.get(Metadata.registration, fn);
+      let registration = Metadata.get(Metadata.registration, fn);
 
-      if (registration !== undefined) {
-        registration.register(this, key || fn, fn);
-      } else {
-        this.registerSingleton(key || fn, fn);
+      if (registration === undefined) {
+        return this._registerStrategyResolver(key === undefined ? fn : key, 1, fn);
       }
-    } else {
-      this.registerInstance(fn, fn);
+
+      let resolver = registration.createResolver(this, key === undefined ? fn : key, fn);
+      this.resolvers.set(key === undefined ? fn : key, resolver);
+      return resolver;
     }
+
+    return this._registerStrategyResolver(key === undefined ? fn : key, 0, fn);
   }
 
   /**
@@ -111,96 +123,25 @@ export class Container {
   }
 
   /**
-  * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
-  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
-  */
-  registerHandler(key: any, handler: (c: Container) => any): void {
-    this._getOrCreateEntry(key).push(handler);
-  }
-
-  /**
   * Unregisters based on key.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   */
   unregister(key: any) : void {
-    this.entries.delete(key);
-  }
-
-  /**
-  * Resolves a single instance based on the provided key.
-  * @param key The key that identifies the object to resolve.
-  * @return Returns the resolved instance.
-  */
-  get(key: any): any {
-    let entry;
-
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
-
-    if (key === Container) {
-      return this;
-    }
-
-    if (key instanceof Resolver) {
-      return key.get(this);
-    }
-
-    entry = this.entries.get(key);
-
-    if (entry !== undefined) {
-      return entry[0](this);
-    }
-
-    if (this.parent) {
-      return this.parent.get(key);
-    }
-
-    this.autoRegister(key);
-    entry = this.entries.get(key);
-
-    return entry[0](this);
-  }
-
-  /**
-  * Resolves all instance registered under the provided key.
-  * @param key The key that identifies the objects to resolve.
-  * @return Returns an array of the resolved instances.
-  */
-  getAll(key: any): any[] {
-    let entry;
-
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
-
-    entry = this.entries.get(key);
-
-    if (entry !== undefined) {
-      return entry.map(x => x(this));
-    }
-
-    if (this.parent) {
-      return this.parent.getAll(key);
-    }
-
-    return [];
+    this.resolvers.delete(key);
   }
 
   /**
   * Inspects the container to determine if a particular key has been registred.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param [checkParent=false] Indicates whether or not to check the parent container hierarchy.
+  * @param checkParent Indicates whether or not to check the parent container hierarchy.
   * @return Returns true if the key has been registred; false otherwise.
   */
-  hasHandler(key: any, checkParent?: boolean = false): boolean {
+  hasResolver(key: any, checkParent?: boolean = false): boolean {
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
 
-    return this.entries.has(key)
-      || (checkParent && this.parent && this.parent.hasHandler(key, checkParent));
+    return this.resolvers.has(key) || (checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent));
   }
 
   /**
@@ -208,19 +149,16 @@ export class Container {
   * @return Returns a new container instance parented to this.
   */
   createChild(): Container {
-    let childContainer = new Container(this.constructionInfo);
-    childContainer.parent = this;
-    childContainer.root = this.root;
-    return childContainer;
+    return new Container(this.constructionInfo, this, this.root);
   }
 
   /**
   * Invokes a function, recursively resolving its dependencies.
   * @param fn The function to invoke with the auto-resolved dependencies.
-  * @param [deps] Additional function dependencies to use during invocation.
+  * @param deps Additional function dependencies to use during invocation.
   * @return Returns the instance resulting from calling the function.
   */
-  invoke(fn : Function, deps? : any[]) : any {
+  invoke(fn: Function, deps?: any[]): any {
     let info;
     let i;
     let ii;
@@ -244,6 +182,7 @@ export class Container {
     } catch(e) {
       let activatingText = info && info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
       let message = `Error ${activatingText} ${fn.name}.`;
+
       if (i < ii) {
         message += ` The argument at index ${i} (key:${keys[i]}) could not be satisfied.`;
       }
@@ -254,21 +193,89 @@ export class Container {
     }
   }
 
-  _getOrCreateEntry(key) {
-    let entry;
-
+  /**
+  * Resolves a single instance based on the provided key.
+  * @param key The key that identifies the object to resolve.
+  * @return Returns the resolved instance.
+  */
+  get(key: any): any {
     if (key === null || key === undefined) {
-      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
+      throw new Error(badKeyError);
     }
 
-    entry = this.entries.get(key);
-
-    if (entry === undefined) {
-      entry = [];
-      this.entries.set(key, entry);
+    if (key instanceof Resolver) {
+      return key.get(this);
     }
 
-    return entry;
+    return this._get(key);
+  }
+
+  _get(key) {
+    let resolver = this.resolvers.get(key);
+
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        resolver = this.autoRegister(key);
+      } else {
+        return this.parent._get(key);
+      }
+    }
+
+    return resolver.get(this, key);
+  }
+
+  /**
+  * Resolves all instance registered under the provided key.
+  * @param key The key that identifies the objects to resolve.
+  * @return Returns an array of the resolved instances.
+  */
+  getAll(key: any): any[] {
+    if (key === null || key === undefined) {
+      throw new Error(badKeyError);
+    }
+
+    let resolver = this.resolvers.get(key);
+
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return emptyParameters;
+      }
+
+      return this.parent.getAll(key);
+    }
+
+    if (resolver.strategy === 4) {
+      let state = resolver.state;
+      let i = state.length;
+      let results = new Array(i);
+
+      while (i--) {
+        results[i] = state[i].get(this, key);
+      }
+
+      return results;
+    }
+
+    return resolver.get(this, key);
+  }
+
+  _registerStrategyResolver(key, strategy, state) {
+    if (key === null || key === undefined) {
+      throw new Error(badKeyError);
+    }
+
+    let resolver = this.resolvers.get(key);
+
+    if (resolver === undefined) {
+      this.resolvers.set(key, resolver = new StrategyResolver(strategy, state));
+    } else if (resolver.strategy === 4) {
+      resolver.state.push(new StrategyResolver(strategy, state));
+    } else {
+      let states = [resolver, new StrategyResolver(strategy, state)];
+      this.resolvers.set(key, resolver = new StrategyResolver(4, states));
+    }
+
+    return resolver;
   }
 
   _getOrCreateConstructionInfo(fn) {
@@ -283,19 +290,14 @@ export class Container {
   }
 
   _createConstructionInfo(fn) {
-    let info = {activator: Metadata.getOwn(Metadata.instanceActivator, fn) || ClassActivator.instance};
+    let activator = Metadata.getOwn(Metadata.instanceActivator, fn) || ClassActivator.instance;
 
-    if (fn.inject !== undefined) {
-      if (typeof fn.inject === 'function') {
-        info.keys = fn.inject();
-      } else {
-        info.keys = fn.inject;
-      }
-
-      return info;
+    if (typeof fn.inject === 'function') {
+      return new ConstructionInfo(activator, fn.inject());
+    } else if (fn.inject !== undefined) {
+      return new ConstructionInfo(activator, fn.inject);
     }
 
-    info.keys = Metadata.getOwn(Metadata.paramTypes, fn) || emptyParameters;
-    return info;
+    return new ConstructionInfo(activator, Metadata.getOwn(Metadata.paramTypes, fn) || emptyParameters);
   }
 }

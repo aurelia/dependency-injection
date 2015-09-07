@@ -1,4 +1,4 @@
-import {Parent} from '../src/metadata';
+import {Parent} from '../src/resolvers';
 import {Container} from '../src/container';
 
 describe('Parent', () => {

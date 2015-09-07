@@ -1,57 +1,3 @@
-import * as core from 'core-js';
-
-/**
-* Used to allow functions/classes to indicate that they should be registered as transients with the container.
-*/
-export class TransientRegistration {
-  /**
-  * Creates an instance of TransientRegistration.
-  * @param [key] The key to register as.
-  */
-  constructor(key: any) {
-    this.key = key;
-  }
-
-  /**
-  * Called by the container to register the annotated function/class as transient.
-  * @param container The container to register with.
-  * @param key The key to register as.
-  * @param fn The function to register (target of the annotation).
-  */
-  register(container: Container, key: any, fn: Function): void {
-    container.registerTransient(this.key || key, fn);
-  }
-}
-
-/**
-* Used to allow functions/classes to indicate that they should be registered as singletons with the container.
-*/
-export class SingletonRegistration {
-  /**
-  * Creates an instance of SingletonRegistration.
-  * @param [key] The key to register as.
-  */
-  constructor(keyOrRegisterInChild: any, registerInChild?: boolean = false) {
-    if (typeof keyOrRegisterInChild === 'boolean') {
-      this.registerInChild = keyOrRegisterInChild;
-    } else {
-      this.key = keyOrRegisterInChild;
-      this.registerInChild = registerInChild;
-    }
-  }
-
-  /**
-  * Called by the container to register the annotated function/class as a singleton.
-  * @param container The container to register with.
-  * @param key The key to register as.
-  * @param fn The function to register (target of the annotation).
-  */
-  register(container: Container, key: any, fn: Function): void {
-    let destination = this.registerInChild ? container : container.root;
-    destination.registerSingleton(this.key || key, fn);
-  }
-}
-
 /**
 * An abstract resolver used to allow functions/classes to specify custom dependency resolution logic.
 */
@@ -153,7 +99,7 @@ export class Optional extends Resolver {
   * @return Returns the instance if found; otherwise null.
   */
   get(container: Container): any {
-    if (container.hasHandler(this.key, this.checkParent)) {
+    if (container.hasResolver(this.key, this.checkParent)) {
       return container.get(this.key);
     }
 
@@ -206,42 +152,29 @@ export class Parent extends Resolver {
   }
 }
 
-/**
-* Used to instantiate a class.
-*/
-export class ClassActivator {
-  /**
-  * The singleton instance of the ClassActivator.
-  */
-  static instance = new ClassActivator();
-
-  /**
-  * Invokes the classes constructor with the provided arguments.
-  * @param fn The constructor function.
-  * @param args The constructor args.
-  * @return The newly created instance.
-  */
-  invoke(fn: Function, args: any[]): any {
-    return Reflect.construct(fn, args);
+export class StrategyResolver {
+  constructor(strategy, state) {
+    this.strategy = strategy;
+    this.state = state;
   }
-}
 
-/**
-* Used to invoke a factory method.
-*/
-export class FactoryActivator {
-  /**
-  * The singleton instance of the FactoryActivator.
-  */
-  static instance = new FactoryActivator();
-
-  /**
-  * Invokes the factory function with the provided arguments.
-  * @param fn The factory function.
-  * @param args The function args.
-  * @return The newly created instance.
-  */
-  invoke(fn: Function, args: any[]): any {
-    return fn.apply(undefined, args);
+  get(container, key) {
+    switch (this.strategy) {
+    case 0: //instance
+      return this.state;
+    case 1: //singleton
+      let singleton = container.invoke(this.state);
+      this.state = singleton;
+      this.strategy = 0;
+      return singleton;
+    case 2: //transient
+      return container.invoke(this.state);
+    case 3: //function
+      return this.state(container, key, this);
+    case 4: //array
+      return this.state[0].get(container, key);
+    default:
+      throw new Error('Invalid strategy: ' + this.strategy);
+    }
   }
 }
