@@ -168,16 +168,16 @@ export class Container {
   invoke(fn: Function, deps?: any[]): any {
     let info;
     let i;
-    let ii;
     let keys;
     let args;
 
     try {
       info = this._getOrCreateConstructionInfo(fn);
       keys = info.keys;
-      args = new Array(keys.length);
+      i = keys.length;
+      args = new Array(i);
 
-      for (i = 0, ii = keys.length; i < ii; ++i) {
+      while (i--) {
         args[i] = this.get(keys[i]);
       }
 
