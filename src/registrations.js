@@ -49,6 +49,12 @@ export class SingletonRegistration {
   * @return The resolver that should to be used.
   */
   createResolver(container: Container, key: any, fn: Function): Resolver {
-    return this.registerInChild ? new StrategyResolver(1, fn) : container.root.registerSingleton(this.key || key, fn);
+    let resolver = new StrategyResolver(1, fn);
+
+    if (!this.registerInChild && container !== container.root) {
+      container.root.registerResolver(this.key || key, resolver);
+    }
+
+    return resolver;
   }
 }

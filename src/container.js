@@ -115,8 +115,8 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param instance The instance that will be resolved when the key is matched.
   */
-  registerInstance(key: any, instance?: any): Resolver {
-    return this._registerStrategyResolver(key, 0, instance === undefined ? key : instance);
+  registerInstance(key: any, instance?: any): void {
+    this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
   }
 
   /**
@@ -124,8 +124,8 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerSingleton(key: any, fn?: Function): Resolver {
-    return this._registerStrategyResolver(key, 1, fn === undefined ? key : fn);
+  registerSingleton(key: any, fn?: Function): void {
+    this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
   }
 
   /**
@@ -133,17 +133,38 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param [fn] The constructor function to use when the dependency needs to be instantiated.
   */
-  registerTransient(key: any, fn?: Function): Resolver {
-    return this._registerStrategyResolver(key, 2, fn === undefined ? key : fn);
+  registerTransient(key: any, fn?: Function): void {
+    this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
   }
 
   /**
   * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
+  * @param handler The resolution function to use when the dependency is needed.
   */
-  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): Resolver {
-    return this._registerStrategyResolver(key, 3, handler);
+  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): void {
+    this.registerResolver(key, new StrategyResolver(3, handler));
+  }
+
+  /**
+  * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
+  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+  * @param resolver The resolver to use when the dependency is needed.
+  */
+  registerResolver(key: any, resolver: Resolver): void {
+    if (key === null || key === undefined) {
+      throw new Error(badKeyError);
+    }
+
+    let result = this.resolvers.get(key);
+
+    if (result === undefined) {
+      this.resolvers.set(key, resolver);
+    } else if (result.strategy === 4) {
+      result.state.push(resolver);
+    } else {
+      this.resolvers.set(key, new StrategyResolver(4, [result, resolver]));
+    }
   }
 
   /**
@@ -152,24 +173,27 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   */
   autoRegister(fn: any, key?: any): Resolver {
+    let resolver;
+
     if (typeof fn === 'function') {
       let registration = Metadata.get(Metadata.registration, fn);
 
       if (registration === undefined) {
-        return this._registerStrategyResolver(key === undefined ? fn : key, 1, fn);
+        resolver = new StrategyResolver(1, fn);
+      } else {
+        resolver = registration.createResolver(this, key === undefined ? fn : key, fn);
       }
-
-      let resolver = registration.createResolver(this, key === undefined ? fn : key, fn);
-      this.resolvers.set(key === undefined ? fn : key, resolver);
-      return resolver;
+    } else {
+      resolver = new StrategyResolver(0, fn);
     }
 
-    return this._registerStrategyResolver(key === undefined ? fn : key, 0, fn);
+    this.registerResolver(key === undefined ? fn : key, resolver);
+    return resolver;
   }
 
   /**
   * Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used.
-  * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
+  * @param fns The constructor function to use when the dependency needs to be instantiated.
   */
   autoRegisterAll(fns: any[]): void {
     let i = fns.length;
@@ -229,10 +253,10 @@ export class Container {
 
     if (resolver === undefined) {
       if (this.parent === null) {
-        resolver = this.autoRegister(key);
-      } else {
-        return this.parent._get(key);
+        return this.autoRegister(key).get(this, key);
       }
+
+      return this.parent._get(key);
     }
 
     return resolver.get(this, key);
@@ -243,10 +267,10 @@ export class Container {
 
     if (resolver === undefined) {
       if (this.parent === null) {
-        resolver = this.autoRegister(key);
-      } else {
-        return this.parent._get(key);
+        return this.autoRegister(key).get(this, key);
       }
+
+      return this.parent._get(key);
     }
 
     return resolver.get(this, key);
@@ -307,12 +331,16 @@ export class Container {
     let info;
 
     try {
-      info = this._getOrCreateConstructionInfo(fn);
+      info = this.constructionInfo.get(fn);
+
+      if (info === undefined) {
+        info = this._createConstructionInfo(fn);
+        this.constructionInfo.set(fn, info);
+      }
+
       return info.activator.invoke(this, fn, info.keys);
     } catch(e) {
-      let activatingText = info && info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
-      let message = `Error ${activatingText} ${fn.name}. Check the inner error for details.`;
-      throw new AggregateError(message, e, true);
+      throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
   }
 
@@ -326,43 +354,17 @@ export class Container {
     let info;
 
     try {
-      info = this._getOrCreateConstructionInfo(fn);
+      info = this.constructionInfo.get(fn);
+
+      if (info === undefined) {
+        info = this._createConstructionInfo(fn);
+        this.constructionInfo.set(fn, info);
+      }
+
       return info.activator.invokeWithDynamicDependencies(this, fn, info.keys, deps);
     } catch(e) {
-      let activatingText = info && info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
-      let message = `Error ${activatingText} ${fn.name}. Check the inner error for details.`;
-      throw new AggregateError(message, e, true);
+      throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
-  }
-
-  _registerStrategyResolver(key, strategy, state) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
-
-    let resolver = this.resolvers.get(key);
-
-    if (resolver === undefined) {
-      this.resolvers.set(key, resolver = new StrategyResolver(strategy, state));
-    } else if (resolver.strategy === 4) {
-      resolver.state.push(new StrategyResolver(strategy, state));
-    } else {
-      let states = [resolver, new StrategyResolver(strategy, state)];
-      this.resolvers.set(key, resolver = new StrategyResolver(4, states));
-    }
-
-    return resolver;
-  }
-
-  _getOrCreateConstructionInfo(fn) {
-    let info = this.constructionInfo.get(fn);
-
-    if (info === undefined) {
-      info = this._createConstructionInfo(fn);
-      this.constructionInfo.set(fn, info);
-    }
-
-    return info;
   }
 
   _createConstructionInfo(fn) {
