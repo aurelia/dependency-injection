@@ -1,26 +1,6 @@
 import * as core from 'core-js';
 
 /**
-* Used to instantiate a class.
-*/
-export class ClassActivator {
-  /**
-  * The singleton instance of the ClassActivator.
-  */
-  static instance = new ClassActivator();
-
-  /**
-  * Invokes the classes constructor with the provided arguments.
-  * @param fn The constructor function.
-  * @param args The constructor args.
-  * @return The newly created instance.
-  */
-  invoke(fn: Function, args: any[]): any {
-    return Reflect.construct(fn, args);
-  }
-}
-
-/**
 * Used to invoke a factory method.
 */
 export class FactoryActivator {
@@ -32,10 +12,39 @@ export class FactoryActivator {
   /**
   * Invokes the factory function with the provided arguments.
   * @param fn The factory function.
-  * @param args The function args.
+  * @param keys The keys representing the function's service dependencies.
   * @return The newly created instance.
   */
-  invoke(fn: Function, args: any[]): any {
+  invoke(container, fn, keys): any {
+    let i = keys.length;
+    let args = new Array(i);
+
+    while (i--) {
+      args[i] = container.get(keys[i]);
+    }
+
+    return fn.apply(undefined, args);
+  }
+
+  /**
+  * Invokes the factory function with the provided arguments.
+  * @param fn The factory function.
+  * @param keys The keys representing the function's service dependencies.
+  * @param deps Additional function dependencies to use during invocation.
+  * @return The newly created instance.
+  */
+  invokeWithDynamicDependencies(container, fn, keys, deps): any {
+    let i = keys.length;
+    let args = new Array(i);
+
+    while (i--) {
+      args[i] = container.get(keys[i]);
+    }
+
+    if (deps !== undefined) {
+      args = args.concat(deps);
+    }
+
     return fn.apply(undefined, args);
   }
 }
