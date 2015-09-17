@@ -1,5 +1,5 @@
 import {Container} from '../src/container';
-import {Lazy, All, Optional, Parent} from '../src/metadata';
+import {Lazy, All, Optional, Parent} from '../src/resolvers';
 import {inject, transient, singleton} from '../src/decorators';
 import {Decorators,Metadata} from 'aurelia-metadata';
 
