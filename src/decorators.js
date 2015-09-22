@@ -12,14 +12,14 @@ export function autoinject(potentialTarget?: any) {
 }
 
 export function inject(...rest: any[]) {
-  return function(target,key, descriptor) {
+  return function(target, key, descriptor) {
     // if it's true then we injecting rest into function and not Class constructor
-        if(descriptor) {
-            const fn = descriptor.value;
-            fn.inject = rest;
-        } else {
-            target.inject = rest;
-        }
+    if (descriptor) {
+      const fn = descriptor.value;
+      fn.inject = rest;
+    } else {
+      target.inject = rest;
+    }
   };
 }
 
