@@ -2,6 +2,10 @@ declare module 'aurelia-dependency-injection' {
   import * as core from 'core-js';
   import { Metadata, Decorators }  from 'aurelia-metadata';
   import { AggregateError }  from 'aurelia-logging';
+
+  interface Class<T> {
+    new (...params: any[]): T;
+  }
   
   /**
   * Used to allow functions/classes to indicate that they should be registered as transients with the container.
@@ -265,7 +269,7 @@ declare module 'aurelia-dependency-injection' {
       * @param key The key that identifies the object to resolve.
       * @return Returns the resolved instance.
       */
-    get(key: any): any;
+    get<T>(key: Class<T>): T;
     
     /**
       * Resolves all instance registered under the provided key.
