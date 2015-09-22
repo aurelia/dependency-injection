@@ -147,6 +147,26 @@ export class Container {
   }
 
   /**
+  * Registers an additional key that serves as an alias to the original DI key.
+  * @param originalKey The key that originally identified the dependency; usually a constructor function.
+  * @param aliasKey An alternate key which can also be used to resolve the same dependency  as the original.
+  */
+  registerAlias(originalKey: any, aliasKey: any): void {
+    let resolver = this.resolvers.get(originalKey);
+
+    if (!resolver) {
+      throw new Error('Alias registered for non-existent dependency.');
+    }
+
+    if (!resolver.aliases) {
+      resolver.aliases = [];
+    }
+
+    resolver.aliases.push(aliasKey);
+    this.resolvers.set(aliasKey, resolver);
+  }
+
+  /**
   * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param resolver The resolver to use when the dependency is needed.
@@ -163,7 +183,11 @@ export class Container {
     } else if (result.strategy === 4) {
       result.state.push(resolver);
     } else {
-      this.resolvers.set(key, new StrategyResolver(4, [result, resolver]));
+      let newStrategy = new StrategyResolver(4, [result, resolver]);
+      this.resolvers.set(key, newStrategy);
+      if (result.aliases) {
+        result.aliases.forEach(x => this.resolvers.set(x, newStrategy));
+      }
     }
   }
 
