@@ -1,25 +1,11 @@
 import * as core from 'core-js';
 import {Metadata} from 'aurelia-metadata';
-import {AggregateError} from 'aurelia-logging';
+import {AggregateError} from 'aurelia-pal';
 import {ClassActivator} from './activators';
 import {Resolver, StrategyResolver} from './resolvers';
 
-// Fix Function#name on browsers that do not support it (IE):
-function test() {}
-if (!test.name) {
-  Object.defineProperty(Function.prototype, 'name', {
-    get: function() {
-      let name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
-      // For better performance only parse once, and then cache the
-      // result through a new accessor for repeated access.
-      Object.defineProperty(this, 'name', { value: name });
-      return name;
-    }
-  });
-}
-
 const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
-export const emptyParameters = Object.freeze([]);
+export const _emptyParameters = Object.freeze([]);
 
 Metadata.registration = 'aurelia:registration';
 Metadata.instanceActivator = 'aurelia:instance-activator';
@@ -314,7 +300,7 @@ export class Container {
 
     if (resolver === undefined) {
       if (this.parent === null) {
-        return emptyParameters;
+        return _emptyParameters;
       }
 
       return this.parent.getAll(key);
@@ -397,7 +383,7 @@ export class Container {
     if (typeof fn.inject === 'function') {
       keys = fn.inject();
     } else if (fn.inject === undefined) {
-      keys = Metadata.getOwn(Metadata.paramTypes, fn) || emptyParameters;
+      keys = Metadata.getOwn(Metadata.paramTypes, fn) || _emptyParameters;
     } else {
       keys = fn.inject;
     }

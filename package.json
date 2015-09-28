@@ -28,6 +28,7 @@
     "dependencies": {
       "aurelia-logging": "github:aurelia/logging@^0.7.0",
       "aurelia-metadata": "github:aurelia/metadata@^0.8.0",
+      "aurelia-pal": "github:aurelia/pal@^0.1.3",
       "core-js": "npm:core-js@^0.9.5"
     },
     "devDependencies": {

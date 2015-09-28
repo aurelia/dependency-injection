@@ -1,11 +1,11 @@
 import {Decorators, Metadata} from 'aurelia-metadata';
 import {TransientRegistration, SingletonRegistration} from './registrations';
 import {FactoryActivator} from './activators';
-import {emptyParameters} from './container';
+import {_emptyParameters} from './container';
 
 export function autoinject(potentialTarget?: any) {
   let deco = function(target) {
-    target.inject = Metadata.getOwn(Metadata.paramTypes, target) || emptyParameters;
+    target.inject = Metadata.getOwn(Metadata.paramTypes, target) || _emptyParameters;
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
