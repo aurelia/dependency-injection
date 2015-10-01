@@ -173,6 +173,8 @@ export class StrategyResolver {
       return this.state(container, key, this);
     case 4: //array
       return this.state[0].get(container, key);
+    case 5: //alias
+      return container.get(this.state);
     default:
       throw new Error('Invalid strategy: ' + this.strategy);
     }

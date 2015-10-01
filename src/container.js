@@ -138,18 +138,7 @@ export class Container {
   * @param aliasKey An alternate key which can also be used to resolve the same dependency  as the original.
   */
   registerAlias(originalKey: any, aliasKey: any): void {
-    let resolver = this.resolvers.get(originalKey);
-
-    if (!resolver) {
-      throw new Error('Alias registered for non-existent dependency.');
-    }
-
-    if (!resolver.aliases) {
-      resolver.aliases = [];
-    }
-
-    resolver.aliases.push(aliasKey);
-    this.resolvers.set(aliasKey, resolver);
+    this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
   }
 
   /**
@@ -169,11 +158,7 @@ export class Container {
     } else if (result.strategy === 4) {
       result.state.push(resolver);
     } else {
-      let newStrategy = new StrategyResolver(4, [result, resolver]);
-      this.resolvers.set(key, newStrategy);
-      if (result.aliases) {
-        result.aliases.forEach(x => this.resolvers.set(x, newStrategy));
-      }
+      this.resolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
   }
 
