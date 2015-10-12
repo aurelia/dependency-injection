@@ -1,11 +1,11 @@
-import {Decorators, Metadata} from 'aurelia-metadata';
+import {decorators, metadata} from 'aurelia-metadata';
 import {TransientRegistration, SingletonRegistration} from './registrations';
 import {FactoryActivator} from './activators';
 import {_emptyParameters} from './container';
 
 export function autoinject(potentialTarget?: any) {
   let deco = function(target) {
-    target.inject = Metadata.getOwn(Metadata.paramTypes, target) || _emptyParameters;
+    target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
@@ -25,7 +25,7 @@ export function inject(...rest: any[]) {
 
 export function registration(value: any) {
   return function(target) {
-    Metadata.define(Metadata.registration, value, target);
+    metadata.define(metadata.registration, value, target);
   };
 }
 
@@ -39,7 +39,7 @@ export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean 
 
 export function instanceActivator(value: any) {
   return function(target) {
-    Metadata.define(Metadata.instanceActivator, value, target);
+    metadata.define(metadata.instanceActivator, value, target);
   };
 }
 
@@ -47,10 +47,10 @@ export function factory() {
   return instanceActivator(FactoryActivator.instance);
 }
 
-Decorators.configure.simpleDecorator('autoinject', autoinject);
-Decorators.configure.parameterizedDecorator('inject', inject);
-Decorators.configure.parameterizedDecorator('registration', registration);
-Decorators.configure.parameterizedDecorator('transient', transient);
-Decorators.configure.parameterizedDecorator('singleton', singleton);
-Decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
-Decorators.configure.parameterizedDecorator('factory', factory);
+decorators.configure.simpleDecorator('autoinject', autoinject);
+decorators.configure.parameterizedDecorator('inject', inject);
+decorators.configure.parameterizedDecorator('registration', registration);
+decorators.configure.parameterizedDecorator('transient', transient);
+decorators.configure.parameterizedDecorator('singleton', singleton);
+decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
+decorators.configure.parameterizedDecorator('factory', factory);

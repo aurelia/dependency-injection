@@ -1,5 +1,5 @@
 import * as core from 'core-js';
-import {Metadata} from 'aurelia-metadata';
+import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
 import {ClassActivator} from './activators';
 import {Resolver, StrategyResolver} from './resolvers';
@@ -7,8 +7,8 @@ import {Resolver, StrategyResolver} from './resolvers';
 const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 export const _emptyParameters = Object.freeze([]);
 
-Metadata.registration = 'aurelia:registration';
-Metadata.instanceActivator = 'aurelia:instance-activator';
+metadata.registration = 'aurelia:registration';
+metadata.instanceActivator = 'aurelia:instance-activator';
 
 class ConstructionInfo {
   constructor(activator, keys) {
@@ -171,7 +171,7 @@ export class Container {
     let resolver;
 
     if (typeof fn === 'function') {
-      let registration = Metadata.get(Metadata.registration, fn);
+      let registration = metadata.get(metadata.registration, fn);
 
       if (registration === undefined) {
         resolver = new StrategyResolver(1, fn);
@@ -334,7 +334,7 @@ export class Container {
       }
 
       return info.activator.invoke(this, fn, info.keys);
-    } catch(e) {
+    } catch (e) {
       throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
   }
@@ -357,7 +357,7 @@ export class Container {
       }
 
       return info.activator.invokeWithDynamicDependencies(this, fn, info.keys, deps);
-    } catch(e) {
+    } catch (e) {
       throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
   }
@@ -368,12 +368,12 @@ export class Container {
     if (typeof fn.inject === 'function') {
       keys = fn.inject();
     } else if (fn.inject === undefined) {
-      keys = Metadata.getOwn(Metadata.paramTypes, fn) || _emptyParameters;
+      keys = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
     } else {
       keys = fn.inject;
     }
 
-    let activator = Metadata.getOwn(Metadata.instanceActivator, fn)
+    let activator = metadata.getOwn(metadata.instanceActivator, fn)
       || classActivators[keys.length] || classActivators.fallback;
 
     return new ConstructionInfo(activator, keys);

@@ -1,7 +1,7 @@
 import {Container} from '../src/container';
 import {Lazy, All, Optional, Parent} from '../src/resolvers';
 import {inject, transient, singleton} from '../src/decorators';
-import {Decorators,Metadata} from 'aurelia-metadata';
+import {decorators} from 'aurelia-metadata';
 
 describe('container', () => {
   describe('injection', () => {
@@ -154,7 +154,7 @@ describe('container', () => {
 
     it('configures singleton via metadata method (ES6)', () => {
       class Logger {
-        static decorators() { return Decorators.singleton(); };
+        static decorators() { return decorators.singleton(); };
       }
 
       class App1 {
@@ -180,7 +180,7 @@ describe('container', () => {
 
     it('configures singleton via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
       class Logger {}
-      Logger.decorators = Decorators.singleton();
+      Logger.decorators = decorators.singleton();
 
       class App1 {
         static inject() { return [Logger]; };
@@ -231,7 +231,7 @@ describe('container', () => {
 
     it('configures transient (non singleton) via metadata method (ES6)', () => {
       class Logger {
-        static decorators() { return Decorators.transient(); };
+        static decorators() { return decorators.transient(); };
       }
 
       class App1 {
@@ -257,7 +257,7 @@ describe('container', () => {
 
     it('configures transient (non singleton) via metadata property (ES5, ES7, TypeScript, CoffeeScript)', () => {
       class Logger {}
-      Logger.decorators = Decorators.transient();
+      Logger.decorators = decorators.transient();
 
       class App1 {
         static inject() { return [Logger]; };
@@ -337,7 +337,7 @@ describe('container', () => {
 
     it('uses base metadata method (ES6) when derived does not specify', () => {
       class LoggerBase {
-        static decorators() { return Decorators.transient(); };
+        static decorators() { return decorators.transient(); };
       }
 
       class Logger extends LoggerBase {
@@ -367,7 +367,7 @@ describe('container', () => {
 
     it('uses base metadata property (ES5, ES7, TypeScript, CoffeeScript) when derived does not specify', () => {
       class LoggerBase {}
-      LoggerBase.decorators = Decorators.transient();
+      LoggerBase.decorators = decorators.transient();
 
       class Logger extends LoggerBase {
 
@@ -396,11 +396,11 @@ describe('container', () => {
 
     it('overrides base metadata method (ES6) with derived configuration', () => {
       class LoggerBase {
-        static decorators() { return Decorators.singleton(); };
+        static decorators() { return decorators.singleton(); };
       }
 
       class Logger extends LoggerBase {
-        static decorators() { return Decorators.transient(); };
+        static decorators() { return decorators.transient(); };
       }
 
       class App1 {
@@ -426,11 +426,11 @@ describe('container', () => {
 
     it('overrides base metadata property (ES5, ES7, TypeScript, CoffeeScript) with derived configuration', () => {
       class LoggerBase {
-        static decorators() { return Decorators.singleton(); };
+        static decorators() { return decorators.singleton(); };
       }
 
       class Logger extends LoggerBase {}
-      Logger.decorators = Decorators.transient();
+      Logger.decorators = decorators.transient();
 
       class App1 {
         static inject() { return [Logger]; };
@@ -521,7 +521,7 @@ describe('container', () => {
 
     it('doesn\'t get hidden when a super class adds metadata which doesn\'t include the base registration type', () => {
       class LoggerBase {
-        static decorators() { return Decorators.transient(); };
+        static decorators() { return decorators.transient(); };
       }
 
       class Logger extends LoggerBase {
