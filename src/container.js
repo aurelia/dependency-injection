@@ -1,4 +1,4 @@
-import * as core from 'core-js';
+import 'core-js';
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
 import {ClassActivator} from './activators';

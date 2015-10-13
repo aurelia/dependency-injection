@@ -1,47 +1,7 @@
 declare module 'aurelia-dependency-injection' {
-  import * as core from 'core-js';
-  import { Metadata, Decorators }  from 'aurelia-metadata';
-  import { AggregateError }  from 'aurelia-logging';
-  
-  /**
-  * Used to allow functions/classes to indicate that they should be registered as transients with the container.
-  */
-  export class TransientRegistration {
-    
-    /**
-      * Creates an instance of TransientRegistration.
-      * @param [key] The key to register as.
-      */
-    constructor(key: any);
-    
-    /**
-      * Called by the container to register the annotated function/class as transient.
-      * @param container The container to register with.
-      * @param key The key to register as.
-      * @param fn The function to register (target of the annotation).
-      */
-    register(container: Container, key: any, fn: Function): void;
-  }
-  
-  /**
-  * Used to allow functions/classes to indicate that they should be registered as singletons with the container.
-  */
-  export class SingletonRegistration {
-    
-    /**
-      * Creates an instance of SingletonRegistration.
-      * @param [key] The key to register as.
-      */
-    constructor(keyOrRegisterInChild: any, registerInChild?: boolean);
-    
-    /**
-      * Called by the container to register the annotated function/class as a singleton.
-      * @param container The container to register with.
-      * @param key The key to register as.
-      * @param fn The function to register (target of the annotation).
-      */
-    register(container: Container, key: any, fn: Function): void;
-  }
+  import 'core-js';
+  import { metadata, decorators }  from 'aurelia-metadata';
+  import { AggregateError }  from 'aurelia-pal';
   
   /**
   * An abstract resolver used to allow functions/classes to specify custom dependency resolution logic.
@@ -161,24 +121,9 @@ declare module 'aurelia-dependency-injection' {
       */
     static of(key: any): Parent;
   }
-  
-  /**
-  * Used to instantiate a class.
-  */
-  export class ClassActivator {
-    
-    /**
-      * The singleton instance of the ClassActivator.
-      */
-    static instance: any;
-    
-    /**
-      * Invokes the classes constructor with the provided arguments.
-      * @param fn The constructor function.
-      * @param args The constructor args.
-      * @return The newly created instance.
-      */
-    invoke(fn: Function, args: any[]): any;
+  export class StrategyResolver {
+    constructor(strategy: any, state: any);
+    get(container: any, key: any): any;
   }
   
   /**
@@ -194,12 +139,65 @@ declare module 'aurelia-dependency-injection' {
     /**
       * Invokes the factory function with the provided arguments.
       * @param fn The factory function.
-      * @param args The function args.
+      * @param keys The keys representing the function's service dependencies.
       * @return The newly created instance.
       */
-    invoke(fn: Function, args: any[]): any;
+    invoke(container: any, fn: any, keys: any): any;
+    
+    /**
+      * Invokes the factory function with the provided arguments.
+      * @param fn The factory function.
+      * @param keys The keys representing the function's service dependencies.
+      * @param deps Additional function dependencies to use during invocation.
+      * @return The newly created instance.
+      */
+    invokeWithDynamicDependencies(container: any, fn: any, keys: any, deps: any): any;
   }
-  export const emptyParameters: any;
+  
+  /**
+  * Used to allow functions/classes to indicate that they should be registered as transients with the container.
+  */
+  export class TransientRegistration {
+    
+    /**
+      * Creates an instance of TransientRegistration.
+      * @param key The key to register as.
+      */
+    constructor(key: any);
+    
+    /**
+      * Called by the container to register the annotated function/class as transient.
+      * @param container The container to register with.
+      * @param key The key to register as.
+      * @param fn The function to register (target of the annotation).
+      * @return The resolver that should to be used.
+      */
+    createResolver(container: Container, key: any, fn: Function): Resolver;
+  }
+  
+  /**
+  * Used to allow functions/classes to indicate that they should be registered as singletons with the container.
+  */
+  export class SingletonRegistration {
+    
+    /**
+      * Creates an instance of SingletonRegistration.
+      * @param key The key to register as.
+      */
+    constructor(keyOrRegisterInChild: any, registerInChild?: boolean);
+    
+    /**
+      * Called by the container to register the annotated function/class as a singleton.
+      * @param container The container to register with.
+      * @param key The key to register as.
+      * @param fn The function to register (target of the annotation).
+      * @return The resolver that should to be used.
+      */
+    createResolver(container: Container, key: any, fn: Function): Resolver;
+  }
+  class ConstructionInfo {
+    constructor(activator: any, keys: any);
+  }
   
   /**
   * A lightweight, extensible dependency injection container.
@@ -218,14 +216,7 @@ declare module 'aurelia-dependency-injection' {
       * @param key The key that identifies the dependency at resolution time; usually a constructor function.
       * @param instance The instance that will be resolved when the key is matched.
       */
-    registerInstance(key: any, instance: any): void;
-    
-    /**
-      * Registers a type (constructor function) such that the container returns a new instance for each request.
-      * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-      * @param [fn] The constructor function to use when the dependency needs to be instantiated.
-      */
-    registerTransient(key: any, fn?: Function): void;
+    registerInstance(key: any, instance?: any): void;
     
     /**
       * Registers a type (constructor function) such that the container always returns the same instance for each request.
@@ -235,30 +226,64 @@ declare module 'aurelia-dependency-injection' {
     registerSingleton(key: any, fn?: Function): void;
     
     /**
-      * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
-      * @param fn The constructor function to use when the dependency needs to be instantiated.
-      * @param [key] The key that identifies the dependency at resolution time; usually a constructor function.
+      * Registers a type (constructor function) such that the container returns a new instance for each request.
+      * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+      * @param [fn] The constructor function to use when the dependency needs to be instantiated.
       */
-    autoRegister(fn: any, key?: any): void;
-    
-    /**
-      * Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used.
-      * @param {Function[]} fns The constructor function to use when the dependency needs to be instantiated.
-      */
-    autoRegisterAll(fns: any[]): void;
+    registerTransient(key: any, fn?: Function): void;
     
     /**
       * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
       * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-      * @param handler The resolution function to use when the dependency is needed. It will be passed one arguement, the container instance that is invoking it.
+      * @param handler The resolution function to use when the dependency is needed.
       */
-    registerHandler(key: any, handler: ((c: Container) => any)): void;
+    registerHandler(key: any, handler: ((container?: Container, key?: any, resolver?: Resolver) => any)): void;
+    
+    /**
+      * Registers an additional key that serves as an alias to the original DI key.
+      * @param originalKey The key that originally identified the dependency; usually a constructor function.
+      * @param aliasKey An alternate key which can also be used to resolve the same dependency  as the original.
+      */
+    registerAlias(originalKey: any, aliasKey: any): void;
+    
+    /**
+      * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
+      * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+      * @param resolver The resolver to use when the dependency is needed.
+      */
+    registerResolver(key: any, resolver: Resolver): void;
+    
+    /**
+      * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
+      * @param fn The constructor function to use when the dependency needs to be instantiated.
+      * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+      */
+    autoRegister(fn: any, key?: any): Resolver;
+    
+    /**
+      * Registers an array of types (constructor functions) by inspecting their registration annotations. If none are found, then the default singleton registration is used.
+      * @param fns The constructor function to use when the dependency needs to be instantiated.
+      */
+    autoRegisterAll(fns: any[]): void;
     
     /**
       * Unregisters based on key.
       * @param key The key that identifies the dependency at resolution time; usually a constructor function.
       */
     unregister(key: any): void;
+    
+    /**
+      * Inspects the container to determine if a particular key has been registred.
+      * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+      * @param checkParent Indicates whether or not to check the parent container hierarchy.
+      * @return Returns true if the key has been registred; false otherwise.
+      */
+    hasResolver(key: any, checkParent?: boolean): boolean;
+    
+    /**
+      * Deprecated. Use hasResolver instead.
+      */
+    hasHandler(key: any, checkParent: any): any;
     
     /**
       * Resolves a single instance based on the provided key.
@@ -275,14 +300,6 @@ declare module 'aurelia-dependency-injection' {
     getAll(key: any): any[];
     
     /**
-      * Inspects the container to determine if a particular key has been registred.
-      * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-      * @param [checkParent=false] Indicates whether or not to check the parent container hierarchy.
-      * @return Returns true if the key has been registred; false otherwise.
-      */
-    hasHandler(key: any, checkParent?: boolean): boolean;
-    
-    /**
       * Creates a new dependency injection container whose parent is the current container.
       * @return Returns a new container instance parented to this.
       */
@@ -291,10 +308,17 @@ declare module 'aurelia-dependency-injection' {
     /**
       * Invokes a function, recursively resolving its dependencies.
       * @param fn The function to invoke with the auto-resolved dependencies.
-      * @param [deps] Additional function dependencies to use during invocation.
       * @return Returns the instance resulting from calling the function.
       */
-    invoke(fn: Function, deps?: any[]): any;
+    invoke(fn: Function): any;
+    
+    /**
+      * Invokes a function, recursively resolving its dependencies.
+      * @param fn The function to invoke with the auto-resolved dependencies.
+      * @param deps Additional function dependencies to use during invocation.
+      * @return Returns the instance resulting from calling the function.
+      */
+    invokeWithDynamicDependencies(fn: Function, deps: any[]): any;
   }
   export function autoinject(potentialTarget?: any): any;
   export function inject(...rest: any[]): any;

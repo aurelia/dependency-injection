@@ -1,4 +1,4 @@
-import * as core from 'core-js';
+import 'core-js';
 
 /**
 * Used to invoke a factory method.

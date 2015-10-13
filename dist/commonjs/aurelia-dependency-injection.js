@@ -2,6 +2,8 @@
 
 exports.__esModule = true;
 
+var _classActivators;
+
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 exports.autoinject = autoinject;
@@ -12,59 +14,15 @@ exports.singleton = singleton;
 exports.instanceActivator = instanceActivator;
 exports.factory = factory;
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _coreJs = require('core-js');
-
-var core = _interopRequireWildcard(_coreJs);
+require('core-js');
 
 var _aureliaMetadata = require('aurelia-metadata');
 
-var _aureliaLogging = require('aurelia-logging');
-
-var TransientRegistration = (function () {
-  function TransientRegistration(key) {
-    _classCallCheck(this, TransientRegistration);
-
-    this.key = key;
-  }
-
-  TransientRegistration.prototype.register = function register(container, key, fn) {
-    container.registerTransient(this.key || key, fn);
-  };
-
-  return TransientRegistration;
-})();
-
-exports.TransientRegistration = TransientRegistration;
-
-var SingletonRegistration = (function () {
-  function SingletonRegistration(keyOrRegisterInChild) {
-    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-    _classCallCheck(this, SingletonRegistration);
-
-    if (typeof keyOrRegisterInChild === 'boolean') {
-      this.registerInChild = keyOrRegisterInChild;
-    } else {
-      this.key = keyOrRegisterInChild;
-      this.registerInChild = registerInChild;
-    }
-  }
-
-  SingletonRegistration.prototype.register = function register(container, key, fn) {
-    var destination = this.registerInChild ? container : container.root;
-    destination.registerSingleton(this.key || key, fn);
-  };
-
-  return SingletonRegistration;
-})();
-
-exports.SingletonRegistration = SingletonRegistration;
+var _aureliaPal = require('aurelia-pal');
 
 var Resolver = (function () {
   function Resolver() {
@@ -144,7 +102,7 @@ var Optional = (function (_Resolver3) {
   }
 
   Optional.prototype.get = function get(container) {
-    if (container.hasHandler(this.key, this.checkParent)) {
+    if (container.hasResolver(this.key, this.checkParent)) {
       return container.get(this.key);
     }
 
@@ -185,32 +143,69 @@ var Parent = (function (_Resolver4) {
 
 exports.Parent = Parent;
 
-var ClassActivator = (function () {
-  function ClassActivator() {
-    _classCallCheck(this, ClassActivator);
+var StrategyResolver = (function () {
+  function StrategyResolver(strategy, state) {
+    _classCallCheck(this, StrategyResolver);
+
+    this.strategy = strategy;
+    this.state = state;
   }
 
-  ClassActivator.prototype.invoke = function invoke(fn, args) {
-    return Reflect.construct(fn, args);
+  StrategyResolver.prototype.get = function get(container, key) {
+    switch (this.strategy) {
+      case 0:
+        return this.state;
+      case 1:
+        var singleton = container.invoke(this.state);
+        this.state = singleton;
+        this.strategy = 0;
+        return singleton;
+      case 2:
+        return container.invoke(this.state);
+      case 3:
+        return this.state(container, key, this);
+      case 4:
+        return this.state[0].get(container, key);
+      case 5:
+        return container.get(this.state);
+      default:
+        throw new Error('Invalid strategy: ' + this.strategy);
+    }
   };
 
-  _createClass(ClassActivator, null, [{
-    key: 'instance',
-    value: new ClassActivator(),
-    enumerable: true
-  }]);
-
-  return ClassActivator;
+  return StrategyResolver;
 })();
 
-exports.ClassActivator = ClassActivator;
+exports.StrategyResolver = StrategyResolver;
 
 var FactoryActivator = (function () {
   function FactoryActivator() {
     _classCallCheck(this, FactoryActivator);
   }
 
-  FactoryActivator.prototype.invoke = function invoke(fn, args) {
+  FactoryActivator.prototype.invoke = function invoke(container, fn, keys) {
+    var i = keys.length;
+    var args = new Array(i);
+
+    while (i--) {
+      args[i] = container.get(keys[i]);
+    }
+
+    return fn.apply(undefined, args);
+  };
+
+  FactoryActivator.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(container, fn, keys, deps) {
+    var i = keys.length;
+    var args = new Array(i);
+
+    while (i--) {
+      args[i] = container.get(keys[i]);
+    }
+
+    if (deps !== undefined) {
+      args = args.concat(deps);
+    }
+
     return fn.apply(undefined, args);
   };
 
@@ -225,34 +220,123 @@ var FactoryActivator = (function () {
 
 exports.FactoryActivator = FactoryActivator;
 
-var badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+var TransientRegistration = (function () {
+  function TransientRegistration(key) {
+    _classCallCheck(this, TransientRegistration);
 
-_aureliaMetadata.Metadata.registration = 'aurelia:registration';
-_aureliaMetadata.Metadata.instanceActivator = 'aurelia:instance-activator';
+    this.key = key;
+  }
 
-function test() {}
-if (!test.name) {
-  Object.defineProperty(Function.prototype, 'name', {
-    get: function get() {
-      var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
+  TransientRegistration.prototype.createResolver = function createResolver(container, key, fn) {
+    return new StrategyResolver(2, fn);
+  };
 
-      Object.defineProperty(this, 'name', { value: name });
-      return name;
+  return TransientRegistration;
+})();
+
+exports.TransientRegistration = TransientRegistration;
+
+var SingletonRegistration = (function () {
+  function SingletonRegistration(keyOrRegisterInChild) {
+    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+    _classCallCheck(this, SingletonRegistration);
+
+    if (typeof keyOrRegisterInChild === 'boolean') {
+      this.registerInChild = keyOrRegisterInChild;
+    } else {
+      this.key = keyOrRegisterInChild;
+      this.registerInChild = registerInChild;
     }
-  });
+  }
+
+  SingletonRegistration.prototype.createResolver = function createResolver(container, key, fn) {
+    var resolver = new StrategyResolver(1, fn);
+
+    if (!this.registerInChild && container !== container.root) {
+      container.root.registerResolver(this.key || key, resolver);
+    }
+
+    return resolver;
+  };
+
+  return SingletonRegistration;
+})();
+
+exports.SingletonRegistration = SingletonRegistration;
+
+var badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+var _emptyParameters = Object.freeze([]);
+
+exports._emptyParameters = _emptyParameters;
+_aureliaMetadata.metadata.registration = 'aurelia:registration';
+_aureliaMetadata.metadata.instanceActivator = 'aurelia:instance-activator';
+
+var ConstructionInfo = function ConstructionInfo(activator, keys) {
+  _classCallCheck(this, ConstructionInfo);
+
+  this.activator = activator;
+  this.keys = keys;
+};
+
+function invokeWithDynamicDependencies(container, fn, keys, deps) {
+  var i = keys.length;
+  var args = new Array(i);
+
+  while (i--) {
+    args[i] = container.get(keys[i]);
+  }
+
+  if (deps !== undefined) {
+    args = args.concat(deps);
+  }
+
+  return Reflect.construct(fn, args);
 }
 
-var emptyParameters = Object.freeze([]);
-
-exports.emptyParameters = emptyParameters;
+var classActivators = (_classActivators = {}, _classActivators[0] = {
+  invoke: function invoke(container, Type, keys) {
+    return new Type();
+  },
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators[1] = {
+  invoke: function invoke(container, Type, keys) {
+    return new Type(container.get(keys[0]));
+  },
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators[2] = {
+  invoke: function invoke(container, Type, keys) {
+    return new Type(container.get(keys[0]), container.get(keys[1]));
+  },
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators[3] = {
+  invoke: function invoke(container, Type, keys) {
+    return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]));
+  },
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators[4] = {
+  invoke: function invoke(container, Type, keys) {
+    return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]), container.get(keys[3]));
+  },
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators[5] = {
+  invoke: function invoke(container, Type, keys) {
+    return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]), container.get(keys[3]), container.get(keys[4]));
+  },
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators.fallback = {
+  invoke: invokeWithDynamicDependencies,
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classActivators);
 
 var Container = (function () {
   function Container(constructionInfo) {
     _classCallCheck(this, Container);
 
-    this.constructionInfo = constructionInfo || new Map();
-    this.entries = new Map();
+    this.resolvers = new Map();
+    this.constructionInfo = constructionInfo === undefined ? new Map() : constructionInfo;
     this.root = this;
+    this.parent = null;
   }
 
   Container.prototype.makeGlobal = function makeGlobal() {
@@ -261,44 +345,58 @@ var Container = (function () {
   };
 
   Container.prototype.registerInstance = function registerInstance(key, instance) {
-    this.registerHandler(key, function (x) {
-      return instance;
-    });
-  };
-
-  Container.prototype.registerTransient = function registerTransient(key, fn) {
-    fn = fn || key;
-    this.registerHandler(key, function (x) {
-      return x.invoke(fn);
-    });
+    this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
   };
 
   Container.prototype.registerSingleton = function registerSingleton(key, fn) {
-    var singleton = null;
-    fn = fn || key;
-    this.registerHandler(key, function (x) {
-      return singleton || (singleton = x.invoke(fn));
-    });
+    this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
   };
 
-  Container.prototype.autoRegister = function autoRegister(fn, key) {
-    var registration = undefined;
+  Container.prototype.registerTransient = function registerTransient(key, fn) {
+    this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
+  };
 
-    if (fn === null || fn === undefined) {
+  Container.prototype.registerHandler = function registerHandler(key, handler) {
+    this.registerResolver(key, new StrategyResolver(3, handler));
+  };
+
+  Container.prototype.registerAlias = function registerAlias(originalKey, aliasKey) {
+    this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
+  };
+
+  Container.prototype.registerResolver = function registerResolver(key, resolver) {
+    if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
 
-    if (typeof fn === 'function') {
-      registration = _aureliaMetadata.Metadata.get(_aureliaMetadata.Metadata.registration, fn);
+    var result = this.resolvers.get(key);
 
-      if (registration !== undefined) {
-        registration.register(this, key || fn, fn);
+    if (result === undefined) {
+      this.resolvers.set(key, resolver);
+    } else if (result.strategy === 4) {
+      result.state.push(resolver);
+    } else {
+      this.resolvers.set(key, new StrategyResolver(4, [result, resolver]));
+    }
+  };
+
+  Container.prototype.autoRegister = function autoRegister(fn, key) {
+    var resolver = undefined;
+
+    if (typeof fn === 'function') {
+      var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
+
+      if (_registration === undefined) {
+        resolver = new StrategyResolver(1, fn);
       } else {
-        this.registerSingleton(key || fn, fn);
+        resolver = _registration.createResolver(this, key === undefined ? fn : key, fn);
       }
     } else {
-      this.registerInstance(fn, fn);
+      resolver = new StrategyResolver(0, fn);
     }
+
+    this.registerResolver(key === undefined ? fn : key, resolver);
+    return resolver;
   };
 
   Container.prototype.autoRegisterAll = function autoRegisterAll(fns) {
@@ -308,17 +406,25 @@ var Container = (function () {
     }
   };
 
-  Container.prototype.registerHandler = function registerHandler(key, handler) {
-    this._getOrCreateEntry(key).push(handler);
+  Container.prototype.unregister = function unregister(key) {
+    this.resolvers['delete'](key);
   };
 
-  Container.prototype.unregister = function unregister(key) {
-    this.entries['delete'](key);
+  Container.prototype.hasResolver = function hasResolver(key) {
+    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+    if (key === null || key === undefined) {
+      throw new Error(badKeyError);
+    }
+
+    return this.resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
+  };
+
+  Container.prototype.hasHandler = function hasHandler(key, checkParent) {
+    return this.hasResolver(key, checkParent);
   };
 
   Container.prototype.get = function get(key) {
-    var entry = undefined;
-
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
@@ -331,140 +437,118 @@ var Container = (function () {
       return key.get(this);
     }
 
-    entry = this.entries.get(key);
+    var resolver = this.resolvers.get(key);
 
-    if (entry !== undefined) {
-      return entry[0](this);
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return this.autoRegister(key).get(this, key);
+      }
+
+      return this.parent._get(key);
     }
 
-    if (this.parent) {
-      return this.parent.get(key);
+    return resolver.get(this, key);
+  };
+
+  Container.prototype._get = function _get(key) {
+    var resolver = this.resolvers.get(key);
+
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return this.autoRegister(key).get(this, key);
+      }
+
+      return this.parent._get(key);
     }
 
-    this.autoRegister(key);
-    entry = this.entries.get(key);
-
-    return entry[0](this);
+    return resolver.get(this, key);
   };
 
   Container.prototype.getAll = function getAll(key) {
-    var _this2 = this;
-
-    var entry = undefined;
-
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
 
-    entry = this.entries.get(key);
+    var resolver = this.resolvers.get(key);
 
-    if (entry !== undefined) {
-      return entry.map(function (x) {
-        return x(_this2);
-      });
-    }
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return _emptyParameters;
+      }
 
-    if (this.parent) {
       return this.parent.getAll(key);
     }
 
-    return [];
-  };
+    if (resolver.strategy === 4) {
+      var state = resolver.state;
+      var i = state.length;
+      var results = new Array(i);
 
-  Container.prototype.hasHandler = function hasHandler(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+      while (i--) {
+        results[i] = state[i].get(this, key);
+      }
 
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
+      return results;
     }
 
-    return this.entries.has(key) || checkParent && this.parent && this.parent.hasHandler(key, checkParent);
+    return resolver.get(this, key);
   };
 
   Container.prototype.createChild = function createChild() {
-    var childContainer = new Container(this.constructionInfo);
-    childContainer.parent = this;
-    childContainer.root = this.root;
-    return childContainer;
+    var child = new Container(this.constructionInfo);
+    child.root = this.root;
+    child.parent = this;
+    return child;
   };
 
-  Container.prototype.invoke = function invoke(fn, deps) {
+  Container.prototype.invoke = function invoke(fn) {
     var info = undefined;
-    var i = undefined;
-    var ii = undefined;
-    var keys = undefined;
-    var args = undefined;
 
     try {
-      info = this._getOrCreateConstructionInfo(fn);
-      keys = info.keys;
-      args = new Array(keys.length);
+      info = this.constructionInfo.get(fn);
 
-      for (i = 0, ii = keys.length; i < ii; ++i) {
-        args[i] = this.get(keys[i]);
+      if (info === undefined) {
+        info = this._createConstructionInfo(fn);
+        this.constructionInfo.set(fn, info);
       }
 
-      if (deps !== undefined) {
-        args = args.concat(deps);
-      }
-
-      return info.activator.invoke(fn, args);
+      return info.activator.invoke(this, fn, info.keys);
     } catch (e) {
-      var activatingText = info && info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
-      var message = 'Error ' + activatingText + ' ' + fn.name + '.';
-      if (i < ii) {
-        message += ' The argument at index ' + i + ' (key:' + keys[i] + ') could not be satisfied.';
+      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
+    }
+  };
+
+  Container.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(fn, deps) {
+    var info = undefined;
+
+    try {
+      info = this.constructionInfo.get(fn);
+
+      if (info === undefined) {
+        info = this._createConstructionInfo(fn);
+        this.constructionInfo.set(fn, info);
       }
 
-      message += ' Check the inner error for details.';
-
-      throw new _aureliaLogging.AggregateError(message, e, true);
+      return info.activator.invokeWithDynamicDependencies(this, fn, info.keys, deps);
+    } catch (e) {
+      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
     }
-  };
-
-  Container.prototype._getOrCreateEntry = function _getOrCreateEntry(key) {
-    var entry = undefined;
-
-    if (key === null || key === undefined) {
-      throw new Error('key cannot be null or undefined.  (Are you trying to inject something that doesn\'t exist with DI?)');
-    }
-
-    entry = this.entries.get(key);
-
-    if (entry === undefined) {
-      entry = [];
-      this.entries.set(key, entry);
-    }
-
-    return entry;
-  };
-
-  Container.prototype._getOrCreateConstructionInfo = function _getOrCreateConstructionInfo(fn) {
-    var info = this.constructionInfo.get(fn);
-
-    if (info === undefined) {
-      info = this._createConstructionInfo(fn);
-      this.constructionInfo.set(fn, info);
-    }
-
-    return info;
   };
 
   Container.prototype._createConstructionInfo = function _createConstructionInfo(fn) {
-    var info = { activator: _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.instanceActivator, fn) || ClassActivator.instance };
+    var keys = undefined;
 
-    if (fn.inject !== undefined) {
-      if (typeof fn.inject === 'function') {
-        info.keys = fn.inject();
-      } else {
-        info.keys = fn.inject;
-      }
-
-      return info;
+    if (typeof fn.inject === 'function') {
+      keys = fn.inject();
+    } else if (fn.inject === undefined) {
+      keys = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
+    } else {
+      keys = fn.inject;
     }
 
-    info.keys = _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.paramTypes, fn) || emptyParameters;
-    return info;
+    var activator = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.instanceActivator, fn) || classActivators[keys.length] || classActivators.fallback;
+
+    return new ConstructionInfo(activator, keys);
   };
 
   return Container;
@@ -474,7 +558,7 @@ exports.Container = Container;
 
 function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    target.inject = _aureliaMetadata.Metadata.getOwn(_aureliaMetadata.Metadata.paramTypes, target) || emptyParameters;
+    target.inject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
@@ -485,14 +569,19 @@ function inject() {
     rest[_key] = arguments[_key];
   }
 
-  return function (target) {
-    target.inject = rest;
+  return function (target, key, descriptor) {
+    if (descriptor) {
+      var fn = descriptor.value;
+      fn.inject = rest;
+    } else {
+      target.inject = rest;
+    }
   };
 }
 
 function registration(value) {
   return function (target) {
-    _aureliaMetadata.Metadata.define(_aureliaMetadata.Metadata.registration, value, target);
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
   };
 }
 
@@ -508,7 +597,7 @@ function singleton(keyOrRegisterInChild) {
 
 function instanceActivator(value) {
   return function (target) {
-    _aureliaMetadata.Metadata.define(_aureliaMetadata.Metadata.instanceActivator, value, target);
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.instanceActivator, value, target);
   };
 }
 
@@ -516,10 +605,10 @@ function factory() {
   return instanceActivator(FactoryActivator.instance);
 }
 
-_aureliaMetadata.Decorators.configure.simpleDecorator('autoinject', autoinject);
-_aureliaMetadata.Decorators.configure.parameterizedDecorator('inject', inject);
-_aureliaMetadata.Decorators.configure.parameterizedDecorator('registration', registration);
-_aureliaMetadata.Decorators.configure.parameterizedDecorator('transient', transient);
-_aureliaMetadata.Decorators.configure.parameterizedDecorator('singleton', singleton);
-_aureliaMetadata.Decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
-_aureliaMetadata.Decorators.configure.parameterizedDecorator('factory', factory);
+_aureliaMetadata.decorators.configure.simpleDecorator('autoinject', autoinject);
+_aureliaMetadata.decorators.configure.parameterizedDecorator('inject', inject);
+_aureliaMetadata.decorators.configure.parameterizedDecorator('registration', registration);
+_aureliaMetadata.decorators.configure.parameterizedDecorator('transient', transient);
+_aureliaMetadata.decorators.configure.parameterizedDecorator('singleton', singleton);
+_aureliaMetadata.decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
+_aureliaMetadata.decorators.configure.parameterizedDecorator('factory', factory);
