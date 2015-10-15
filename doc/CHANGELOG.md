@@ -1,3 +1,11 @@
+### 0.11.1 (2015-10-15)
+
+
+#### Bug Fixes
+
+* **registrations:** properly handle registrations that want to target different containers ([b60c1039](http://github.com/aurelia/dependency-injection/commit/b60c10392588b49b6b3ea2fb20c75c27c2a73bb5))
+
+
 ## 0.11.0 (2015-10-13)
 
 
