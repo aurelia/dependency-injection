@@ -52,7 +52,7 @@ export class SingletonRegistration {
     let resolver = new StrategyResolver(1, fn);
 
     if (!this.registerInChild && container !== container.root) {
-      container.root.registerResolver(this.key || key, resolver);
+      this.targetContainer = container.root;
     }
 
     return resolver;

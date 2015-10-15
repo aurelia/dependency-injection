@@ -249,7 +249,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
       var resolver = new StrategyResolver(1, fn);
 
       if (!this.registerInChild && container !== container.root) {
-        container.root.registerResolver(this.key || key, resolver);
+        this.targetContainer = container.root;
       }
 
       return resolver;
@@ -390,7 +390,8 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
         resolver = new StrategyResolver(0, fn);
       }
 
-      this.registerResolver(key === undefined ? fn : key, resolver);
+      var targetContainer = resolver.targetContainer || this;
+      targetContainer.registerResolver(key === undefined ? fn : key, resolver);
       return resolver;
     };
 

@@ -182,7 +182,8 @@ export class Container {
       resolver = new StrategyResolver(0, fn);
     }
 
-    this.registerResolver(key === undefined ? fn : key, resolver);
+    let targetContainer = resolver.targetContainer || this;
+    targetContainer.registerResolver(key === undefined ? fn : key, resolver);
     return resolver;
   }
 
