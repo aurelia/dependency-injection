@@ -1,3 +1,11 @@
+### 0.11.2 (2015-10-15)
+
+
+#### Bug Fixes
+
+* **registrations:** move configuration to correct instance ([e6d4b542](http://github.com/aurelia/dependency-injection/commit/e6d4b5420aec12940fbce21852a44c248deb4340))
+
+
 ### 0.11.1 (2015-10-15)
 
 

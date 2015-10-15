@@ -254,7 +254,7 @@ var SingletonRegistration = (function () {
     var resolver = new StrategyResolver(1, fn);
 
     if (!this.registerInChild && container !== container.root) {
-      this.targetContainer = container.root;
+      resolver.targetContainer = container.root;
     }
 
     return resolver;
