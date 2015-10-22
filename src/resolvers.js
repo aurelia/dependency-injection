@@ -1,28 +1,40 @@
+import {protocol} from 'aurelia-metadata';
+
 /**
-* An abstract resolver used to allow functions/classes to specify custom dependency resolution logic.
+* Decorator: Indicates that the decorated class/object is a custom resolver.
 */
-export class Resolver {
+export const resolver = protocol.create('aureia:resolver', function(target) {
+  if (!(typeof target.get === 'function')) {
+    return 'Resolvers must implement: get(container: Container, key: any): any';
+  }
+
+  return true;
+});
+
+/**
+* Used to allow functions/classes to specify custom dependency resolution logic.
+*/
+interface Resolver {
   /**
   * Called by the container to allow custom resolution of dependencies for a function/class.
   * @param container The container to resolve from.
+  * @param key The key that the resolver was registered as.
   * @return Returns the resolved object.
   */
-  get(container: Container): any {
-    throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
-  }
+  get(container: Container, key: any): any;
 }
 
 /**
 * Used to allow functions/classes to specify lazy resolution logic.
 */
-export class Lazy extends Resolver {
+@resolver()
+export class Lazy {
   /**
   * Creates an instance of the Lazy class.
   * @param key The key to lazily resolve.
   */
   constructor(key: any) {
-    super();
-    this.key = key;
+    this._key = key;
   }
 
   /**
@@ -31,9 +43,7 @@ export class Lazy extends Resolver {
   * @return Returns a function which can be invoked at a later time to obtain the actual dependency.
   */
   get(container: Container): any {
-    return () => {
-      return container.get(this.key);
-    };
+    return () => container.get(this._key);
   }
 
   /**
@@ -49,14 +59,14 @@ export class Lazy extends Resolver {
 /**
 * Used to allow functions/classes to specify resolution of all matches to a key.
 */
-export class All extends Resolver {
+@resolver()
+export class All {
   /**
   * Creates an instance of the All class.
   * @param key The key to lazily resolve all matches for.
   */
   constructor(key: any) {
-    super();
-    this.key = key;
+    this._key = key;
   }
 
   /**
@@ -65,7 +75,7 @@ export class All extends Resolver {
   * @return Returns an array of all matching instances.
   */
   get(container: Container): any[] {
-    return container.getAll(this.key);
+    return container.getAll(this._key);
   }
 
   /**
@@ -81,16 +91,16 @@ export class All extends Resolver {
 /**
 * Used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container.
 */
-export class Optional extends Resolver {
+@resolver()
+export class Optional {
   /**
   * Creates an instance of the Optional class.
   * @param key The key to optionally resolve for.
   * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
   */
   constructor(key: any, checkParent?: boolean = false) {
-    super();
-    this.key = key;
-    this.checkParent = checkParent;
+    this._key = key;
+    this._checkParent = checkParent;
   }
 
   /**
@@ -99,8 +109,8 @@ export class Optional extends Resolver {
   * @return Returns the instance if found; otherwise null.
   */
   get(container: Container): any {
-    if (container.hasResolver(this.key, this.checkParent)) {
-      return container.get(this.key);
+    if (container.hasResolver(this._key, this._checkParent)) {
+      return container.get(this._key);
     }
 
     return null;
@@ -121,14 +131,14 @@ export class Optional extends Resolver {
 /**
 * Used to inject the dependency from the parent container instead of the current one.
 */
-export class Parent extends Resolver {
+@resolver()
+export class Parent {
   /**
   * Creates an instance of the Parent class.
   * @param key The key to resolve from the parent container.
   */
   constructor(key: any) {
-    super();
-    this.key = key;
+    this._key = key;
   }
 
   /**
@@ -138,7 +148,7 @@ export class Parent extends Resolver {
   */
   get(container: Container): any {
     return container.parent
-      ? container.parent.get(this.key)
+      ? container.parent.get(this._key)
       : null;
   }
 
@@ -152,12 +162,24 @@ export class Parent extends Resolver {
   }
 }
 
+@resolver()
 export class StrategyResolver {
+  /**
+  * Creates an instance of the StrategyResolver class.
+  * @param strategy The type of resolution strategy.
+  * @param state The state associated with the resolution strategy.
+  */
   constructor(strategy, state) {
     this.strategy = strategy;
     this.state = state;
   }
 
+  /**
+  * Called by the container to allow custom resolution of dependencies for a function/class.
+  * @param container The container to resolve from.
+  * @param key The key that the resolver was registered as.
+  * @return Returns the resolved object.
+  */
   get(container, key) {
     switch (this.strategy) {
     case 0: //instance

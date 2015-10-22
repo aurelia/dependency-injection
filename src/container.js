@@ -1,71 +1,88 @@
 import 'core-js';
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
-import {ClassActivator} from './activators';
-import {Resolver, StrategyResolver} from './resolvers';
+import {resolver as resolverProtocol, StrategyResolver} from './resolvers';
 
 const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 export const _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
-metadata.instanceActivator = 'aurelia:instance-activator';
+metadata.invoker = 'aurelia:invoker';
 
-class ConstructionInfo {
-  constructor(activator, keys) {
-    this.activator = activator;
-    this.keys = keys;
+/**
+* Stores the information needed to invoke a function.
+*/
+class InvocationDescription {
+  /**
+  * Instantiates an InvocationDescription.
+  * @param invoker The strategy for invoking the function.
+  * @param dependencies The static dependencies of the function call.
+  */
+  constructor(invoker: Invoker, dependencies: any[]) {
+    this.invoker = invoker;
+    this.dependencies = dependencies;
   }
 }
 
-function invokeWithDynamicDependencies(container, fn, keys, deps) {
-  let i = keys.length;
+/**
+* Used to configure a Container instance.
+*/
+interface ContainerConfiguration {
+  /**
+  * An optional callback which will be called when any function is invoked by the container.
+  */
+  onInvoke?: (instance: any) => any;
+}
+
+function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
+  let i = staticDependencies.length;
   let args = new Array(i);
 
   while (i--) {
-    args[i] = container.get(keys[i]);
+    args[i] = container.get(staticDependencies[i]);
   }
 
-  if (deps !== undefined) {
-    args = args.concat(deps);
+  if (dynamicDependencies !== undefined) {
+    args = args.concat(dynamicDependencies);
   }
 
   return Reflect.construct(fn, args);
 }
 
-let classActivators = {
+let classInvokers = {
   [0]: {
-    invoke(container, Type, keys) {
+    invoke(container, Type) {
       return new Type();
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [1]: {
-    invoke(container, Type, keys) {
-      return new Type(container.get(keys[0]));
+    invoke(container, Type, deps) {
+      return new Type(container.get(deps[0]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [2]: {
-    invoke(container, Type, keys) {
-      return new Type(container.get(keys[0]), container.get(keys[1]));
+    invoke(container, Type, deps) {
+      return new Type(container.get(deps[0]), container.get(deps[1]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [3]: {
-    invoke(container, Type, keys) {
-      return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]));
+    invoke(container, Type, deps) {
+      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [4]: {
-    invoke(container, Type, keys) {
-      return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]), container.get(keys[3]));
+    invoke(container, Type, deps) {
+      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [5]: {
-    invoke(container, Type, keys) {
-      return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]), container.get(keys[3]), container.get(keys[4]));
+    invoke(container, Type, deps) {
+      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
@@ -81,9 +98,29 @@ let classActivators = {
 export class Container {
   static instance: Container;
 
-  constructor(constructionInfo?: Map<Function, Object>) {
-    this.resolvers = new Map();
-    this.constructionInfo = constructionInfo === undefined ? new Map() : constructionInfo;
+  /**
+  * The parent container in the DI hierarchy.
+  */
+  parent: Container;
+
+  /**
+  * The root container in the DI hierarchy.
+  */
+  root: Container;
+
+  /**
+  * Creates an instance of Container.
+  * @param configuration Provides some configuration for the new Container instance.
+  */
+  constructor(configuration?: ContainerConfiguration) {
+    if (!configuration) {
+      configuration = {};
+    }
+
+    this._configuration = configuration;
+    this._onInvoke = configuration.onInvoke || (configuration.onInvoke = instance => instance);
+    this._invocationDescriptions = configuration.invocationDescriptions || (configuration.invocationDescriptions = new Map());
+    this._resolvers = new Map();
     this.root = this;
     this.parent = null;
   }
@@ -94,6 +131,15 @@ export class Container {
   makeGlobal(): Container {
     Container.instance = this;
     return this;
+  }
+
+  /**
+  * Sets an invocation callback that will be called with all instances created by internal invokers.
+  * @param onInvoke The callback to be called when an internal invoker creates/returns a new instance.
+  */
+  setInvocationCallback(onInvoke: (target: any) => any) {
+    this._onInvoke = onInvoke;
+    this._configuration.onInvoke = onInvoke;
   }
 
   /**
@@ -151,14 +197,15 @@ export class Container {
       throw new Error(badKeyError);
     }
 
-    let result = this.resolvers.get(key);
+    let allResolvers = this._resolvers;
+    let result = allResolvers.get(key);
 
     if (result === undefined) {
-      this.resolvers.set(key, resolver);
+      allResolvers.set(key, resolver);
     } else if (result.strategy === 4) {
       result.state.push(resolver);
     } else {
-      this.resolvers.set(key, new StrategyResolver(4, [result, resolver]));
+      allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
   }
 
@@ -175,15 +222,15 @@ export class Container {
 
       if (registration === undefined) {
         resolver = new StrategyResolver(1, fn);
+        this.registerResolver(key === undefined ? fn : key, resolver);
       } else {
-        resolver = registration.createResolver(this, key === undefined ? fn : key, fn);
+        resolver = registration.registerResolver(this, key === undefined ? fn : key, fn);
       }
     } else {
       resolver = new StrategyResolver(0, fn);
+      this.registerResolver(key === undefined ? fn : key, resolver);
     }
 
-    let targetContainer = resolver.targetContainer || this;
-    targetContainer.registerResolver(key === undefined ? fn : key, resolver);
     return resolver;
   }
 
@@ -203,7 +250,7 @@ export class Container {
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   */
   unregister(key: any) : void {
-    this.resolvers.delete(key);
+    this._resolvers.delete(key);
   }
 
   /**
@@ -217,14 +264,7 @@ export class Container {
       throw new Error(badKeyError);
     }
 
-    return this.resolvers.has(key) || (checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent));
-  }
-
-  /**
-  * Deprecated. Use hasResolver instead.
-  */
-  hasHandler(key, checkParent) {
-    return this.hasResolver(key, checkParent);
+    return this._resolvers.has(key) || (checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent));
   }
 
   /**
@@ -241,11 +281,11 @@ export class Container {
       return this;
     }
 
-    if (key instanceof Resolver) {
-      return key.get(this);
+    if (resolverProtocol.decorates(key)) {
+      return key.get(this, key);
     }
 
-    let resolver = this.resolvers.get(key);
+    let resolver = this._resolvers.get(key);
 
     if (resolver === undefined) {
       if (this.parent === null) {
@@ -259,7 +299,7 @@ export class Container {
   }
 
   _get(key) {
-    let resolver = this.resolvers.get(key);
+    let resolver = this._resolvers.get(key);
 
     if (resolver === undefined) {
       if (this.parent === null) {
@@ -282,7 +322,7 @@ export class Container {
       throw new Error(badKeyError);
     }
 
-    let resolver = this.resolvers.get(key);
+    let resolver = this._resolvers.get(key);
 
     if (resolver === undefined) {
       if (this.parent === null) {
@@ -312,7 +352,7 @@ export class Container {
   * @return Returns a new container instance parented to this.
   */
   createChild(): Container {
-    let child = new Container(this.constructionInfo);
+    let child = new Container(this._configuration);
     child.root = this.root;
     child.parent = this;
     return child;
@@ -324,17 +364,18 @@ export class Container {
   * @return Returns the instance resulting from calling the function.
   */
   invoke(fn: Function): any {
-    let info;
+    let allDescriptions = this._invocationDescriptions;
+    let description;
 
     try {
-      info = this.constructionInfo.get(fn);
+      description = allDescriptions.get(fn);
 
-      if (info === undefined) {
-        info = this._createConstructionInfo(fn);
-        this.constructionInfo.set(fn, info);
+      if (description === undefined) {
+        description = this._createInvocationDescription(fn);
+        allDescriptions.set(fn, description);
       }
 
-      return info.activator.invoke(this, fn, info.keys);
+      return this._onInvoke(description.invoker.invoke(this, fn, description.dependencies));
     } catch (e) {
       throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
@@ -343,40 +384,41 @@ export class Container {
   /**
   * Invokes a function, recursively resolving its dependencies.
   * @param fn The function to invoke with the auto-resolved dependencies.
-  * @param deps Additional function dependencies to use during invocation.
+  * @param dynamicDependencies Additional function dependencies to use during invocation.
   * @return Returns the instance resulting from calling the function.
   */
-  invokeWithDynamicDependencies(fn: Function, deps: any[]) {
-    let info;
+  invokeWithDynamicDependencies(fn: Function, dynamicDependencies: any[]) {
+    let allDescriptions = this._invocationDescriptions;
+    let description;
 
     try {
-      info = this.constructionInfo.get(fn);
+      description = allDescriptions.get(fn);
 
-      if (info === undefined) {
-        info = this._createConstructionInfo(fn);
-        this.constructionInfo.set(fn, info);
+      if (description === undefined) {
+        description = this._createInvocationDescription(fn);
+        allDescriptions.set(fn, description);
       }
 
-      return info.activator.invokeWithDynamicDependencies(this, fn, info.keys, deps);
+      return this._onInvoke(description.invoker.invokeWithDynamicDependencies(this, fn, description.dependencies, dynamicDependencies));
     } catch (e) {
       throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
   }
 
-  _createConstructionInfo(fn) {
-    let keys;
+  _createInvocationDescription(fn) {
+    let dependencies;
 
     if (typeof fn.inject === 'function') {
-      keys = fn.inject();
+      dependencies = fn.inject();
     } else if (fn.inject === undefined) {
-      keys = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
+      dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
     } else {
-      keys = fn.inject;
+      dependencies = fn.inject;
     }
 
-    let activator = metadata.getOwn(metadata.instanceActivator, fn)
-      || classActivators[keys.length] || classActivators.fallback;
+    let invoker = metadata.getOwn(metadata.invoker, fn)
+      || classInvokers[dependencies.length] || classInvokers.fallback;
 
-    return new ConstructionInfo(activator, keys);
+    return new InvocationDescription(invoker, dependencies);
   }
 }

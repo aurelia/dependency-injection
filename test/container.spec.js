@@ -1,6 +1,7 @@
 import {Container} from '../src/container';
 import {Lazy, All, Optional, Parent} from '../src/resolvers';
-import {inject, transient, singleton} from '../src/decorators';
+import {transient, singleton} from '../src/registrations';
+import {inject} from '../src/injection';
 import {decorators} from 'aurelia-metadata';
 
 describe('container', () => {
@@ -152,35 +153,8 @@ describe('container', () => {
       expect(app1.logger).toBe(app2.logger);
     });
 
-    it('configures singleton via metadata method (ES6)', () => {
-      class Logger {
-        static decorators() { return decorators.singleton(); };
-      }
-
-      class App1 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      class App2 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
-
-      expect(app1.logger).toBe(app2.logger);
-    });
-
-    it('configures singleton via metadata property (ES5, AtScript, TypeScript, CoffeeScript)', () => {
-      class Logger {}
-      Logger.decorators = decorators.singleton();
+    it('configures singleton via decorators helper (ES5/6)', () => {
+      let Logger = decorators(singleton()).on(class {})
 
       class App1 {
         static inject() { return [Logger]; };
@@ -229,35 +203,8 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('configures transient (non singleton) via metadata method (ES6)', () => {
-      class Logger {
-        static decorators() { return decorators.transient(); };
-      }
-
-      class App1 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      class App2 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
-
-      expect(app1.logger).not.toBe(app2.logger);
-    });
-
-    it('configures transient (non singleton) via metadata property (ES5, ES7, TypeScript, CoffeeScript)', () => {
-      class Logger {}
-      Logger.decorators = decorators.transient();
+    it('configures transient (non singleton) via metadata method (ES5/6)', () => {
+      let Logger = decorators(transient()).on(class { });
 
       class App1 {
         static inject() { return [Logger]; };
@@ -335,10 +282,8 @@ describe('container', () => {
       expect(app2.logger).toEqual("something strange");
     });
 
-    it('uses base metadata method (ES6) when derived does not specify', () => {
-      class LoggerBase {
-        static decorators() { return decorators.transient(); };
-      }
+    it('uses base metadata method (ES5/6) when derived does not specify', () => {
+      let LoggerBase = decorators(transient()).on(class {});
 
       class Logger extends LoggerBase {
 
@@ -365,72 +310,9 @@ describe('container', () => {
       expect(app1.logger).not.toBe(app2.logger);
     });
 
-    it('uses base metadata property (ES5, ES7, TypeScript, CoffeeScript) when derived does not specify', () => {
-      class LoggerBase {}
-      LoggerBase.decorators = decorators.transient();
-
-      class Logger extends LoggerBase {
-
-      }
-
-      class App1 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      class App2 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
-
-      expect(app1.logger).not.toBe(app2.logger);
-    });
-
-    it('overrides base metadata method (ES6) with derived configuration', () => {
-      class LoggerBase {
-        static decorators() { return decorators.singleton(); };
-      }
-
-      class Logger extends LoggerBase {
-        static decorators() { return decorators.transient(); };
-      }
-
-      class App1 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      class App2 {
-        static inject() { return [Logger]; };
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
-
-      expect(app1.logger).not.toBe(app2.logger);
-    });
-
-    it('overrides base metadata property (ES5, ES7, TypeScript, CoffeeScript) with derived configuration', () => {
-      class LoggerBase {
-        static decorators() { return decorators.singleton(); };
-      }
-
-      class Logger extends LoggerBase {}
-      Logger.decorators = decorators.transient();
+    it('overrides base metadata method (ES5/6) with derived configuration', () => {
+      let LoggerBase = decorators(singleton()).on(class { });
+      let Logger = decorators(transient()).on(class extends LoggerBase {});
 
       class App1 {
         static inject() { return [Logger]; };
@@ -481,7 +363,7 @@ describe('container', () => {
       expect(logger2).toBe(logger1);
     });
 
-    it('configures concrete singelton via api for abstract dependency', () => {
+    it('configures concrete singleton via api for abstract dependency', () => {
       class LoggerBase {}
       class Logger extends LoggerBase {}
 
@@ -520,9 +402,7 @@ describe('container', () => {
     });
 
     it('doesn\'t get hidden when a super class adds metadata which doesn\'t include the base registration type', () => {
-      class LoggerBase {
-        static decorators() { return decorators.transient(); };
-      }
+      let LoggerBase = decorators(transient()).on(class {});
 
       class Logger extends LoggerBase {
       }
