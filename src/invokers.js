@@ -54,6 +54,7 @@ export class FactoryInvoker {
 
   /**
   * Invokes the function with the provided dependencies.
+  * @param container The calling container.
   * @param fn The constructor or factory function.
   * @param dependencies The dependencies of the function call.
   * @return The result of the function invocation.
@@ -71,6 +72,7 @@ export class FactoryInvoker {
 
   /**
   * Invokes the function with the provided dependencies.
+  * @param container The calling container.
   * @param fn The constructor or factory function.
   * @param staticDependencies The static dependencies of the function.
   * @param dynamicDependencies Additional dependencies to use during invocation.

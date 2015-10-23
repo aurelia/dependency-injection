@@ -12,15 +12,44 @@ metadata.invoker = 'aurelia:invoker';
 /**
 * Stores the information needed to invoke a function.
 */
-class InvocationDescription {
+export class InvocationHandler {
+  /**
+  * The function to be invoked by this handler.
+  */
+  fn: Function;
+
+  /**
+  * The invoker implementation that will be used to actually invoke the function.
+  */
+  invoker: Invoker;
+
+  /**
+  * The statically known dependencies of this function invocation.
+  */
+  dependencies: any[];
+
   /**
   * Instantiates an InvocationDescription.
+  * @param fn The Function described by this description object.
   * @param invoker The strategy for invoking the function.
   * @param dependencies The static dependencies of the function call.
   */
-  constructor(invoker: Invoker, dependencies: any[]) {
+  constructor(fn: Function, invoker: Invoker, dependencies: any[]) {
+    this.fn = fn;
     this.invoker = invoker;
     this.dependencies = dependencies;
+  }
+
+  /**
+  * Invokes the function.
+  * @param container The calling container.
+  * @param dynamicDependencies Additional dependencies to use during invocation.
+  * @return The result of the function invocation.
+  */
+  invoke(container: Container, dynamicDependencies?: any[]): any {
+    return dynamicDependencies !== undefined
+      ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
+      : this.invoker.invoke(container, this.fn, this.dependencies);
   }
 }
 
@@ -29,9 +58,9 @@ class InvocationDescription {
 */
 interface ContainerConfiguration {
   /**
-  * An optional callback which will be called when any function is invoked by the container.
+  * An optional callback which will be called when any function needs an InvocationHandler created (called once per Function).
   */
-  onInvoke?: (instance: any) => any;
+  onHandlerCreated?: (handler: InvocationHandler) => InvocationHandler;
 }
 
 function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
@@ -118,8 +147,8 @@ export class Container {
     }
 
     this._configuration = configuration;
-    this._onInvoke = configuration.onInvoke || (configuration.onInvoke = instance => instance);
-    this._invocationDescriptions = configuration.invocationDescriptions || (configuration.invocationDescriptions = new Map());
+    this._onHandlerCreated = configuration.onHandlerCreated;
+    this._handlers = configuration.handlers || (configuration.handlers = new Map());
     this._resolvers = new Map();
     this.root = this;
     this.parent = null;
@@ -134,12 +163,12 @@ export class Container {
   }
 
   /**
-  * Sets an invocation callback that will be called with all instances created by internal invokers.
-  * @param onInvoke The callback to be called when an internal invoker creates/returns a new instance.
+  * Sets an invocation handler creation callback that will be called when new InvocationsHandlers are created (called once per Function).
+  * @param onHandlerCreated The callback to be called when an InvocationsHandler is created.
   */
-  setInvocationCallback(onInvoke: (target: any) => any) {
-    this._onInvoke = onInvoke;
-    this._configuration.onInvoke = onInvoke;
+  setHandlerCreatedCallback(onHandlerCreated: (handler: InvocationHandler) => InvocationHandler) {
+    this._onHandlerCreated = onHandlerCreated;
+    this._configuration.onHandlerCreated = onHandlerCreated;
   }
 
   /**
@@ -361,51 +390,25 @@ export class Container {
   /**
   * Invokes a function, recursively resolving its dependencies.
   * @param fn The function to invoke with the auto-resolved dependencies.
-  * @return Returns the instance resulting from calling the function.
-  */
-  invoke(fn: Function): any {
-    let allDescriptions = this._invocationDescriptions;
-    let description;
-
-    try {
-      description = allDescriptions.get(fn);
-
-      if (description === undefined) {
-        description = this._createInvocationDescription(fn);
-        allDescriptions.set(fn, description);
-      }
-
-      return this._onInvoke(description.invoker.invoke(this, fn, description.dependencies));
-    } catch (e) {
-      throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
-    }
-  }
-
-  /**
-  * Invokes a function, recursively resolving its dependencies.
-  * @param fn The function to invoke with the auto-resolved dependencies.
   * @param dynamicDependencies Additional function dependencies to use during invocation.
   * @return Returns the instance resulting from calling the function.
   */
-  invokeWithDynamicDependencies(fn: Function, dynamicDependencies: any[]) {
-    let allDescriptions = this._invocationDescriptions;
-    let description;
-
+  invoke(fn: Function, dynamicDependencies?: any[]) {
     try {
-      description = allDescriptions.get(fn);
+      let handler = this._handlers.get(fn);
 
-      if (description === undefined) {
-        description = this._createInvocationDescription(fn);
-        allDescriptions.set(fn, description);
+      if (handler === undefined) {
+        handler = this._createInvocationHandler(fn);
+        this._handlers.set(fn, handler);
       }
 
-      return this._onInvoke(description.invoker.invokeWithDynamicDependencies(this, fn, description.dependencies, dynamicDependencies));
+      return handler.invoke(this, dynamicDependencies);
     } catch (e) {
       throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
   }
 
-  _createInvocationDescription(fn) {
+  _createInvocationHandler(fn: Function): InvocationHandler {
     let dependencies;
 
     if (typeof fn.inject === 'function') {
@@ -419,6 +422,7 @@ export class Container {
     let invoker = metadata.getOwn(metadata.invoker, fn)
       || classInvokers[dependencies.length] || classInvokers.fallback;
 
-    return new InvocationDescription(invoker, dependencies);
+    let handler = new InvocationHandler(fn, invoker, dependencies);
+    return this._onHandlerCreated !== undefined ? this._onHandlerCreated(handler) : handler;
   }
 }

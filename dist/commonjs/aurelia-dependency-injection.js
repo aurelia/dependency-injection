@@ -2,19 +2,17 @@
 
 exports.__esModule = true;
 
-var _classActivators;
+var _classInvokers;
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-exports.autoinject = autoinject;
-exports.inject = inject;
+exports.invoker = invoker;
+exports.factory = factory;
 exports.registration = registration;
 exports.transient = transient;
 exports.singleton = singleton;
-exports.instanceActivator = instanceActivator;
-exports.factory = factory;
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.autoinject = autoinject;
+exports.inject = inject;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -24,35 +22,28 @@ var _aureliaMetadata = require('aurelia-metadata');
 
 var _aureliaPal = require('aurelia-pal');
 
-var Resolver = (function () {
-  function Resolver() {
-    _classCallCheck(this, Resolver);
+var resolver = _aureliaMetadata.protocol.create('aureia:resolver', function (target) {
+  if (!(typeof target.get === 'function')) {
+    return 'Resolvers must implement: get(container: Container, key: any): any';
   }
 
-  Resolver.prototype.get = function get(container) {
-    throw new Error('A custom Resolver must implement get(container) and return the resolved instance(s).');
-  };
+  return true;
+});
 
-  return Resolver;
-})();
+exports.resolver = resolver;
 
-exports.Resolver = Resolver;
-
-var Lazy = (function (_Resolver) {
-  _inherits(Lazy, _Resolver);
-
+var Lazy = (function () {
   function Lazy(key) {
-    _classCallCheck(this, Lazy);
+    _classCallCheck(this, _Lazy);
 
-    _Resolver.call(this);
-    this.key = key;
+    this._key = key;
   }
 
   Lazy.prototype.get = function get(container) {
     var _this = this;
 
     return function () {
-      return container.get(_this.key);
+      return container.get(_this._key);
     };
   };
 
@@ -60,50 +51,48 @@ var Lazy = (function (_Resolver) {
     return new Lazy(key);
   };
 
+  var _Lazy = Lazy;
+  Lazy = resolver()(Lazy) || Lazy;
   return Lazy;
-})(Resolver);
+})();
 
 exports.Lazy = Lazy;
 
-var All = (function (_Resolver2) {
-  _inherits(All, _Resolver2);
-
+var All = (function () {
   function All(key) {
-    _classCallCheck(this, All);
+    _classCallCheck(this, _All);
 
-    _Resolver2.call(this);
-    this.key = key;
+    this._key = key;
   }
 
   All.prototype.get = function get(container) {
-    return container.getAll(this.key);
+    return container.getAll(this._key);
   };
 
   All.of = function of(key) {
     return new All(key);
   };
 
+  var _All = All;
+  All = resolver()(All) || All;
   return All;
-})(Resolver);
+})();
 
 exports.All = All;
 
-var Optional = (function (_Resolver3) {
-  _inherits(Optional, _Resolver3);
-
+var Optional = (function () {
   function Optional(key) {
     var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-    _classCallCheck(this, Optional);
+    _classCallCheck(this, _Optional);
 
-    _Resolver3.call(this);
-    this.key = key;
-    this.checkParent = checkParent;
+    this._key = key;
+    this._checkParent = checkParent;
   }
 
   Optional.prototype.get = function get(container) {
-    if (container.hasResolver(this.key, this.checkParent)) {
-      return container.get(this.key);
+    if (container.hasResolver(this._key, this._checkParent)) {
+      return container.get(this._key);
     }
 
     return null;
@@ -115,37 +104,38 @@ var Optional = (function (_Resolver3) {
     return new Optional(key, checkParent);
   };
 
+  var _Optional = Optional;
+  Optional = resolver()(Optional) || Optional;
   return Optional;
-})(Resolver);
+})();
 
 exports.Optional = Optional;
 
-var Parent = (function (_Resolver4) {
-  _inherits(Parent, _Resolver4);
-
+var Parent = (function () {
   function Parent(key) {
-    _classCallCheck(this, Parent);
+    _classCallCheck(this, _Parent);
 
-    _Resolver4.call(this);
-    this.key = key;
+    this._key = key;
   }
 
   Parent.prototype.get = function get(container) {
-    return container.parent ? container.parent.get(this.key) : null;
+    return container.parent ? container.parent.get(this._key) : null;
   };
 
   Parent.of = function of(key) {
     return new Parent(key);
   };
 
+  var _Parent = Parent;
+  Parent = resolver()(Parent) || Parent;
   return Parent;
-})(Resolver);
+})();
 
 exports.Parent = Parent;
 
 var StrategyResolver = (function () {
   function StrategyResolver(strategy, state) {
-    _classCallCheck(this, StrategyResolver);
+    _classCallCheck(this, _StrategyResolver);
 
     this.strategy = strategy;
     this.state = state;
@@ -173,62 +163,96 @@ var StrategyResolver = (function () {
     }
   };
 
+  var _StrategyResolver = StrategyResolver;
+  StrategyResolver = resolver()(StrategyResolver) || StrategyResolver;
   return StrategyResolver;
 })();
 
 exports.StrategyResolver = StrategyResolver;
 
-var FactoryActivator = (function () {
-  function FactoryActivator() {
-    _classCallCheck(this, FactoryActivator);
+function invoker(value) {
+  return function (target) {
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
+  };
+}
+
+function factory(potentialTarget) {
+  var deco = function deco(target) {
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, FactoryInvoker.instance, target);
+  };
+
+  return potentialTarget ? deco(potentialTarget) : deco;
+}
+
+var FactoryInvoker = (function () {
+  function FactoryInvoker() {
+    _classCallCheck(this, FactoryInvoker);
   }
 
-  FactoryActivator.prototype.invoke = function invoke(container, fn, keys) {
-    var i = keys.length;
+  FactoryInvoker.prototype.invoke = function invoke(container, fn, dependencies) {
+    var i = dependencies.length;
     var args = new Array(i);
 
     while (i--) {
-      args[i] = container.get(keys[i]);
+      args[i] = container.get(dependencies[i]);
     }
 
     return fn.apply(undefined, args);
   };
 
-  FactoryActivator.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(container, fn, keys, deps) {
-    var i = keys.length;
+  FactoryInvoker.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
+    var i = staticDependencies.length;
     var args = new Array(i);
 
     while (i--) {
-      args[i] = container.get(keys[i]);
+      args[i] = container.get(staticDependencies[i]);
     }
 
-    if (deps !== undefined) {
-      args = args.concat(deps);
+    if (dynamicDependencies !== undefined) {
+      args = args.concat(dynamicDependencies);
     }
 
     return fn.apply(undefined, args);
   };
 
-  _createClass(FactoryActivator, null, [{
+  _createClass(FactoryInvoker, null, [{
     key: 'instance',
-    value: new FactoryActivator(),
+    value: new FactoryInvoker(),
     enumerable: true
   }]);
 
-  return FactoryActivator;
+  return FactoryInvoker;
 })();
 
-exports.FactoryActivator = FactoryActivator;
+exports.FactoryInvoker = FactoryInvoker;
+
+function registration(value) {
+  return function (target) {
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
+  };
+}
+
+function transient(key) {
+  return registration(new TransientRegistration(key));
+}
+
+function singleton(keyOrRegisterInChild) {
+  var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+  return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
+}
 
 var TransientRegistration = (function () {
   function TransientRegistration(key) {
     _classCallCheck(this, TransientRegistration);
 
-    this.key = key;
+    this._key = key;
   }
 
-  TransientRegistration.prototype.createResolver = function createResolver(container, key, fn) {
-    return new StrategyResolver(2, fn);
+  TransientRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
+    var resolver = new StrategyResolver(2, fn);
+    container.registerResolver(this._key || key, resolver);
+    return resolver;
   };
 
   return TransientRegistration;
@@ -243,18 +267,20 @@ var SingletonRegistration = (function () {
     _classCallCheck(this, SingletonRegistration);
 
     if (typeof keyOrRegisterInChild === 'boolean') {
-      this.registerInChild = keyOrRegisterInChild;
+      this._registerInChild = keyOrRegisterInChild;
     } else {
-      this.key = keyOrRegisterInChild;
-      this.registerInChild = registerInChild;
+      this._key = keyOrRegisterInChild;
+      this._registerInChild = registerInChild;
     }
   }
 
-  SingletonRegistration.prototype.createResolver = function createResolver(container, key, fn) {
+  SingletonRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
     var resolver = new StrategyResolver(1, fn);
 
-    if (!this.registerInChild && container !== container.root) {
-      resolver.targetContainer = container.root;
+    if (this._registerInChild) {
+      container.registerResolver(this._key || key, resolver);
+    } else {
+      container.root.registerResolver(this._key || key, resolver);
     }
 
     return resolver;
@@ -270,71 +296,88 @@ var _emptyParameters = Object.freeze([]);
 
 exports._emptyParameters = _emptyParameters;
 _aureliaMetadata.metadata.registration = 'aurelia:registration';
-_aureliaMetadata.metadata.instanceActivator = 'aurelia:instance-activator';
+_aureliaMetadata.metadata.invoker = 'aurelia:invoker';
 
-var ConstructionInfo = function ConstructionInfo(activator, keys) {
-  _classCallCheck(this, ConstructionInfo);
+var InvocationHandler = (function () {
+  function InvocationHandler(fn, invoker, dependencies) {
+    _classCallCheck(this, InvocationHandler);
 
-  this.activator = activator;
-  this.keys = keys;
-};
+    this.fn = fn;
+    this.invoker = invoker;
+    this.dependencies = dependencies;
+  }
 
-function invokeWithDynamicDependencies(container, fn, keys, deps) {
-  var i = keys.length;
+  InvocationHandler.prototype.invoke = function invoke(container, dynamicDependencies) {
+    return dynamicDependencies !== undefined ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies) : this.invoker.invoke(container, this.fn, this.dependencies);
+  };
+
+  return InvocationHandler;
+})();
+
+exports.InvocationHandler = InvocationHandler;
+
+function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
+  var i = staticDependencies.length;
   var args = new Array(i);
 
   while (i--) {
-    args[i] = container.get(keys[i]);
+    args[i] = container.get(staticDependencies[i]);
   }
 
-  if (deps !== undefined) {
-    args = args.concat(deps);
+  if (dynamicDependencies !== undefined) {
+    args = args.concat(dynamicDependencies);
   }
 
   return Reflect.construct(fn, args);
 }
 
-var classActivators = (_classActivators = {}, _classActivators[0] = {
-  invoke: function invoke(container, Type, keys) {
+var classInvokers = (_classInvokers = {}, _classInvokers[0] = {
+  invoke: function invoke(container, Type) {
     return new Type();
   },
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators[1] = {
-  invoke: function invoke(container, Type, keys) {
-    return new Type(container.get(keys[0]));
+}, _classInvokers[1] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]));
   },
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators[2] = {
-  invoke: function invoke(container, Type, keys) {
-    return new Type(container.get(keys[0]), container.get(keys[1]));
+}, _classInvokers[2] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]));
   },
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators[3] = {
-  invoke: function invoke(container, Type, keys) {
-    return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]));
+}, _classInvokers[3] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
   },
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators[4] = {
-  invoke: function invoke(container, Type, keys) {
-    return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]), container.get(keys[3]));
+}, _classInvokers[4] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
   },
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators[5] = {
-  invoke: function invoke(container, Type, keys) {
-    return new Type(container.get(keys[0]), container.get(keys[1]), container.get(keys[2]), container.get(keys[3]), container.get(keys[4]));
+}, _classInvokers[5] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
   },
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators.fallback = {
+}, _classInvokers.fallback = {
   invoke: invokeWithDynamicDependencies,
   invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classActivators);
+}, _classInvokers);
 
 var Container = (function () {
-  function Container(constructionInfo) {
+  function Container(configuration) {
     _classCallCheck(this, Container);
 
-    this.resolvers = new Map();
-    this.constructionInfo = constructionInfo === undefined ? new Map() : constructionInfo;
+    if (!configuration) {
+      configuration = {};
+    }
+
+    this._configuration = configuration;
+    this._onHandlerCreated = configuration.onHandlerCreated;
+    this._handlers = configuration.handlers || (configuration.handlers = new Map());
+    this._resolvers = new Map();
     this.root = this;
     this.parent = null;
   }
@@ -342,6 +385,11 @@ var Container = (function () {
   Container.prototype.makeGlobal = function makeGlobal() {
     Container.instance = this;
     return this;
+  };
+
+  Container.prototype.setHandlerCreatedCallback = function setHandlerCreatedCallback(onHandlerCreated) {
+    this._onHandlerCreated = onHandlerCreated;
+    this._configuration.onHandlerCreated = onHandlerCreated;
   };
 
   Container.prototype.registerInstance = function registerInstance(key, instance) {
@@ -369,14 +417,15 @@ var Container = (function () {
       throw new Error(badKeyError);
     }
 
-    var result = this.resolvers.get(key);
+    var allResolvers = this._resolvers;
+    var result = allResolvers.get(key);
 
     if (result === undefined) {
-      this.resolvers.set(key, resolver);
+      allResolvers.set(key, resolver);
     } else if (result.strategy === 4) {
       result.state.push(resolver);
     } else {
-      this.resolvers.set(key, new StrategyResolver(4, [result, resolver]));
+      allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
   };
 
@@ -388,15 +437,15 @@ var Container = (function () {
 
       if (_registration === undefined) {
         resolver = new StrategyResolver(1, fn);
+        this.registerResolver(key === undefined ? fn : key, resolver);
       } else {
-        resolver = _registration.createResolver(this, key === undefined ? fn : key, fn);
+        resolver = _registration.registerResolver(this, key === undefined ? fn : key, fn);
       }
     } else {
       resolver = new StrategyResolver(0, fn);
+      this.registerResolver(key === undefined ? fn : key, resolver);
     }
 
-    var targetContainer = resolver.targetContainer || this;
-    targetContainer.registerResolver(key === undefined ? fn : key, resolver);
     return resolver;
   };
 
@@ -408,7 +457,7 @@ var Container = (function () {
   };
 
   Container.prototype.unregister = function unregister(key) {
-    this.resolvers['delete'](key);
+    this._resolvers['delete'](key);
   };
 
   Container.prototype.hasResolver = function hasResolver(key) {
@@ -418,11 +467,7 @@ var Container = (function () {
       throw new Error(badKeyError);
     }
 
-    return this.resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
-  };
-
-  Container.prototype.hasHandler = function hasHandler(key, checkParent) {
-    return this.hasResolver(key, checkParent);
+    return this._resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
   };
 
   Container.prototype.get = function get(key) {
@@ -434,11 +479,11 @@ var Container = (function () {
       return this;
     }
 
-    if (key instanceof Resolver) {
-      return key.get(this);
+    if (resolverProtocol.decorates(key)) {
+      return key.get(this, key);
     }
 
-    var resolver = this.resolvers.get(key);
+    var resolver = this._resolvers.get(key);
 
     if (resolver === undefined) {
       if (this.parent === null) {
@@ -452,7 +497,7 @@ var Container = (function () {
   };
 
   Container.prototype._get = function _get(key) {
-    var resolver = this.resolvers.get(key);
+    var resolver = this._resolvers.get(key);
 
     if (resolver === undefined) {
       if (this.parent === null) {
@@ -470,7 +515,7 @@ var Container = (function () {
       throw new Error(badKeyError);
     }
 
-    var resolver = this.resolvers.get(key);
+    var resolver = this._resolvers.get(key);
 
     if (resolver === undefined) {
       if (this.parent === null) {
@@ -496,60 +541,42 @@ var Container = (function () {
   };
 
   Container.prototype.createChild = function createChild() {
-    var child = new Container(this.constructionInfo);
+    var child = new Container(this._configuration);
     child.root = this.root;
     child.parent = this;
     return child;
   };
 
-  Container.prototype.invoke = function invoke(fn) {
-    var info = undefined;
-
+  Container.prototype.invoke = function invoke(fn, dynamicDependencies) {
     try {
-      info = this.constructionInfo.get(fn);
+      var _handler = this._handlers.get(fn);
 
-      if (info === undefined) {
-        info = this._createConstructionInfo(fn);
-        this.constructionInfo.set(fn, info);
+      if (_handler === undefined) {
+        _handler = this._createInvocationHandler(fn);
+        this._handlers.set(fn, _handler);
       }
 
-      return info.activator.invoke(this, fn, info.keys);
+      return _handler.invoke(this, dynamicDependencies);
     } catch (e) {
       throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
     }
   };
 
-  Container.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(fn, deps) {
-    var info = undefined;
-
-    try {
-      info = this.constructionInfo.get(fn);
-
-      if (info === undefined) {
-        info = this._createConstructionInfo(fn);
-        this.constructionInfo.set(fn, info);
-      }
-
-      return info.activator.invokeWithDynamicDependencies(this, fn, info.keys, deps);
-    } catch (e) {
-      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
-    }
-  };
-
-  Container.prototype._createConstructionInfo = function _createConstructionInfo(fn) {
-    var keys = undefined;
+  Container.prototype._createInvocationHandler = function _createInvocationHandler(fn) {
+    var dependencies = undefined;
 
     if (typeof fn.inject === 'function') {
-      keys = fn.inject();
+      dependencies = fn.inject();
     } else if (fn.inject === undefined) {
-      keys = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
+      dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
     } else {
-      keys = fn.inject;
+      dependencies = fn.inject;
     }
 
-    var activator = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.instanceActivator, fn) || classActivators[keys.length] || classActivators.fallback;
+    var invoker = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
 
-    return new ConstructionInfo(activator, keys);
+    var handler = new InvocationHandler(fn, invoker, dependencies);
+    return this._onHandlerCreated !== undefined ? this._onHandlerCreated(handler) : handler;
   };
 
   return Container;
@@ -572,44 +599,10 @@ function inject() {
 
   return function (target, key, descriptor) {
     if (descriptor) {
-      var fn = descriptor.value;
-      fn.inject = rest;
+      var _fn = descriptor.value;
+      _fn.inject = rest;
     } else {
       target.inject = rest;
     }
   };
 }
-
-function registration(value) {
-  return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
-  };
-}
-
-function transient(key) {
-  return registration(new TransientRegistration(key));
-}
-
-function singleton(keyOrRegisterInChild) {
-  var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-  return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
-}
-
-function instanceActivator(value) {
-  return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.instanceActivator, value, target);
-  };
-}
-
-function factory() {
-  return instanceActivator(FactoryActivator.instance);
-}
-
-_aureliaMetadata.decorators.configure.simpleDecorator('autoinject', autoinject);
-_aureliaMetadata.decorators.configure.parameterizedDecorator('inject', inject);
-_aureliaMetadata.decorators.configure.parameterizedDecorator('registration', registration);
-_aureliaMetadata.decorators.configure.parameterizedDecorator('transient', transient);
-_aureliaMetadata.decorators.configure.parameterizedDecorator('singleton', singleton);
-_aureliaMetadata.decorators.configure.parameterizedDecorator('instanceActivator', instanceActivator);
-_aureliaMetadata.decorators.configure.parameterizedDecorator('factory', factory);

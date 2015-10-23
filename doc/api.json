@@ -6,19 +6,16 @@
   "flags": {},
   "children": [
     {
-      "id": 17,
+      "id": 40,
       "name": "All",
       "kind": 128,
       "kindString": "Class",
       "flags": {
         "isExported": true
       },
-      "comment": {
-        "shortText": "Used to allow functions/classes to specify resolution of all matches to a key."
-      },
       "children": [
         {
-          "id": 18,
+          "id": 41,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -30,7 +27,7 @@
           },
           "signatures": [
             {
-              "id": 19,
+              "id": 42,
               "name": "new All",
               "kind": 16384,
               "kindString": "Constructor signature",
@@ -40,7 +37,7 @@
               },
               "parameters": [
                 {
-                  "id": 20,
+                  "id": 43,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -57,14 +54,14 @@
               "type": {
                 "type": "reference",
                 "name": "All",
-                "id": 17,
+                "id": 40,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 21,
+          "id": 44,
           "name": "get",
           "kind": 2048,
           "kindString": "Method",
@@ -73,7 +70,7 @@
           },
           "signatures": [
             {
-              "id": 22,
+              "id": 45,
               "name": "get",
               "kind": 4096,
               "kindString": "Call signature",
@@ -84,7 +81,7 @@
               },
               "parameters": [
                 {
-                  "id": 23,
+                  "id": 46,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -95,7 +92,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 95,
+                    "id": 126,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -104,22 +101,12 @@
                 "type": "instrinct",
                 "isArray": true,
                 "name": "any"
-              },
-              "overwrites": {
-                "type": "reference",
-                "name": "Resolver.get",
-                "id": 4
               }
             }
-          ],
-          "overwrites": {
-            "type": "reference",
-            "name": "Resolver.get",
-            "id": 4
-          }
+          ]
         },
         {
-          "id": 24,
+          "id": 47,
           "name": "of",
           "kind": 2048,
           "kindString": "Method",
@@ -129,7 +116,7 @@
           },
           "signatures": [
             {
-              "id": 25,
+              "id": 48,
               "name": "of",
               "kind": 4096,
               "kindString": "Call signature",
@@ -140,7 +127,7 @@
               },
               "parameters": [
                 {
-                  "id": 26,
+                  "id": 49,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -157,7 +144,7 @@
               "type": {
                 "type": "reference",
                 "name": "All",
-                "id": 17,
+                "id": 40,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
@@ -169,92 +156,21 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            18
+            41
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            21,
-            24
-          ]
-        }
-      ],
-      "extendedTypes": [
-        {
-          "type": "reference",
-          "name": "Resolver",
-          "id": 3
-        }
-      ]
-    },
-    {
-      "id": 90,
-      "name": "ConstructionInfo",
-      "kind": 128,
-      "kindString": "Class",
-      "flags": {},
-      "children": [
-        {
-          "id": 91,
-          "name": "constructor",
-          "kind": 512,
-          "kindString": "Constructor",
-          "flags": {},
-          "signatures": [
-            {
-              "id": 92,
-              "name": "new ConstructionInfo",
-              "kind": 16384,
-              "kindString": "Constructor signature",
-              "flags": {},
-              "parameters": [
-                {
-                  "id": 93,
-                  "name": "activator",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 94,
-                  "name": "keys",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "ConstructionInfo",
-                "id": 90,
-                "moduleName": "\"aurelia-dependency-injection\""
-              }
-            }
-          ]
-        }
-      ],
-      "groups": [
-        {
-          "title": "Constructors",
-          "kind": 512,
-          "children": [
-            91
+            44,
+            47
           ]
         }
       ]
     },
     {
-      "id": 95,
+      "id": 126,
       "name": "Container",
       "kind": 128,
       "kindString": "Class",
@@ -266,56 +182,93 @@
       },
       "children": [
         {
-          "id": 97,
+          "id": 130,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of Container."
+          },
           "signatures": [
             {
-              "id": 98,
+              "id": 131,
               "name": "new Container",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of Container."
+              },
               "parameters": [
                 {
-                  "id": 99,
-                  "name": "constructionInfo",
+                  "id": 132,
+                  "name": "configuration",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {
                     "isOptional": true
                   },
+                  "comment": {
+                    "shortText": "Provides some configuration for the new Container instance.\n"
+                  },
                   "type": {
                     "type": "reference",
-                    "name": "Map",
-                    "typeArguments": [
-                      {
-                        "type": "reference",
-                        "name": "Function"
-                      },
-                      {
-                        "type": "reference",
-                        "name": "Object"
-                      }
-                    ]
+                    "name": "ContainerConfiguration",
+                    "id": 26,
+                    "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
               ],
               "type": {
                 "type": "reference",
                 "name": "Container",
-                "id": 95,
+                "id": 126,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 96,
+          "id": 128,
+          "name": "parent",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "The parent container in the DI hierarchy."
+          },
+          "type": {
+            "type": "reference",
+            "name": "Container",
+            "id": 126,
+            "moduleName": "\"aurelia-dependency-injection\""
+          }
+        },
+        {
+          "id": 129,
+          "name": "root",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "The root container in the DI hierarchy."
+          },
+          "type": {
+            "type": "reference",
+            "name": "Container",
+            "id": 126,
+            "moduleName": "\"aurelia-dependency-injection\""
+          }
+        },
+        {
+          "id": 127,
           "name": "instance",
           "kind": 1024,
           "kindString": "Property",
@@ -326,12 +279,12 @@
           "type": {
             "type": "reference",
             "name": "Container",
-            "id": 95,
+            "id": 126,
             "moduleName": "\"aurelia-dependency-injection\""
           }
         },
         {
-          "id": 131,
+          "id": 170,
           "name": "autoRegister",
           "kind": 2048,
           "kindString": "Method",
@@ -340,7 +293,7 @@
           },
           "signatures": [
             {
-              "id": 132,
+              "id": 171,
               "name": "autoRegister",
               "kind": 4096,
               "kindString": "Call signature",
@@ -350,7 +303,7 @@
               },
               "parameters": [
                 {
-                  "id": 133,
+                  "id": 172,
                   "name": "fn",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -364,7 +317,7 @@
                   }
                 },
                 {
-                  "id": 134,
+                  "id": 173,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -390,7 +343,7 @@
           ]
         },
         {
-          "id": 135,
+          "id": 174,
           "name": "autoRegisterAll",
           "kind": 2048,
           "kindString": "Method",
@@ -399,7 +352,7 @@
           },
           "signatures": [
             {
-              "id": 136,
+              "id": 175,
               "name": "autoRegisterAll",
               "kind": 4096,
               "kindString": "Call signature",
@@ -409,7 +362,7 @@
               },
               "parameters": [
                 {
-                  "id": 137,
+                  "id": 176,
                   "name": "fns",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -432,7 +385,7 @@
           ]
         },
         {
-          "id": 155,
+          "id": 190,
           "name": "createChild",
           "kind": 2048,
           "kindString": "Method",
@@ -441,7 +394,7 @@
           },
           "signatures": [
             {
-              "id": 156,
+              "id": 191,
               "name": "createChild",
               "kind": 4096,
               "kindString": "Call signature",
@@ -453,14 +406,14 @@
               "type": {
                 "type": "reference",
                 "name": "Container",
-                "id": 95,
+                "id": 126,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 149,
+          "id": 184,
           "name": "get",
           "kind": 2048,
           "kindString": "Method",
@@ -469,7 +422,7 @@
           },
           "signatures": [
             {
-              "id": 150,
+              "id": 185,
               "name": "get",
               "kind": 4096,
               "kindString": "Call signature",
@@ -480,7 +433,7 @@
               },
               "parameters": [
                 {
-                  "id": 151,
+                  "id": 186,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -502,7 +455,7 @@
           ]
         },
         {
-          "id": 152,
+          "id": 187,
           "name": "getAll",
           "kind": 2048,
           "kindString": "Method",
@@ -511,7 +464,7 @@
           },
           "signatures": [
             {
-              "id": 153,
+              "id": 188,
               "name": "getAll",
               "kind": 4096,
               "kindString": "Call signature",
@@ -522,7 +475,7 @@
               },
               "parameters": [
                 {
-                  "id": 154,
+                  "id": 189,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -545,56 +498,7 @@
           ]
         },
         {
-          "id": 145,
-          "name": "hasHandler",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 146,
-              "name": "hasHandler",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Deprecated. Use hasResolver instead."
-              },
-              "parameters": [
-                {
-                  "id": 147,
-                  "name": "key",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 148,
-                  "name": "checkParent",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                }
-              ],
-              "type": {
-                "type": "instrinct",
-                "name": "any"
-              }
-            }
-          ]
-        },
-        {
-          "id": 141,
+          "id": 180,
           "name": "hasResolver",
           "kind": 2048,
           "kindString": "Method",
@@ -603,7 +507,7 @@
           },
           "signatures": [
             {
-              "id": 142,
+              "id": 181,
               "name": "hasResolver",
               "kind": 4096,
               "kindString": "Call signature",
@@ -614,7 +518,7 @@
               },
               "parameters": [
                 {
-                  "id": 143,
+                  "id": 182,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -628,7 +532,7 @@
                   }
                 },
                 {
-                  "id": 144,
+                  "id": 183,
                   "name": "checkParent",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -652,7 +556,7 @@
           ]
         },
         {
-          "id": 157,
+          "id": 192,
           "name": "invoke",
           "kind": 2048,
           "kindString": "Method",
@@ -661,7 +565,7 @@
           },
           "signatures": [
             {
-              "id": 158,
+              "id": 193,
               "name": "invoke",
               "kind": 4096,
               "kindString": "Call signature",
@@ -672,49 +576,7 @@
               },
               "parameters": [
                 {
-                  "id": 159,
-                  "name": "fn",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The function to invoke with the auto-resolved dependencies."
-                  },
-                  "type": {
-                    "type": "reference",
-                    "name": "Function"
-                  }
-                }
-              ],
-              "type": {
-                "type": "instrinct",
-                "name": "any"
-              }
-            }
-          ]
-        },
-        {
-          "id": 160,
-          "name": "invokeWithDynamicDependencies",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 161,
-              "name": "invokeWithDynamicDependencies",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Invokes a function, recursively resolving its dependencies.",
-                "returns": "Returns the instance resulting from calling the function.\n"
-              },
-              "parameters": [
-                {
-                  "id": 162,
+                  "id": 194,
                   "name": "fn",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -728,11 +590,13 @@
                   }
                 },
                 {
-                  "id": 163,
-                  "name": "deps",
+                  "id": 195,
+                  "name": "dynamicDependencies",
                   "kind": 32768,
                   "kindString": "Parameter",
-                  "flags": {},
+                  "flags": {
+                    "isOptional": true
+                  },
                   "comment": {
                     "text": "Additional function dependencies to use during invocation."
                   },
@@ -751,7 +615,7 @@
           ]
         },
         {
-          "id": 100,
+          "id": 133,
           "name": "makeGlobal",
           "kind": 2048,
           "kindString": "Method",
@@ -760,7 +624,7 @@
           },
           "signatures": [
             {
-              "id": 101,
+              "id": 134,
               "name": "makeGlobal",
               "kind": 4096,
               "kindString": "Call signature",
@@ -771,14 +635,14 @@
               "type": {
                 "type": "reference",
                 "name": "Container",
-                "id": 95,
+                "id": 126,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 123,
+          "id": 162,
           "name": "registerAlias",
           "kind": 2048,
           "kindString": "Method",
@@ -787,7 +651,7 @@
           },
           "signatures": [
             {
-              "id": 124,
+              "id": 163,
               "name": "registerAlias",
               "kind": 4096,
               "kindString": "Call signature",
@@ -797,7 +661,7 @@
               },
               "parameters": [
                 {
-                  "id": 125,
+                  "id": 164,
                   "name": "originalKey",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -811,7 +675,7 @@
                   }
                 },
                 {
-                  "id": 126,
+                  "id": 165,
                   "name": "aliasKey",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -833,7 +697,7 @@
           ]
         },
         {
-          "id": 114,
+          "id": 153,
           "name": "registerHandler",
           "kind": 2048,
           "kindString": "Method",
@@ -842,7 +706,7 @@
           },
           "signatures": [
             {
-              "id": 115,
+              "id": 154,
               "name": "registerHandler",
               "kind": 4096,
               "kindString": "Call signature",
@@ -852,7 +716,7 @@
               },
               "parameters": [
                 {
-                  "id": 116,
+                  "id": 155,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -866,7 +730,7 @@
                   }
                 },
                 {
-                  "id": 117,
+                  "id": 156,
                   "name": "handler",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -877,21 +741,21 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 118,
+                      "id": 157,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 119,
+                          "id": 158,
                           "name": "__call",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 120,
+                              "id": 159,
                               "name": "container",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -901,11 +765,11 @@
                               "type": {
                                 "type": "reference",
                                 "name": "Container",
-                                "id": 95
+                                "id": 126
                               }
                             },
                             {
-                              "id": 121,
+                              "id": 160,
                               "name": "key",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -918,7 +782,7 @@
                               }
                             },
                             {
-                              "id": 122,
+                              "id": 161,
                               "name": "resolver",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -950,7 +814,7 @@
           ]
         },
         {
-          "id": 102,
+          "id": 141,
           "name": "registerInstance",
           "kind": 2048,
           "kindString": "Method",
@@ -959,7 +823,7 @@
           },
           "signatures": [
             {
-              "id": 103,
+              "id": 142,
               "name": "registerInstance",
               "kind": 4096,
               "kindString": "Call signature",
@@ -969,7 +833,7 @@
               },
               "parameters": [
                 {
-                  "id": 104,
+                  "id": 143,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -983,7 +847,7 @@
                   }
                 },
                 {
-                  "id": 105,
+                  "id": 144,
                   "name": "instance",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1007,7 +871,7 @@
           ]
         },
         {
-          "id": 127,
+          "id": 166,
           "name": "registerResolver",
           "kind": 2048,
           "kindString": "Method",
@@ -1016,7 +880,7 @@
           },
           "signatures": [
             {
-              "id": 128,
+              "id": 167,
               "name": "registerResolver",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1026,7 +890,7 @@
               },
               "parameters": [
                 {
-                  "id": 129,
+                  "id": 168,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1040,7 +904,7 @@
                   }
                 },
                 {
-                  "id": 130,
+                  "id": 169,
                   "name": "resolver",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1064,7 +928,7 @@
           ]
         },
         {
-          "id": 106,
+          "id": 145,
           "name": "registerSingleton",
           "kind": 2048,
           "kindString": "Method",
@@ -1073,7 +937,7 @@
           },
           "signatures": [
             {
-              "id": 107,
+              "id": 146,
               "name": "registerSingleton",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1083,7 +947,7 @@
               },
               "parameters": [
                 {
-                  "id": 108,
+                  "id": 147,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1097,7 +961,7 @@
                   }
                 },
                 {
-                  "id": 109,
+                  "id": 148,
                   "name": "fn",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1118,7 +982,7 @@
           ]
         },
         {
-          "id": 110,
+          "id": 149,
           "name": "registerTransient",
           "kind": 2048,
           "kindString": "Method",
@@ -1127,7 +991,7 @@
           },
           "signatures": [
             {
-              "id": 111,
+              "id": 150,
               "name": "registerTransient",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1137,7 +1001,7 @@
               },
               "parameters": [
                 {
-                  "id": 112,
+                  "id": 151,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1151,7 +1015,7 @@
                   }
                 },
                 {
-                  "id": 113,
+                  "id": 152,
                   "name": "fn",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1172,7 +1036,82 @@
           ]
         },
         {
-          "id": 138,
+          "id": 135,
+          "name": "setHandlerCreatedCallback",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 136,
+              "name": "setHandlerCreatedCallback",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Sets an invocation handler creation callback that will be called when new InvocationsHandlers are created (called once per Function)."
+              },
+              "parameters": [
+                {
+                  "id": 137,
+                  "name": "onHandlerCreated",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The callback to be called when an InvocationsHandler is created.\n"
+                  },
+                  "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 138,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "signatures": [
+                        {
+                          "id": 139,
+                          "name": "__call",
+                          "kind": 4096,
+                          "kindString": "Call signature",
+                          "flags": {},
+                          "parameters": [
+                            {
+                              "id": 140,
+                              "name": "handler",
+                              "kind": 32768,
+                              "kindString": "Parameter",
+                              "flags": {},
+                              "type": {
+                                "type": "reference",
+                                "name": "InvocationHandler",
+                                "id": 113
+                              }
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "InvocationHandler",
+                            "id": 113
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 177,
           "name": "unregister",
           "kind": 2048,
           "kindString": "Method",
@@ -1181,7 +1120,7 @@
           },
           "signatures": [
             {
-              "id": 139,
+              "id": 178,
               "name": "unregister",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1191,7 +1130,7 @@
               },
               "parameters": [
                 {
-                  "id": 140,
+                  "id": 179,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1218,55 +1157,56 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            97
+            130
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            96
+            128,
+            129,
+            127
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            131,
-            135,
-            155,
-            149,
-            152,
-            145,
+            170,
+            174,
+            190,
+            184,
+            187,
+            180,
+            192,
+            133,
+            162,
+            153,
             141,
-            157,
-            160,
-            100,
-            123,
-            114,
-            102,
-            127,
-            106,
-            110,
-            138
+            166,
+            145,
+            149,
+            135,
+            177
           ]
         }
       ]
     },
     {
-      "id": 58,
-      "name": "FactoryActivator",
+      "id": 81,
+      "name": "FactoryInvoker",
       "kind": 128,
       "kindString": "Class",
       "flags": {
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to invoke a factory method."
+        "shortText": "An Invoker that is used to invoke a factory method."
       },
       "children": [
         {
-          "id": 59,
+          "id": 82,
           "name": "instance",
           "kind": 1024,
           "kindString": "Property",
@@ -1275,7 +1215,7 @@
             "isExported": true
           },
           "comment": {
-            "shortText": "The singleton instance of the FactoryActivator."
+            "shortText": "The singleton instance of the FactoryInvoker."
           },
           "type": {
             "type": "instrinct",
@@ -1283,7 +1223,7 @@
           }
         },
         {
-          "id": 60,
+          "id": 83,
           "name": "invoke",
           "kind": 2048,
           "kindString": "Method",
@@ -1292,52 +1232,58 @@
           },
           "signatures": [
             {
-              "id": 61,
+              "id": 84,
               "name": "invoke",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Invokes the factory function with the provided arguments.",
-                "returns": "The newly created instance.\n"
+                "shortText": "Invokes the function with the provided dependencies.",
+                "returns": "The result of the function invocation.\n"
               },
               "parameters": [
                 {
-                  "id": 62,
+                  "id": 85,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The calling container."
+                  },
                   "type": {
-                    "type": "instrinct",
-                    "name": "any"
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126,
+                    "moduleName": "\"aurelia-dependency-injection\""
                   }
                 },
                 {
-                  "id": 63,
+                  "id": 86,
                   "name": "fn",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "text": "The factory function."
+                    "text": "The constructor or factory function."
                   },
                   "type": {
-                    "type": "instrinct",
-                    "name": "any"
+                    "type": "reference",
+                    "name": "Function"
                   }
                 },
                 {
-                  "id": 64,
-                  "name": "keys",
+                  "id": 87,
+                  "name": "dependencies",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "text": "The keys representing the function's service dependencies."
+                    "text": "The dependencies of the function call."
                   },
                   "type": {
                     "type": "instrinct",
+                    "isArray": true,
                     "name": "any"
                   }
                 }
@@ -1350,7 +1296,7 @@
           ]
         },
         {
-          "id": 65,
+          "id": 88,
           "name": "invokeWithDynamicDependencies",
           "kind": 2048,
           "kindString": "Method",
@@ -1359,66 +1305,73 @@
           },
           "signatures": [
             {
-              "id": 66,
+              "id": 89,
               "name": "invokeWithDynamicDependencies",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Invokes the factory function with the provided arguments.",
-                "returns": "The newly created instance.\n"
+                "shortText": "Invokes the function with the provided dependencies.",
+                "returns": "The result of the function invocation.\n"
               },
               "parameters": [
                 {
-                  "id": 67,
+                  "id": 90,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The calling container."
+                  },
                   "type": {
-                    "type": "instrinct",
-                    "name": "any"
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126,
+                    "moduleName": "\"aurelia-dependency-injection\""
                   }
                 },
                 {
-                  "id": 68,
+                  "id": 91,
                   "name": "fn",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "text": "The factory function."
+                    "text": "The constructor or factory function."
                   },
                   "type": {
-                    "type": "instrinct",
-                    "name": "any"
+                    "type": "reference",
+                    "name": "Function"
                   }
                 },
                 {
-                  "id": 69,
-                  "name": "keys",
+                  "id": 92,
+                  "name": "staticDependencies",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "text": "The keys representing the function's service dependencies."
+                    "text": "The static dependencies of the function."
                   },
                   "type": {
                     "type": "instrinct",
+                    "isArray": true,
                     "name": "any"
                   }
                 },
                 {
-                  "id": 70,
-                  "name": "deps",
+                  "id": 93,
+                  "name": "dynamicDependencies",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "text": "Additional function dependencies to use during invocation."
+                    "text": "Additional dependencies to use during invocation."
                   },
                   "type": {
                     "type": "instrinct",
+                    "isArray": true,
                     "name": "any"
                   }
                 }
@@ -1436,33 +1389,258 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            59
+            82
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            60,
-            65
+            83,
+            88
           ]
         }
       ]
     },
     {
-      "id": 7,
-      "name": "Lazy",
+      "id": 113,
+      "name": "InvocationHandler",
       "kind": 128,
       "kindString": "Class",
       "flags": {
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to specify lazy resolution logic."
+        "shortText": "Stores the information needed to invoke a function."
       },
       "children": [
         {
-          "id": 8,
+          "id": 117,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "Instantiates an InvocationDescription."
+          },
+          "signatures": [
+            {
+              "id": 118,
+              "name": "new InvocationHandler",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Instantiates an InvocationDescription."
+              },
+              "parameters": [
+                {
+                  "id": 119,
+                  "name": "fn",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The Function described by this description object."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Function"
+                  }
+                },
+                {
+                  "id": 120,
+                  "name": "invoker",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The strategy for invoking the function."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Invoker",
+                    "id": 8,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                },
+                {
+                  "id": 121,
+                  "name": "dependencies",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The static dependencies of the function call.\n"
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "isArray": true,
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "InvocationHandler",
+                "id": 113,
+                "moduleName": "\"aurelia-dependency-injection\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 116,
+          "name": "dependencies",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "The statically known dependencies of this function invocation."
+          },
+          "type": {
+            "type": "instrinct",
+            "isArray": true,
+            "name": "any"
+          }
+        },
+        {
+          "id": 114,
+          "name": "fn",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "The function to be invoked by this handler."
+          },
+          "type": {
+            "type": "reference",
+            "name": "Function"
+          }
+        },
+        {
+          "id": 115,
+          "name": "invoker",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "The invoker implementation that will be used to actually invoke the function."
+          },
+          "type": {
+            "type": "reference",
+            "name": "Invoker",
+            "id": 8,
+            "moduleName": "\"aurelia-dependency-injection\""
+          }
+        },
+        {
+          "id": 122,
+          "name": "invoke",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 123,
+              "name": "invoke",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Invokes the function.",
+                "returns": "The result of the function invocation.\n"
+              },
+              "parameters": [
+                {
+                  "id": 124,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The calling container."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                },
+                {
+                  "id": 125,
+                  "name": "dynamicDependencies",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "text": "Additional dependencies to use during invocation."
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "isArray": true,
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            117
+          ]
+        },
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [
+            116,
+            114,
+            115
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            122
+          ]
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "name": "Lazy",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 31,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -1474,7 +1652,7 @@
           },
           "signatures": [
             {
-              "id": 9,
+              "id": 32,
               "name": "new Lazy",
               "kind": 16384,
               "kindString": "Constructor signature",
@@ -1484,7 +1662,7 @@
               },
               "parameters": [
                 {
-                  "id": 10,
+                  "id": 33,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1501,14 +1679,14 @@
               "type": {
                 "type": "reference",
                 "name": "Lazy",
-                "id": 7,
+                "id": 30,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 11,
+          "id": 34,
           "name": "get",
           "kind": 2048,
           "kindString": "Method",
@@ -1517,7 +1695,7 @@
           },
           "signatures": [
             {
-              "id": 12,
+              "id": 35,
               "name": "get",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1528,7 +1706,7 @@
               },
               "parameters": [
                 {
-                  "id": 13,
+                  "id": 36,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1539,7 +1717,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 95,
+                    "id": 126,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -1547,22 +1725,12 @@
               "type": {
                 "type": "instrinct",
                 "name": "any"
-              },
-              "overwrites": {
-                "type": "reference",
-                "name": "Resolver.get",
-                "id": 4
               }
             }
-          ],
-          "overwrites": {
-            "type": "reference",
-            "name": "Resolver.get",
-            "id": 4
-          }
+          ]
         },
         {
-          "id": 14,
+          "id": 37,
           "name": "of",
           "kind": 2048,
           "kindString": "Method",
@@ -1572,7 +1740,7 @@
           },
           "signatures": [
             {
-              "id": 15,
+              "id": 38,
               "name": "of",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1583,7 +1751,7 @@
               },
               "parameters": [
                 {
-                  "id": 16,
+                  "id": 39,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1600,7 +1768,7 @@
               "type": {
                 "type": "reference",
                 "name": "Lazy",
-                "id": 7,
+                "id": 30,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
@@ -1612,40 +1780,30 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            8
+            31
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            11,
-            14
+            34,
+            37
           ]
-        }
-      ],
-      "extendedTypes": [
-        {
-          "type": "reference",
-          "name": "Resolver",
-          "id": 3
         }
       ]
     },
     {
-      "id": 27,
+      "id": 50,
       "name": "Optional",
       "kind": 128,
       "kindString": "Class",
       "flags": {
         "isExported": true
       },
-      "comment": {
-        "shortText": "Used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container."
-      },
       "children": [
         {
-          "id": 28,
+          "id": 51,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -1657,7 +1815,7 @@
           },
           "signatures": [
             {
-              "id": 29,
+              "id": 52,
               "name": "new Optional",
               "kind": 16384,
               "kindString": "Constructor signature",
@@ -1667,7 +1825,7 @@
               },
               "parameters": [
                 {
-                  "id": 30,
+                  "id": 53,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1681,12 +1839,15 @@
                   }
                 },
                 {
-                  "id": 31,
+                  "id": 54,
                   "name": "checkParent",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {
                     "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Indicates whether or not the parent container hierarchy should be checked.\n"
                   },
                   "type": {
                     "type": "instrinct",
@@ -1697,14 +1858,14 @@
               "type": {
                 "type": "reference",
                 "name": "Optional",
-                "id": 27,
+                "id": 50,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 32,
+          "id": 55,
           "name": "get",
           "kind": 2048,
           "kindString": "Method",
@@ -1713,7 +1874,7 @@
           },
           "signatures": [
             {
-              "id": 33,
+              "id": 56,
               "name": "get",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1724,7 +1885,7 @@
               },
               "parameters": [
                 {
-                  "id": 34,
+                  "id": 57,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1735,7 +1896,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 95,
+                    "id": 126,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -1743,22 +1904,12 @@
               "type": {
                 "type": "instrinct",
                 "name": "any"
-              },
-              "overwrites": {
-                "type": "reference",
-                "name": "Resolver.get",
-                "id": 4
               }
             }
-          ],
-          "overwrites": {
-            "type": "reference",
-            "name": "Resolver.get",
-            "id": 4
-          }
+          ]
         },
         {
-          "id": 35,
+          "id": 58,
           "name": "of",
           "kind": 2048,
           "kindString": "Method",
@@ -1768,7 +1919,7 @@
           },
           "signatures": [
             {
-              "id": 36,
+              "id": 59,
               "name": "of",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1779,7 +1930,7 @@
               },
               "parameters": [
                 {
-                  "id": 37,
+                  "id": 60,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1793,7 +1944,7 @@
                   }
                 },
                 {
-                  "id": 38,
+                  "id": 61,
                   "name": "checkParent",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1809,7 +1960,7 @@
               "type": {
                 "type": "reference",
                 "name": "Optional",
-                "id": 27,
+                "id": 50,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
@@ -1821,40 +1972,30 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            28
+            51
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            32,
-            35
+            55,
+            58
           ]
-        }
-      ],
-      "extendedTypes": [
-        {
-          "type": "reference",
-          "name": "Resolver",
-          "id": 3
         }
       ]
     },
     {
-      "id": 39,
+      "id": 62,
       "name": "Parent",
       "kind": 128,
       "kindString": "Class",
       "flags": {
         "isExported": true
       },
-      "comment": {
-        "shortText": "Used to inject the dependency from the parent container instead of the current one."
-      },
       "children": [
         {
-          "id": 40,
+          "id": 63,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -1866,7 +2007,7 @@
           },
           "signatures": [
             {
-              "id": 41,
+              "id": 64,
               "name": "new Parent",
               "kind": 16384,
               "kindString": "Constructor signature",
@@ -1876,7 +2017,7 @@
               },
               "parameters": [
                 {
-                  "id": 42,
+                  "id": 65,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1893,14 +2034,14 @@
               "type": {
                 "type": "reference",
                 "name": "Parent",
-                "id": 39,
+                "id": 62,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ]
         },
         {
-          "id": 43,
+          "id": 66,
           "name": "get",
           "kind": 2048,
           "kindString": "Method",
@@ -1909,7 +2050,7 @@
           },
           "signatures": [
             {
-              "id": 44,
+              "id": 67,
               "name": "get",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1920,7 +2061,7 @@
               },
               "parameters": [
                 {
-                  "id": 45,
+                  "id": 68,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1931,7 +2072,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 95,
+                    "id": 126,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -1939,22 +2080,12 @@
               "type": {
                 "type": "instrinct",
                 "name": "any"
-              },
-              "overwrites": {
-                "type": "reference",
-                "name": "Resolver.get",
-                "id": 4
               }
             }
-          ],
-          "overwrites": {
-            "type": "reference",
-            "name": "Resolver.get",
-            "id": 4
-          }
+          ]
         },
         {
-          "id": 46,
+          "id": 69,
           "name": "of",
           "kind": 2048,
           "kindString": "Method",
@@ -1964,7 +2095,7 @@
           },
           "signatures": [
             {
-              "id": 47,
+              "id": 70,
               "name": "of",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1975,7 +2106,7 @@
               },
               "parameters": [
                 {
-                  "id": 48,
+                  "id": 71,
                   "name": "key",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1992,7 +2123,7 @@
               "type": {
                 "type": "reference",
                 "name": "Parent",
-                "id": 39,
+                "id": 62,
                 "moduleName": "\"aurelia-dependency-injection\""
               }
             }
@@ -2004,36 +2135,784 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            40
+            63
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            43,
-            46
+            66,
+            69
           ]
-        }
-      ],
-      "extendedTypes": [
-        {
-          "type": "reference",
-          "name": "Resolver",
-          "id": 3
         }
       ]
     },
     {
-      "id": 3,
-      "name": "Resolver",
+      "id": 103,
+      "name": "SingletonRegistration",
       "kind": 128,
       "kindString": "Class",
       "flags": {
         "isExported": true
       },
       "comment": {
-        "shortText": "An abstract resolver used to allow functions/classes to specify custom dependency resolution logic."
+        "shortText": "Used to allow functions/classes to indicate that they should be registered as singletons with the container."
+      },
+      "children": [
+        {
+          "id": 104,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "Creates an instance of SingletonRegistration."
+          },
+          "signatures": [
+            {
+              "id": 105,
+              "name": "new SingletonRegistration",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of SingletonRegistration."
+              },
+              "parameters": [
+                {
+                  "id": 106,
+                  "name": "keyOrRegisterInChild",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 107,
+                  "name": "registerInChild",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "boolean"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "SingletonRegistration",
+                "id": 103,
+                "moduleName": "\"aurelia-dependency-injection\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 108,
+          "name": "registerResolver",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 109,
+              "name": "registerResolver",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the container to register the resolver.",
+                "returns": "The resolver that was registered.\n"
+              },
+              "parameters": [
+                {
+                  "id": 110,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The container the resolver is being registered with."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                },
+                {
+                  "id": 111,
+                  "name": "key",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The key the resolver should be registered as."
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 112,
+                  "name": "fn",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The function to create the resolver for."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Function"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Resolver",
+                "id": 3,
+                "moduleName": "\"aurelia-dependency-injection\""
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            104
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            108
+          ]
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "name": "StrategyResolver",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 73,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "Creates an instance of the StrategyResolver class."
+          },
+          "signatures": [
+            {
+              "id": 74,
+              "name": "new StrategyResolver",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of the StrategyResolver class."
+              },
+              "parameters": [
+                {
+                  "id": 75,
+                  "name": "strategy",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The type of resolution strategy."
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 76,
+                  "name": "state",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The state associated with the resolution strategy.\n"
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "StrategyResolver",
+                "id": 72,
+                "moduleName": "\"aurelia-dependency-injection\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 77,
+          "name": "get",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 78,
+              "name": "get",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the container to allow custom resolution of dependencies for a function/class.",
+                "returns": "Returns the resolved object.\n"
+              },
+              "parameters": [
+                {
+                  "id": 79,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The container to resolve from."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                },
+                {
+                  "id": 80,
+                  "name": "key",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The key that the resolver was registered as."
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            73
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            77
+          ]
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "name": "TransientRegistration",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Used to allow functions/classes to indicate that they should be registered as transients with the container."
+      },
+      "children": [
+        {
+          "id": 95,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "comment": {
+            "shortText": "Creates an instance of TransientRegistration."
+          },
+          "signatures": [
+            {
+              "id": 96,
+              "name": "new TransientRegistration",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of TransientRegistration."
+              },
+              "parameters": [
+                {
+                  "id": 97,
+                  "name": "key",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "The key to register as.\n"
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "TransientRegistration",
+                "id": 94,
+                "moduleName": "\"aurelia-dependency-injection\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 98,
+          "name": "registerResolver",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 99,
+              "name": "registerResolver",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the container to register the resolver.",
+                "returns": "The resolver that was registered.\n"
+              },
+              "parameters": [
+                {
+                  "id": 100,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The container the resolver is being registered with."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                },
+                {
+                  "id": 101,
+                  "name": "key",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The key the resolver should be registered as."
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 102,
+                  "name": "fn",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The function to create the resolver for."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Function"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Resolver",
+                "id": 3,
+                "moduleName": "\"aurelia-dependency-injection\""
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            95
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            98
+          ]
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "ContainerConfiguration",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Used to configure a Container instance."
+      },
+      "children": [
+        {
+          "id": 27,
+          "name": "onHandlerCreated",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 28,
+              "name": "onHandlerCreated",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 29,
+                  "name": "handler",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "InvocationHandler",
+                    "id": 113
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "InvocationHandler",
+                "id": 113
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Invoker",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "A strategy for invoking a function, resulting in an object instance."
+      },
+      "children": [
+        {
+          "id": 9,
+          "name": "invoke",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 10,
+              "name": "invoke",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 11,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126
+                  }
+                },
+                {
+                  "id": 12,
+                  "name": "fn",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Function"
+                  }
+                },
+                {
+                  "id": 13,
+                  "name": "dependencies",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "isArray": true,
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "invokeWithDynamicDependencies",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 15,
+              "name": "invokeWithDynamicDependencies",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 16,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126
+                  }
+                },
+                {
+                  "id": 17,
+                  "name": "fn",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Function"
+                  }
+                },
+                {
+                  "id": 18,
+                  "name": "staticDependencies",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "isArray": true,
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 19,
+                  "name": "dynamicDependencies",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "isArray": true,
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            9,
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Registration",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Customizes how a particular function is resolved by the Container."
+      },
+      "children": [
+        {
+          "id": 21,
+          "name": "registerResolver",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 22,
+              "name": "registerResolver",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 23,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 126
+                  }
+                },
+                {
+                  "id": 24,
+                  "name": "key",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 25,
+                  "name": "fn",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Function"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Resolver",
+                "id": 3
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Resolver",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Used to allow functions/classes to specify custom dependency resolution logic."
       },
       "children": [
         {
@@ -2051,10 +2930,6 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
-              "comment": {
-                "shortText": "Called by the container to allow custom resolution of dependencies for a function/class.",
-                "returns": "Returns the resolved object.\n"
-              },
               "parameters": [
                 {
                   "id": 6,
@@ -2062,14 +2937,21 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
-                  "comment": {
-                    "text": "The container to resolve from."
-                  },
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 95,
-                    "moduleName": "\"aurelia-dependency-injection\""
+                    "id": 126
+                  }
+                },
+                {
+                  "id": 7,
+                  "name": "key",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
                   }
                 }
               ],
@@ -2089,463 +2971,26 @@
             4
           ]
         }
-      ],
-      "extendedBy": [
-        {
-          "type": "reference",
-          "name": "Lazy",
-          "id": 7
-        },
-        {
-          "type": "reference",
-          "name": "All",
-          "id": 17
-        },
-        {
-          "type": "reference",
-          "name": "Optional",
-          "id": 27
-        },
-        {
-          "type": "reference",
-          "name": "Parent",
-          "id": 39
-        }
       ]
     },
     {
-      "id": 80,
-      "name": "SingletonRegistration",
-      "kind": 128,
-      "kindString": "Class",
+      "id": 196,
+      "name": "resolver",
+      "kind": 32,
+      "kindString": "Variable",
       "flags": {
         "isExported": true
       },
       "comment": {
-        "shortText": "Used to allow functions/classes to indicate that they should be registered as singletons with the container."
+        "shortText": "Decorator: Indicates that the decorated class/object is a custom resolver."
       },
-      "children": [
-        {
-          "id": 81,
-          "name": "constructor",
-          "kind": 512,
-          "kindString": "Constructor",
-          "flags": {
-            "isExported": true
-          },
-          "comment": {
-            "shortText": "Creates an instance of SingletonRegistration."
-          },
-          "signatures": [
-            {
-              "id": 82,
-              "name": "new SingletonRegistration",
-              "kind": 16384,
-              "kindString": "Constructor signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Creates an instance of SingletonRegistration."
-              },
-              "parameters": [
-                {
-                  "id": 83,
-                  "name": "keyOrRegisterInChild",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 84,
-                  "name": "registerInChild",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {
-                    "isOptional": true
-                  },
-                  "type": {
-                    "type": "instrinct",
-                    "name": "boolean"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "SingletonRegistration",
-                "id": 80,
-                "moduleName": "\"aurelia-dependency-injection\""
-              }
-            }
-          ]
-        },
-        {
-          "id": 85,
-          "name": "createResolver",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 86,
-              "name": "createResolver",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Called by the container to register the annotated function/class as a singleton.",
-                "returns": "The resolver that should to be used.\n"
-              },
-              "parameters": [
-                {
-                  "id": 87,
-                  "name": "container",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The container to register with."
-                  },
-                  "type": {
-                    "type": "reference",
-                    "name": "Container",
-                    "id": 95,
-                    "moduleName": "\"aurelia-dependency-injection\""
-                  }
-                },
-                {
-                  "id": 88,
-                  "name": "key",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The key to register as."
-                  },
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 89,
-                  "name": "fn",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The function to register (target of the annotation)."
-                  },
-                  "type": {
-                    "type": "reference",
-                    "name": "Function"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "Resolver",
-                "id": 3,
-                "moduleName": "\"aurelia-dependency-injection\""
-              }
-            }
-          ]
-        }
-      ],
-      "groups": [
-        {
-          "title": "Constructors",
-          "kind": 512,
-          "children": [
-            81
-          ]
-        },
-        {
-          "title": "Methods",
-          "kind": 2048,
-          "children": [
-            85
-          ]
-        }
-      ]
+      "type": {
+        "type": "reference",
+        "name": "Function"
+      }
     },
     {
-      "id": 49,
-      "name": "StrategyResolver",
-      "kind": 128,
-      "kindString": "Class",
-      "flags": {
-        "isExported": true
-      },
-      "children": [
-        {
-          "id": 50,
-          "name": "constructor",
-          "kind": 512,
-          "kindString": "Constructor",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 51,
-              "name": "new StrategyResolver",
-              "kind": 16384,
-              "kindString": "Constructor signature",
-              "flags": {},
-              "parameters": [
-                {
-                  "id": 52,
-                  "name": "strategy",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 53,
-                  "name": "state",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "StrategyResolver",
-                "id": 49,
-                "moduleName": "\"aurelia-dependency-injection\""
-              }
-            }
-          ]
-        },
-        {
-          "id": 54,
-          "name": "get",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 55,
-              "name": "get",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "parameters": [
-                {
-                  "id": 56,
-                  "name": "container",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 57,
-                  "name": "key",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                }
-              ],
-              "type": {
-                "type": "instrinct",
-                "name": "any"
-              }
-            }
-          ]
-        }
-      ],
-      "groups": [
-        {
-          "title": "Constructors",
-          "kind": 512,
-          "children": [
-            50
-          ]
-        },
-        {
-          "title": "Methods",
-          "kind": 2048,
-          "children": [
-            54
-          ]
-        }
-      ]
-    },
-    {
-      "id": 71,
-      "name": "TransientRegistration",
-      "kind": 128,
-      "kindString": "Class",
-      "flags": {
-        "isExported": true
-      },
-      "comment": {
-        "shortText": "Used to allow functions/classes to indicate that they should be registered as transients with the container."
-      },
-      "children": [
-        {
-          "id": 72,
-          "name": "constructor",
-          "kind": 512,
-          "kindString": "Constructor",
-          "flags": {
-            "isExported": true
-          },
-          "comment": {
-            "shortText": "Creates an instance of TransientRegistration."
-          },
-          "signatures": [
-            {
-              "id": 73,
-              "name": "new TransientRegistration",
-              "kind": 16384,
-              "kindString": "Constructor signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Creates an instance of TransientRegistration."
-              },
-              "parameters": [
-                {
-                  "id": 74,
-                  "name": "key",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "shortText": "The key to register as.\n"
-                  },
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "TransientRegistration",
-                "id": 71,
-                "moduleName": "\"aurelia-dependency-injection\""
-              }
-            }
-          ]
-        },
-        {
-          "id": 75,
-          "name": "createResolver",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 76,
-              "name": "createResolver",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Called by the container to register the annotated function/class as transient.",
-                "returns": "The resolver that should to be used.\n"
-              },
-              "parameters": [
-                {
-                  "id": 77,
-                  "name": "container",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The container to register with."
-                  },
-                  "type": {
-                    "type": "reference",
-                    "name": "Container",
-                    "id": 95,
-                    "moduleName": "\"aurelia-dependency-injection\""
-                  }
-                },
-                {
-                  "id": 78,
-                  "name": "key",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The key to register as."
-                  },
-                  "type": {
-                    "type": "instrinct",
-                    "name": "any"
-                  }
-                },
-                {
-                  "id": 79,
-                  "name": "fn",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The function to register (target of the annotation)."
-                  },
-                  "type": {
-                    "type": "reference",
-                    "name": "Function"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "Resolver",
-                "id": 3,
-                "moduleName": "\"aurelia-dependency-injection\""
-              }
-            }
-          ]
-        }
-      ],
-      "groups": [
-        {
-          "title": "Constructors",
-          "kind": 512,
-          "children": [
-            72
-          ]
-        },
-        {
-          "title": "Methods",
-          "kind": 2048,
-          "children": [
-            75
-          ]
-        }
-      ]
-    },
-    {
-      "id": 164,
+      "id": 213,
       "name": "autoinject",
       "kind": 64,
       "kindString": "Function",
@@ -2554,14 +2999,17 @@
       },
       "signatures": [
         {
-          "id": 165,
+          "id": 214,
           "name": "autoinject",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Directs the TypeScript transpiler to write-out type metadata for the decorated class."
+          },
           "parameters": [
             {
-              "id": 166,
+              "id": 215,
               "name": "potentialTarget",
               "kind": 32768,
               "kindString": "Parameter",
@@ -2582,7 +3030,7 @@
       ]
     },
     {
-      "id": 183,
+      "id": 200,
       "name": "factory",
       "kind": 64,
       "kindString": "Function",
@@ -2591,11 +3039,29 @@
       },
       "signatures": [
         {
-          "id": 184,
+          "id": 201,
           "name": "factory",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor."
+          },
+          "parameters": [
+            {
+              "id": 202,
+              "name": "potentialTarget",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {
+                "isOptional": true
+              },
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
           "type": {
             "type": "instrinct",
             "name": "any"
@@ -2604,7 +3070,7 @@
       ]
     },
     {
-      "id": 167,
+      "id": 216,
       "name": "inject",
       "kind": 64,
       "kindString": "Function",
@@ -2613,14 +3079,17 @@
       },
       "signatures": [
         {
-          "id": 168,
+          "id": 217,
           "name": "inject",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function."
+          },
           "parameters": [
             {
-              "id": 169,
+              "id": 218,
               "name": "rest",
               "kind": 32768,
               "kindString": "Parameter",
@@ -2642,8 +3111,8 @@
       ]
     },
     {
-      "id": 180,
-      "name": "instanceActivator",
+      "id": 197,
+      "name": "invoker",
       "kind": 64,
       "kindString": "Function",
       "flags": {
@@ -2651,21 +3120,26 @@
       },
       "signatures": [
         {
-          "id": 181,
-          "name": "instanceActivator",
+          "id": 198,
+          "name": "invoker",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Specifies a custom Invoker for the decorated item."
+          },
           "parameters": [
             {
-              "id": 182,
+              "id": 199,
               "name": "value",
               "kind": 32768,
               "kindString": "Parameter",
               "flags": {},
               "type": {
-                "type": "instrinct",
-                "name": "any"
+                "type": "reference",
+                "name": "Invoker",
+                "id": 8,
+                "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ],
@@ -2677,7 +3151,7 @@
       ]
     },
     {
-      "id": 170,
+      "id": 203,
       "name": "registration",
       "kind": 64,
       "kindString": "Function",
@@ -2686,21 +3160,26 @@
       },
       "signatures": [
         {
-          "id": 171,
+          "id": 204,
           "name": "registration",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Specifies a custom registration strategy for the decorated class/function."
+          },
           "parameters": [
             {
-              "id": 172,
+              "id": 205,
               "name": "value",
               "kind": 32768,
               "kindString": "Parameter",
               "flags": {},
               "type": {
-                "type": "instrinct",
-                "name": "any"
+                "type": "reference",
+                "name": "Registration",
+                "id": 20,
+                "moduleName": "\"aurelia-dependency-injection\""
               }
             }
           ],
@@ -2712,7 +3191,7 @@
       ]
     },
     {
-      "id": 176,
+      "id": 209,
       "name": "singleton",
       "kind": 64,
       "kindString": "Function",
@@ -2721,14 +3200,17 @@
       },
       "signatures": [
         {
-          "id": 177,
+          "id": 210,
           "name": "singleton",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Specifies to register the decorated item with a \"singleton\" lieftime."
+          },
           "parameters": [
             {
-              "id": 178,
+              "id": 211,
               "name": "keyOrRegisterInChild",
               "kind": 32768,
               "kindString": "Parameter",
@@ -2741,7 +3223,7 @@
               }
             },
             {
-              "id": 179,
+              "id": 212,
               "name": "registerInChild",
               "kind": 32768,
               "kindString": "Parameter",
@@ -2762,7 +3244,7 @@
       ]
     },
     {
-      "id": 173,
+      "id": 206,
       "name": "transient",
       "kind": 64,
       "kindString": "Function",
@@ -2771,14 +3253,17 @@
       },
       "signatures": [
         {
-          "id": 174,
+          "id": 207,
           "name": "transient",
           "kind": 4096,
           "kindString": "Call signature",
           "flags": {},
+          "comment": {
+            "shortText": "Decorator: Specifies to register the decorated item with a \"transient\" lifetime."
+          },
           "parameters": [
             {
-              "id": 175,
+              "id": 208,
               "name": "key",
               "kind": 32768,
               "kindString": "Parameter",
@@ -2804,30 +3289,46 @@
       "title": "Classes",
       "kind": 128,
       "children": [
-        17,
-        90,
-        95,
-        58,
-        7,
-        27,
-        39,
-        3,
-        80,
-        49,
-        71
+        40,
+        126,
+        81,
+        113,
+        30,
+        50,
+        62,
+        103,
+        72,
+        94
+      ]
+    },
+    {
+      "title": "Interfaces",
+      "kind": 256,
+      "children": [
+        26,
+        8,
+        20,
+        3
+      ]
+    },
+    {
+      "title": "Variables",
+      "kind": 32,
+      "children": [
+        196
       ]
     },
     {
       "title": "Functions",
       "kind": 64,
       "children": [
-        164,
-        183,
-        167,
-        180,
-        170,
-        176,
-        173
+        213,
+        200,
+        216,
+        197,
+        203,
+        209,
+        206
       ]
     }
   ]

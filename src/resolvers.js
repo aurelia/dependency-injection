@@ -3,7 +3,7 @@ import {protocol} from 'aurelia-metadata';
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
 */
-export const resolver = protocol.create('aureia:resolver', function(target) {
+export const resolver: Function = protocol.create('aureia:resolver', function(target) {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
@@ -96,7 +96,7 @@ export class Optional {
   /**
   * Creates an instance of the Optional class.
   * @param key The key to optionally resolve for.
-  * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
+  * @param checkParent Indicates whether or not the parent container hierarchy should be checked.
   */
   constructor(key: any, checkParent?: boolean = false) {
     this._key = key;
@@ -157,7 +157,7 @@ export class Parent {
   * @param key The key to resolve.
   * @return Returns an insance of Parent for the key.
   */
-  static of(key : any) : Parent {
+  static of(key: any) : Parent {
     return new Parent(key);
   }
 }
@@ -180,7 +180,7 @@ export class StrategyResolver {
   * @param key The key that the resolver was registered as.
   * @return Returns the resolved object.
   */
-  get(container, key) {
+  get(container: Container, key: any): any {
     switch (this.strategy) {
     case 0: //instance
       return this.state;
