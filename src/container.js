@@ -1,13 +1,15 @@
 import 'core-js';
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
-import {resolver as resolverProtocol, StrategyResolver} from './resolvers';
+import {resolver, StrategyResolver} from './resolvers';
 
 const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 export const _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
+
+let resolverDecorates = resolver.decorates;
 
 /**
 * Stores the information needed to invoke a function.
@@ -310,7 +312,7 @@ export class Container {
       return this;
     }
 
-    if (resolverProtocol.decorates(key)) {
+    if (resolverDecorates(key)) {
       return key.get(this, key);
     }
 
