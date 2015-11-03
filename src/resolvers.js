@@ -3,7 +3,7 @@ import {protocol} from 'aurelia-metadata';
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
 */
-export const resolver: Function = protocol.create('aureia:resolver', function(target) {
+export const resolver: Function = protocol.create('aurelia:resolver', function(target) {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
