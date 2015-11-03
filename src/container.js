@@ -127,6 +127,9 @@ let classInvokers = {
 * A lightweight, extensible dependency injection container.
 */
 export class Container {
+  /**
+  * The global root Container instance. Available if makeGlobal() has been called. Aurelia Framework calls makeGlobal().
+  */
   static instance: Container;
 
   /**
