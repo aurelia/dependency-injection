@@ -1,7 +1,7 @@
 System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_export) {
   'use strict';
 
-  var protocol, metadata, AggregateError, resolver, Lazy, All, Optional, Parent, StrategyResolver, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, InvocationHandler, classInvokers, Container;
+  var protocol, metadata, AggregateError, resolver, Lazy, All, Optional, Parent, StrategyResolver, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
 
   var _classInvokers;
 
@@ -99,7 +99,7 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_expor
       AggregateError = _aureliaPal.AggregateError;
     }],
     execute: function () {
-      resolver = protocol.create('aureia:resolver', function (target) {
+      resolver = protocol.create('aurelia:resolver', function (target) {
         if (!(typeof target.get === 'function')) {
           return 'Resolvers must implement: get(container: Container, key: any): any';
         }
@@ -346,6 +346,8 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_expor
       metadata.registration = 'aurelia:registration';
       metadata.invoker = 'aurelia:invoker';
 
+      resolverDecorates = resolver.decorates;
+
       InvocationHandler = (function () {
         function InvocationHandler(fn, invoker, dependencies) {
           _classCallCheck(this, InvocationHandler);
@@ -512,7 +514,7 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_expor
             return this;
           }
 
-          if (resolverProtocol.decorates(key)) {
+          if (resolverDecorates(key)) {
             return key.get(this, key);
           }
 

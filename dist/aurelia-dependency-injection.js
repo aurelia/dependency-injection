@@ -5,7 +5,7 @@ import {AggregateError} from 'aurelia-pal';
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
 */
-export const resolver: Function = protocol.create('aureia:resolver', function(target) {
+export const resolver: Function = protocol.create('aurelia:resolver', function(target) {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
@@ -404,6 +404,8 @@ export const _emptyParameters = Object.freeze([]);
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
 
+let resolverDecorates = resolver.decorates;
+
 /**
 * Stores the information needed to invoke a function.
 */
@@ -520,6 +522,9 @@ let classInvokers = {
 * A lightweight, extensible dependency injection container.
 */
 export class Container {
+  /**
+  * The global root Container instance. Available if makeGlobal() has been called. Aurelia Framework calls makeGlobal().
+  */
   static instance: Container;
 
   /**
@@ -705,7 +710,7 @@ export class Container {
       return this;
     }
 
-    if (resolverProtocol.decorates(key)) {
+    if (resolverDecorates(key)) {
       return key.get(this, key);
     }
 

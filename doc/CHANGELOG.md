@@ -1,3 +1,19 @@
+## 0.12.0 (2015-11-09)
+
+
+#### Bug Fixes
+
+* **container:** bug with build combining and renamed imports ([090c041a](http://github.com/aurelia/dependency-injection/commit/090c041a53cd7d653cf034aa753ce90e9c0b3df1))
+* **resolvers:** typo in resolver protocol name ([befe9668](http://github.com/aurelia/dependency-injection/commit/befe966899781d3c54710e75b901ebf0ebaa8d34))
+
+
+#### Features
+
+* **all:**
+  * further refining of data structures and hooks; api lockdown and docs complete ([0ee0c34c](http://github.com/aurelia/dependency-injection/commit/0ee0c34cb0b63f5ca89a5ddca9c2a34cf6ed6ebc))
+  * new resolver marker, fixed registrations, onActivate hook, invokers ([ca5ccf7d](http://github.com/aurelia/dependency-injection/commit/ca5ccf7d03e907ce9fb794dcbe9f0065ceba3c43))
+
+
 ### 0.11.2 (2015-10-15)
 
 

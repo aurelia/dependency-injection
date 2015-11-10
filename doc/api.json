@@ -276,6 +276,9 @@
             "isStatic": true,
             "isExported": true
           },
+          "comment": {
+            "shortText": "The global root Container instance. Available if makeGlobal() has been called. Aurelia Framework calls makeGlobal()."
+          },
           "type": {
             "type": "reference",
             "name": "Container",

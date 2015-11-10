@@ -17,7 +17,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-  var resolver = _aureliaMetadata.protocol.create('aureia:resolver', function (target) {
+  var resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
     if (!(typeof target.get === 'function')) {
       return 'Resolvers must implement: get(container: Container, key: any): any';
     }
@@ -293,6 +293,8 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
   _aureliaMetadata.metadata.registration = 'aurelia:registration';
   _aureliaMetadata.metadata.invoker = 'aurelia:invoker';
 
+  var resolverDecorates = resolver.decorates;
+
   var InvocationHandler = (function () {
     function InvocationHandler(fn, invoker, dependencies) {
       _classCallCheck(this, InvocationHandler);
@@ -474,7 +476,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
         return this;
       }
 
-      if (resolverProtocol.decorates(key)) {
+      if (resolverDecorates(key)) {
         return key.get(this, key);
       }
 
