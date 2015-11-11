@@ -4,7 +4,7 @@ import {_emptyParameters} from './container';
 /**
 * Decorator: Directs the TypeScript transpiler to write-out type metadata for the decorated class.
 */
-export function autoinject(potentialTarget?: any) {
+export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
     target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
   };
@@ -15,7 +15,7 @@ export function autoinject(potentialTarget?: any) {
 /**
 * Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function.
 */
-export function inject(...rest: any[]) {
+export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
     // if it's true then we injecting rest into function and not Class constructor
     if (descriptor) {

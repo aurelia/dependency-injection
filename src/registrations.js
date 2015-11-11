@@ -4,7 +4,7 @@ import {metadata} from 'aurelia-metadata';
 /**
 * Decorator: Specifies a custom registration strategy for the decorated class/function.
 */
-export function registration(value: Registration) {
+export function registration(value: Registration): any {
   return function(target) {
     metadata.define(metadata.registration, value, target);
   };
@@ -13,14 +13,14 @@ export function registration(value: Registration) {
 /**
 * Decorator: Specifies to register the decorated item with a "transient" lifetime.
 */
-export function transient(key?: any) {
+export function transient(key?: any): any {
   return registration(new TransientRegistration(key));
 }
 
 /**
 * Decorator: Specifies to register the decorated item with a "singleton" lieftime.
 */
-export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean = false) {
+export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean = false): any {
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 

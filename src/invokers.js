@@ -4,7 +4,7 @@ import {metadata} from 'aurelia-metadata';
 /**
 * Decorator: Specifies a custom Invoker for the decorated item.
 */
-export function invoker(value: Invoker) {
+export function invoker(value: Invoker): any {
   return function(target) {
     metadata.define(metadata.invoker, value, target);
   };
@@ -13,7 +13,7 @@ export function invoker(value: Invoker) {
 /**
 * Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor.
 */
-export function factory(potentialTarget?: any) {
+export function factory(potentialTarget?: any): any {
   let deco = function(target) {
     metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
