@@ -208,7 +208,7 @@ export class StrategyResolver {
 /**
 * Decorator: Specifies a custom Invoker for the decorated item.
 */
-export function invoker(value: Invoker) {
+export function invoker(value: Invoker): any {
   return function(target) {
     metadata.define(metadata.invoker, value, target);
   };
@@ -217,7 +217,7 @@ export function invoker(value: Invoker) {
 /**
 * Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor.
 */
-export function factory(potentialTarget?: any) {
+export function factory(potentialTarget?: any): any {
   let deco = function(target) {
     metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
@@ -301,7 +301,7 @@ export class FactoryInvoker {
 /**
 * Decorator: Specifies a custom registration strategy for the decorated class/function.
 */
-export function registration(value: Registration) {
+export function registration(value: Registration): any {
   return function(target) {
     metadata.define(metadata.registration, value, target);
   };
@@ -310,14 +310,14 @@ export function registration(value: Registration) {
 /**
 * Decorator: Specifies to register the decorated item with a "transient" lifetime.
 */
-export function transient(key?: any) {
+export function transient(key?: any): any {
   return registration(new TransientRegistration(key));
 }
 
 /**
 * Decorator: Specifies to register the decorated item with a "singleton" lieftime.
 */
-export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean = false) {
+export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean = false): any {
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
@@ -830,7 +830,7 @@ export class Container {
 /**
 * Decorator: Directs the TypeScript transpiler to write-out type metadata for the decorated class.
 */
-export function autoinject(potentialTarget?: any) {
+export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
     target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
   };
@@ -841,7 +841,7 @@ export function autoinject(potentialTarget?: any) {
 /**
 * Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function.
 */
-export function inject(...rest: any[]) {
+export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
     // if it's true then we injecting rest into function and not Class constructor
     if (descriptor) {

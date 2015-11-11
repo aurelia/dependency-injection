@@ -1,3 +1,11 @@
+### 0.12.1 (2015-11-11)
+
+
+#### Bug Fixes
+
+* **all:** TS fixes for decorators ([04257368](http://github.com/aurelia/dependency-injection/commit/0425736875302f80c0216c7caaa9421182f4184d))
+
+
 ## 0.12.0 (2015-11-09)
 
 
