@@ -7,6 +7,13 @@ declare module 'aurelia-dependency-injection' {
   * Used to allow functions/classes to specify custom dependency resolution logic.
   */
   export interface Resolver {
+    
+    /**
+      * Called by the container to allow custom resolution of dependencies for a function/class.
+      * @param container The container to resolve from.
+      * @param key The key that the resolver was registered as.
+      * @return Returns the resolved object.
+      */
     get(container: Container, key: any): any;
   }
   
@@ -14,7 +21,22 @@ declare module 'aurelia-dependency-injection' {
   * A strategy for invoking a function, resulting in an object instance.
   */
   export interface Invoker {
+    
+    /**
+      * Invokes the function with the provided dependencies.
+      * @param fn The constructor or factory function.
+      * @param dependencies The dependencies of the function call.
+      * @return The result of the function invocation.
+      */
     invoke(container: Container, fn: Function, dependencies: any[]): any;
+    
+    /**
+      * Invokes the function with the provided dependencies.
+      * @param fn The constructor or factory function.
+      * @param staticDependencies The static dependencies of the function.
+      * @param dynamicDependencies Additional dependencies to use during invocation.
+      * @return The result of the function invocation.
+      */
     invokeWithDynamicDependencies(container: Container, fn: Function, staticDependencies: any[], dynamicDependencies: any[]): any;
   }
   
@@ -22,6 +44,14 @@ declare module 'aurelia-dependency-injection' {
   * Customizes how a particular function is resolved by the Container.
   */
   export interface Registration {
+    
+    /**
+      * Called by the container to register the resolver.
+      * @param container The container the resolver is being registered with.
+      * @param key The key the resolver should be registered as.
+      * @param fn The function to create the resolver for.
+      * @return The resolver that was registered.
+      */
     registerResolver(container: Container, key: any, fn: Function): Resolver;
   }
   
@@ -29,13 +59,21 @@ declare module 'aurelia-dependency-injection' {
   * Used to configure a Container instance.
   */
   export interface ContainerConfiguration {
-    onHandlerCreated(handler: InvocationHandler): InvocationHandler;
+    
+    /**
+      * An optional callback which will be called when any function needs an InvocationHandler created (called once per Function).
+      */
+    onHandlerCreated?: (handler: InvocationHandler) => InvocationHandler;
   }
   
   /**
   * Decorator: Indicates that the decorated class/object is a custom resolver.
   */
   export const resolver: Function;
+  
+  /**
+  * Used to allow functions/classes to specify lazy resolution logic.
+  */
   export class Lazy {
     
     /**
@@ -58,6 +96,10 @@ declare module 'aurelia-dependency-injection' {
       */
     static of(key: any): Lazy;
   }
+  
+  /**
+  * Used to allow functions/classes to specify resolution of all matches to a key.
+  */
   export class All {
     
     /**
@@ -80,6 +122,10 @@ declare module 'aurelia-dependency-injection' {
       */
     static of(key: any): All;
   }
+  
+  /**
+  * Used to allow functions/classes to specify an optional dependency, which will be resolved only if already registred with the container.
+  */
   export class Optional {
     
     /**
@@ -104,6 +150,10 @@ declare module 'aurelia-dependency-injection' {
       */
     static of(key: any, checkParent?: boolean): Optional;
   }
+  
+  /**
+  * Used to inject the dependency from the parent container instead of the current one.
+  */
   export class Parent {
     
     /**
