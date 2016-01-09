@@ -367,7 +367,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
     function Container(configuration) {
       _classCallCheck(this, Container);
 
-      if (!configuration) {
+      if (configuration === undefined) {
         configuration = {};
       }
 

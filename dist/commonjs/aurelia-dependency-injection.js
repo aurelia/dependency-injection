@@ -372,7 +372,7 @@ var Container = (function () {
   function Container(configuration) {
     _classCallCheck(this, Container);
 
-    if (!configuration) {
+    if (configuration === undefined) {
       configuration = {};
     }
 

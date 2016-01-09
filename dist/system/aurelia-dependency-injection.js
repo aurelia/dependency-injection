@@ -405,7 +405,7 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_expor
         function Container(configuration) {
           _classCallCheck(this, Container);
 
-          if (!configuration) {
+          if (configuration === undefined) {
             configuration = {};
           }
 

@@ -542,7 +542,7 @@ export class Container {
   * @param configuration Provides some configuration for the new Container instance.
   */
   constructor(configuration?: ContainerConfiguration) {
-    if (!configuration) {
+    if (configuration === undefined) {
       configuration = {};
     }
 
