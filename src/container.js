@@ -378,7 +378,7 @@ export class Container {
       return results;
     }
 
-    return resolver.get(this, key);
+    return [resolver.get(this, key)];
   }
 
   /**
