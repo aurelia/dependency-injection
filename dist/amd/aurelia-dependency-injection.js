@@ -534,7 +534,7 @@ define(['exports', 'core-js', 'aurelia-metadata', 'aurelia-pal'], function (expo
         return results;
       }
 
-      return resolver.get(this, key);
+      return [resolver.get(this, key)];
     };
 
     Container.prototype.createChild = function createChild() {

@@ -1,3 +1,16 @@
+### 1.0.0-beta.1.1.0 (2016-01-28)
+
+
+#### Bug Fixes
+
+* **container:** correct inconsistent return type from getAll ([bbbef9e5](http://github.com/aurelia/dependency-injection/commit/bbbef9e582e4a81497db5655c7a7e9d2d1e5c10a), closes [#71](http://github.com/aurelia/dependency-injection/issues/71))
+
+
+#### Features
+
+* **all:** update for jspm; update core-js; update aurelia deps ([11d16867](http://github.com/aurelia/dependency-injection/commit/11d1686765c626896dbb3d5edb7f5b40da9dd5ca))
+
+
 ### 1.0.0-beta.1.0.1 (2016-01-08)
 
 * minor perf work

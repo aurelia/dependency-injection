@@ -539,7 +539,7 @@ var Container = (function () {
       return results;
     }
 
-    return resolver.get(this, key);
+    return [resolver.get(this, key)];
   };
 
   Container.prototype.createChild = function createChild() {
