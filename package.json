@@ -19,14 +19,17 @@
     "type": "git",
     "url": "http://github.com/aurelia/dependency-injection"
   },
-  "registry": "npm",
-  "jspmPackage": true,
-  "format": "cjs",
   "jspm": {
+    "registry": "npm",
+    "main": "aurelia-dependency-injection",
+    "format": "amd",
+    "directories": {
+      "dist": "dist/amd"
+    },
     "peerDependencies": {
-      "aurelia-logging": "^1.0.0-beta.1.1.0",
-      "aurelia-metadata": "^1.0.0-beta.1.1.1",
-      "aurelia-pal": "^1.0.0-beta.1.1.0",
+      "aurelia-logging": "^1.0.0-beta.1.1.1",
+      "aurelia-metadata": "^1.0.0-beta.1.1.2",
+      "aurelia-pal": "^1.0.0-beta.1.1.1",
       "core-js": "^2.0.3"
     },
     "devDependencies": {
@@ -36,9 +39,9 @@
     }
   },
   "peerDependencies": {
-    "aurelia-logging": "^1.0.0-beta.1.1.0",
-    "aurelia-metadata": "^1.0.0-beta.1.1.1",
-    "aurelia-pal": "^1.0.0-beta.1.1.0",
+    "aurelia-logging": "^1.0.0-beta.1.1.1",
+    "aurelia-metadata": "^1.0.0-beta.1.1.2",
+    "aurelia-pal": "^1.0.0-beta.1.1.1",
     "core-js": "^2.0.3"
   },
   "devDependencies": {
