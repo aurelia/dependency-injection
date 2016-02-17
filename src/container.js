@@ -1,4 +1,3 @@
-import 'core-js';
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
 import {resolver, StrategyResolver} from './resolvers';

@@ -1,3 +1,4 @@
+import './setup';
 import {Container} from '../src/container';
 import {Lazy, All, Optional, Parent} from '../src/resolvers';
 import {transient, singleton} from '../src/registrations';

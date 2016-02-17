@@ -1,3 +1,4 @@
+import './setup';
 import {Parent} from '../src/resolvers';
 import {Container} from '../src/container';
 

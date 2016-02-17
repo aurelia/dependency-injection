@@ -18,6 +18,7 @@ System.config({
     "aurelia-logging": "npm:aurelia-logging@1.0.0-beta.1.1.1",
     "aurelia-metadata": "npm:aurelia-metadata@1.0.0-beta.1.1.3",
     "aurelia-pal": "npm:aurelia-pal@1.0.0-beta.1.1.1",
+    "aurelia-polyfills": "npm:aurelia-polyfills@0.1.2",
     "babel": "npm:babel-core@5.8.34",
     "babel-runtime": "npm:babel-runtime@5.8.34",
     "core-js": "npm:core-js@2.0.3",
@@ -39,6 +40,9 @@ System.config({
     "npm:aurelia-metadata@1.0.0-beta.1.1.3": {
       "aurelia-pal": "npm:aurelia-pal@1.0.0-beta.1.1.1",
       "core-js": "npm:core-js@2.0.3"
+    },
+    "npm:aurelia-polyfills@0.1.2": {
+      "aurelia-pal": "npm:aurelia-pal@1.0.0-beta.1.1.1"
     },
     "npm:babel-runtime@5.8.34": {
       "process": "github:jspm/nodelibs-process@0.1.2"
