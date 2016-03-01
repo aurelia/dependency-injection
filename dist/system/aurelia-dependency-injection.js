@@ -1,4 +1,4 @@
-System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_export) {
+System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
   'use strict';
 
   var protocol, metadata, AggregateError, resolver, Lazy, All, Optional, Parent, StrategyResolver, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
@@ -92,7 +92,7 @@ System.register(['core-js', 'aurelia-metadata', 'aurelia-pal'], function (_expor
   }
 
   return {
-    setters: [function (_coreJs) {}, function (_aureliaMetadata) {
+    setters: [function (_aureliaMetadata) {
       protocol = _aureliaMetadata.protocol;
       metadata = _aureliaMetadata.metadata;
     }, function (_aureliaPal) {

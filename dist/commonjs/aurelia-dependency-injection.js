@@ -16,8 +16,6 @@ exports.inject = inject;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-require('core-js');
-
 var _aureliaMetadata = require('aurelia-metadata');
 
 var _aureliaPal = require('aurelia-pal');

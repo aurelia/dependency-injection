@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.1.4 (2016-03-01)
+
+
+#### Bug Fixes
+
+* **all:** remove core-js dependency ([4dff5f15](http://github.com/aurelia/dependency-injection/commit/4dff5f15761485ca744f82b950f9b6e9e719350e))
+
+
 ### 1.0.0-beta.1.1.3 (2016-02-08)
 
 

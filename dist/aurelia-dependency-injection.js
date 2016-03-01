@@ -1,4 +1,3 @@
-import 'core-js';
 import {protocol,metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
 
