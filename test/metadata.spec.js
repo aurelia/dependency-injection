@@ -3,28 +3,28 @@ import {Parent} from '../src/resolvers';
 import {Container} from '../src/container';
 
 describe('Parent', () => {
-	it('should return the key from the parent container when present', () => {
-		var sut = new Parent("test"),
-			parent = new Container(),
-			childContainer = parent.createChild(),
-			instance = {},
-			wrongInstance = {};
+  it('should return the key from the parent container when present', () => {
+    let sut = new Parent('test');
+    let parent = new Container();
+    let childContainer = parent.createChild();
+    let instance = {};
+    let wrongInstance = {};
 
-		parent.registerInstance("test", instance);
-		childContainer.registerInstance("test", wrongInstance);
+    parent.registerInstance('test', instance);
+    childContainer.registerInstance('test', wrongInstance);
 
-		var result = sut.get(childContainer);
+    let result = sut.get(childContainer);
 
-		expect(result).toBe(instance);
-		expect(result).not.toBe(wrongInstance);
-	});
+    expect(result).toBe(instance);
+    expect(result).not.toBe(wrongInstance);
+  });
 
-	it('should return null when the parent container is not present', () => {
-		var sut = new Parent("test"),
-			childContainer = new Container(),
-			instance = {};
+  it('should return null when the parent container is not present', () => {
+    let sut = new Parent('test');
+    let childContainer = new Container();
+    let instance = {};
 
-		childContainer.registerInstance("test", instance);
-		expect(sut.get(childContainer)).toBe(null);
-	});
+    childContainer.registerInstance('test', instance);
+    expect(sut.get(childContainer)).toBe(null);
+  });
 });

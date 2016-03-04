@@ -10,8 +10,8 @@ describe('container', () => {
     it('instantiates class without injected services', function() {
       class App {}
 
-      var container = new Container();
-      var app = container.get(App);
+      let container = new Container();
+      let app = container.get(App);
 
       expect(app).toEqual(jasmine.any(App));
     });
@@ -20,15 +20,14 @@ describe('container', () => {
       class Logger {}
 
       class App {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var app = container.get(App);
-
+      let container = new Container();
+      let app = container.get(App);
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
 
@@ -43,8 +42,8 @@ describe('container', () => {
 
       App.inject = [Logger];
 
-      var container = new Container();
-      var app = container.get(App);
+      let container = new Container();
+      let app = container.get(App);
 
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
@@ -52,7 +51,7 @@ describe('container', () => {
 
   describe('registration', () => {
     it('asserts keys are defined', () => {
-      var container = new Container();
+      let container = new Container();
 
       expect(() => container.get(null)).toThrow();
       expect(() => container.get(undefined)).toThrow();
@@ -101,15 +100,15 @@ describe('container', () => {
 
       inject(Logger)(App2);
 
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let container = new Container();
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).toBe(app2.logger);
     });
 
     it('automatically configures non-functions as instances', () => {
-      var someObject = {};
+      let someObject = {};
 
       class App1 {
         constructor(something) {
@@ -120,8 +119,8 @@ describe('container', () => {
       inject(someObject)(App1);
 
 
-      var container = new Container();
-      var app1 = container.get(App1);
+      let container = new Container();
+      let app1 = container.get(App1);
 
       expect(app1.something).toBe(someObject);
     });
@@ -145,35 +144,35 @@ describe('container', () => {
 
       inject(Logger)(App2);
 
-      var container = new Container();
+      let container = new Container();
       container.registerSingleton(Logger, Logger);
 
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).toBe(app2.logger);
     });
 
     it('configures singleton via decorators helper (ES5/6)', () => {
-      let Logger = decorators(singleton()).on(class {})
+      let Logger = decorators(singleton()).on(class {});
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let container = new Container();
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).toBe(app2.logger);
     });
@@ -182,24 +181,24 @@ describe('container', () => {
       class Logger {}
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
+      let container = new Container();
       container.registerTransient(Logger, Logger);
 
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).not.toBe(app2.logger);
     });
@@ -208,22 +207,22 @@ describe('container', () => {
       let Logger = decorators(transient()).on(class { });
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let container = new Container();
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).not.toBe(app2.logger);
     });
@@ -232,25 +231,25 @@ describe('container', () => {
       class Logger {}
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var instance = new Logger();
+      let container = new Container();
+      let instance = new Logger();
       container.registerInstance(Logger, instance);
 
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).toBe(instance);
       expect(app2.logger).toBe(instance);
@@ -260,27 +259,27 @@ describe('container', () => {
       class Logger {}
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      container.registerHandler(Logger, c => "something strange");
+      let container = new Container();
+      container.registerHandler(Logger, c => 'something strange');
 
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
-      expect(app1.logger).toEqual("something strange");
-      expect(app2.logger).toEqual("something strange");
+      expect(app1.logger).toEqual('something strange');
+      expect(app2.logger).toEqual('something strange');
     });
 
     it('uses base metadata method (ES5/6) when derived does not specify', () => {
@@ -291,22 +290,22 @@ describe('container', () => {
       }
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let container = new Container();
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).not.toBe(app2.logger);
     });
@@ -316,22 +315,22 @@ describe('container', () => {
       let Logger = decorators(transient()).on(class extends LoggerBase {});
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let container = new Container();
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).not.toBe(app2.logger);
     });
@@ -339,11 +338,11 @@ describe('container', () => {
     it('configures key as service when transient api only provided with key', () => {
       class Logger {}
 
-      var container = new Container();
+      let container = new Container();
       container.registerTransient(Logger);
 
-      var logger1 = container.get(Logger),
-          logger2 = container.get(Logger);
+      let logger1 = container.get(Logger);
+      let logger2 = container.get(Logger);
 
       expect(logger1).toEqual(jasmine.any(Logger));
       expect(logger2).toEqual(jasmine.any(Logger));
@@ -353,11 +352,11 @@ describe('container', () => {
     it('configures key as service when singleton api only provided with key', () => {
       class Logger {}
 
-      var container = new Container();
+      let container = new Container();
       container.registerSingleton(Logger);
 
-      var logger1 = container.get(Logger),
-          logger2 = container.get(Logger);
+      let logger1 = container.get(Logger);
+      let logger2 = container.get(Logger);
 
       expect(logger1).toEqual(jasmine.any(Logger));
       expect(logger2).toEqual(jasmine.any(Logger));
@@ -369,16 +368,16 @@ describe('container', () => {
       class Logger extends LoggerBase {}
 
       class App {
-        static inject() { return [LoggerBase]; };
+        static inject() { return [LoggerBase]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
+      let container = new Container();
       container.registerSingleton(LoggerBase, Logger);
 
-      var app = container.get(App);
+      let app = container.get(App);
 
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
@@ -388,16 +387,16 @@ describe('container', () => {
       class Logger extends LoggerBase {}
 
       class App {
-        static inject() { return [LoggerBase]; };
+        static inject() { return [LoggerBase]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
+      let container = new Container();
       container.registerTransient(LoggerBase, Logger);
 
-      var app = container.get(App);
+      let app = container.get(App);
 
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
@@ -411,22 +410,22 @@ describe('container', () => {
       Reflect.defineMetadata('something', 'test', Logger);
 
       class App1 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
       class App2 {
-        static inject() { return [Logger]; };
+        static inject() { return [Logger]; }
         constructor(logger) {
           this.logger = logger;
         }
       }
 
-      var container = new Container();
-      var app1 = container.get(App1);
-      var app2 = container.get(App2);
+      let container = new Container();
+      let app1 = container.get(App1);
+      let app2 = container.get(App2);
 
       expect(app1.logger).not.toBe(app2.logger);
     });
@@ -437,16 +436,16 @@ describe('container', () => {
           class Logger {}
 
           class App1 {
-            static inject() { return [Lazy.of(Logger)]; };
+            static inject() { return [Lazy.of(Logger)]; }
             constructor(getLogger) {
               this.getLogger = getLogger;
             }
           }
 
-          var container = new Container();
-          var app1 = container.get(App1);
+          let container = new Container();
+          let app1 = container.get(App1);
 
-          var logger = app1.getLogger;
+          let logger = app1.getLogger;
 
           expect(logger()).toEqual(jasmine.any(Logger));
         });
@@ -458,19 +457,19 @@ describe('container', () => {
 
           class VerboseLogger extends LoggerBase {}
 
-          class Logger extends LoggerBase{}
+          class Logger extends LoggerBase {}
 
           class App {
-            static inject() { return [All.of(LoggerBase)]; };
+            static inject() { return [All.of(LoggerBase)]; }
             constructor(loggers) {
               this.loggers = loggers;
             }
           }
 
-          var container = new Container();
+          let container = new Container();
           container.registerSingleton(LoggerBase, VerboseLogger);
           container.registerTransient(LoggerBase, Logger);
-          var app = container.get(App);
+          let app = container.get(App);
 
           expect(app.loggers).toEqual(jasmine.any(Array));
           expect(app.loggers.length).toBe(2);
@@ -481,53 +480,53 @@ describe('container', () => {
 
       describe('Optional', ()=> {
         it('injects the instance if its registered in the container', () => {
-          class Logger{}
+          class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger)]; };
+            static inject() { return [Optional.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var container = new Container();
+          let container = new Container();
           container.registerSingleton(Logger, Logger);
-          var app = container.get(App);
+          let app = container.get(App);
 
           expect(app.logger).toEqual(jasmine.any(Logger));
         });
 
         it('injects null if key is not registered in the container', () => {
-          class VerboseLogger{}
-          class Logger{}
+          class VerboseLogger {}
+          class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger)]; };
+            static inject() { return [Optional.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var container = new Container();
+          let container = new Container();
           container.registerSingleton(VerboseLogger, Logger);
-          var app = container.get(App);
+          let app = container.get(App);
 
           expect(app.logger).toBe(null);
         });
 
         it('injects null if key nor function is registered in the container', () => {
-          class VerboseLogger{}
-          class Logger{}
+          class VerboseLogger {}
+          class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger)]; };
+            static inject() { return [Optional.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var container = new Container();
-          var app = container.get(App);
+          let container = new Container();
+          let app = container.get(App);
 
           expect(app.logger).toBe(null);
         });
@@ -536,19 +535,19 @@ describe('container', () => {
           class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger)]; };
+            static inject() { return [Optional.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var parentContainer = new Container();
+          let parentContainer = new Container();
           parentContainer.registerSingleton(Logger, Logger);
 
-          var childContainer = parentContainer.createChild();
+          let childContainer = parentContainer.createChild();
           childContainer.registerSingleton(App, App);
 
-          var app = childContainer.get(App);
+          let app = childContainer.get(App);
 
           expect(app.logger).toBe(null);
         });
@@ -557,19 +556,19 @@ describe('container', () => {
           class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger, true)]; };
+            static inject() { return [Optional.of(Logger, true)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var parentContainer = new Container();
+          let parentContainer = new Container();
           parentContainer.registerSingleton(Logger, Logger);
 
-          var childContainer = parentContainer.createChild();
+          let childContainer = parentContainer.createChild();
           childContainer.registerSingleton(App, App);
 
-          var app = childContainer.get(App);
+          let app = childContainer.get(App);
 
           expect(app.logger).toEqual(jasmine.any(Logger));
         });
@@ -580,22 +579,22 @@ describe('container', () => {
           class Logger {}
 
           class App {
-            static inject() { return [Parent.of(Logger)]; };
+            static inject() { return [Parent.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var parentContainer = new Container();
-          var parentInstance = new Logger();
+          let parentContainer = new Container();
+          let parentInstance = new Logger();
           parentContainer.registerInstance(Logger, parentInstance);
 
-          var childContainer = parentContainer.createChild();
-          var childInstance = new Logger();
+          let childContainer = parentContainer.createChild();
+          let childInstance = new Logger();
           childContainer.registerInstance(Logger, childInstance);
           childContainer.registerSingleton(App, App);
 
-          var app = childContainer.get(App);
+          let app = childContainer.get(App);
 
           expect(app.logger).toBe(parentInstance);
         });
@@ -604,17 +603,17 @@ describe('container', () => {
           class Logger {}
 
           class App {
-            static inject() { return [Parent.of(Logger)]; };
+            static inject() { return [Parent.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }
           }
 
-          var container = new Container();
-          var instance = new Logger();
+          let container = new Container();
+          let instance = new Logger();
           container.registerInstance(Logger, instance);
 
-          var app = container.get(App);
+          let app = container.get(App);
 
           expect(app.logger).toBe(null);
         });
@@ -639,9 +638,9 @@ describe('container', () => {
 
         class App {
           static inject() { return [Factory.of(Service)]; }
-          constructor(getService) {
-            this.getService = getService;
-            this.service = new getService(data);
+          constructor(GetService) {
+            this.GetService = GetService;
+            this.service = new GetService(data);
           }
         }
 
@@ -651,7 +650,7 @@ describe('container', () => {
 
         it('provides a function which, when called, will return the instance', () => {
           app = container.get(App);
-          service = app.getService;
+          service = app.GetService;
           expect(service()).toEqual(jasmine.any(Service));
         });
 

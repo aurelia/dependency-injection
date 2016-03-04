@@ -11,6 +11,7 @@ module.exports = {
   style: 'styles/**/*.css',
   output: 'dist/',
   doc:'./doc',
+  unitTests: 'test/**/*.js',
   e2eSpecsSrc: 'test/e2e/src/*.js',
   e2eSpecsDist: 'test/e2e/dist/',
   packageName: pkg.name
