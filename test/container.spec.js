@@ -1,6 +1,6 @@
 import './setup';
 import {Container} from '../src/container';
-import {Lazy, All, Optional, Parent} from '../src/resolvers';
+import {Lazy, All, Optional, Parent, Factory} from '../src/resolvers';
 import {transient, singleton} from '../src/registrations';
 import {inject} from '../src/injection';
 import {decorators} from 'aurelia-metadata';
@@ -617,6 +617,47 @@ describe('container', () => {
           var app = container.get(App);
 
           expect(app.logger).toBe(null);
+        });
+      });
+
+      describe('Factory', () => {
+        let container;
+        let app;
+        let logger;
+        let service;
+        let data = 'test';
+
+        class Logger {}
+
+        class Service {
+          static inject() { return [Factory.of(Logger)]; }
+          constructor(getLogger, data) {
+            this.getLogger = getLogger;
+            this.data = data;
+          }
+        }
+
+        class App {
+          static inject() { return [Factory.of(Service)]; }
+          constructor(getService) {
+            this.getService = getService;
+            this.service = new getService(data);
+          }
+        }
+
+        beforeEach(() => {
+          container = new Container();
+        });
+
+        it('provides a function which, when called, will return the instance', () => {
+          app = container.get(App);
+          service = app.getService;
+          expect(service()).toEqual(jasmine.any(Service));
+        });
+
+        it('passes data in to the constructor as the second argument', () => {
+          app = container.get(App);
+          expect(app.service.data).toEqual(data);
         });
       });
     });
