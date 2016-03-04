@@ -1,7 +1,7 @@
 System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
   'use strict';
 
-  var protocol, metadata, AggregateError, resolver, Lazy, All, Optional, Parent, StrategyResolver, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
+  var protocol, metadata, AggregateError, resolver, Lazy, All, Optional, Parent, StrategyResolver, Factory, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
 
   var _classInvokers;
 
@@ -77,8 +77,8 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
   }
 
   function inject() {
-    for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-      rest[_key] = arguments[_key];
+    for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      rest[_key2] = arguments[_key2];
     }
 
     return function (target, key, descriptor) {
@@ -246,6 +246,36 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
       })();
 
       _export('StrategyResolver', StrategyResolver);
+
+      Factory = (function () {
+        function Factory(key) {
+          _classCallCheck(this, _Factory);
+
+          this._key = key;
+        }
+
+        Factory.prototype.get = function get(container) {
+          var _this2 = this;
+
+          return function () {
+            for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+              rest[_key] = arguments[_key];
+            }
+
+            return container.invoke(_this2._key, rest);
+          };
+        };
+
+        Factory.of = function of(key) {
+          return new Factory(key);
+        };
+
+        var _Factory = Factory;
+        Factory = resolver()(Factory) || Factory;
+        return Factory;
+      })();
+
+      _export('Factory', Factory);
 
       FactoryInvoker = (function () {
         function FactoryInvoker() {

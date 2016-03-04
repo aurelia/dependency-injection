@@ -91,7 +91,7 @@ declare module 'aurelia-dependency-injection' {
     /**
       * Creates a Lazy Resolver for the supplied key.
       * @param key The key to lazily resolve.
-      * @return Returns an insance of Lazy for the key.
+      * @return Returns an instance of Lazy for the key.
       */
     static of(key: any): Lazy;
   }
@@ -117,7 +117,7 @@ declare module 'aurelia-dependency-injection' {
     /**
       * Creates an All Resolver for the supplied key.
       * @param key The key to resolve all instances for.
-      * @return Returns an insance of All for the key.
+      * @return Returns an instance of All for the key.
       */
     static of(key: any): All;
   }
@@ -145,7 +145,7 @@ declare module 'aurelia-dependency-injection' {
       * Creates an Optional Resolver for the supplied key.
       * @param key The key to optionally resolve for.
       * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
-      * @return Returns an insance of Optional for the key.
+      * @return Returns an instance of Optional for the key.
       */
     static of(key: any, checkParent?: boolean): Optional;
   }
@@ -171,7 +171,7 @@ declare module 'aurelia-dependency-injection' {
     /**
       * Creates a Parent Resolver for the supplied key.
       * @param key The key to resolve.
-      * @return Returns an insance of Parent for the key.
+      * @return Returns an instance of Parent for the key.
       */
     static of(key: any): Parent;
   }
@@ -191,6 +191,32 @@ declare module 'aurelia-dependency-injection' {
       * @return Returns the resolved object.
       */
     get(container: Container, key: any): any;
+  }
+  
+  /**
+  * Used to allow injecting dependencies but also passing data to the constructor.
+  */
+  export class Factory {
+    
+    /**
+      * Creates an instance of the Factory class.
+      * @param key The key to resolve from the parent container.
+      */
+    constructor(key: any);
+    
+    /**
+      * Called by the container to pass the dependencies to the constructor.
+      * @param container The container to invoke the constructor with dependencies and other parameters.
+      * @return Returns a function that can be invoked to resolve dependencies later, and the rest of the parameters.
+      */
+    get(container: Container): any;
+    
+    /**
+      * Creates a Factory Resolver for the supplied key.
+      * @param key The key to resolve.
+      * @return Returns an instance of Factory for the key.
+      */
+    static of(key: any): Factory;
   }
   
   /**

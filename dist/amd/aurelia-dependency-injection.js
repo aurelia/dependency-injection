@@ -165,6 +165,36 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
   exports.StrategyResolver = StrategyResolver;
 
+  var Factory = (function () {
+    function Factory(key) {
+      _classCallCheck(this, _Factory);
+
+      this._key = key;
+    }
+
+    Factory.prototype.get = function get(container) {
+      var _this2 = this;
+
+      return function () {
+        for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+          rest[_key] = arguments[_key];
+        }
+
+        return container.invoke(_this2._key, rest);
+      };
+    };
+
+    Factory.of = function of(key) {
+      return new Factory(key);
+    };
+
+    var _Factory = Factory;
+    Factory = resolver()(Factory) || Factory;
+    return Factory;
+  })();
+
+  exports.Factory = Factory;
+
   function invoker(value) {
     return function (target) {
       _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
@@ -590,8 +620,8 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
   }
 
   function inject() {
-    for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-      rest[_key] = arguments[_key];
+    for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      rest[_key2] = arguments[_key2];
     }
 
     return function (target, key, descriptor) {

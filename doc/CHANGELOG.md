@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.1.5 (2016-03-04)
+
+
+#### Features
+
+* **resolver:** add factory resolver ([0d59042d](http://github.com/aurelia/dependency-injection/commit/0d59042dff1d4987c67be789e0688b6e85ce587a))
+
+
 ### 1.0.0-beta.1.1.4 (2016-03-01)
 
 
