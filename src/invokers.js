@@ -49,7 +49,7 @@ export class FactoryInvoker {
   /**
   * The singleton instance of the FactoryInvoker.
   */
-  static instance = new FactoryInvoker();
+  static instance: FactoryInvoker;
 
   /**
   * Invokes the function with the provided dependencies.
@@ -92,3 +92,5 @@ export class FactoryInvoker {
     return fn.apply(undefined, args);
   }
 }
+
+FactoryInvoker.instance = new FactoryInvoker();
