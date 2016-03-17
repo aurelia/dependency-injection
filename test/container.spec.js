@@ -49,6 +49,69 @@ describe('container', () => {
     });
   });
 
+  describe('inheritence', function() {
+    class Logger {}
+    class Service {}
+
+    it('loads dependencies for the parent class', function() {
+      class ParentApp {
+        static inject() { return [Logger]; }
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+
+      class ChildApp extends ParentApp {
+        constructor(...rest) {
+          super(...rest);
+        }
+      }
+
+      let container = new Container();
+      let app = container.get(ChildApp);
+      expect(app.logger).toEqual(jasmine.any(Logger));
+    });
+
+    it('loads dependencies for the child class', function() {
+      class ParentApp {
+      }
+
+      class ChildApp extends ParentApp {
+        static inject() { return [Service]; }
+        constructor(service, ...rest) {
+          super(...rest);
+          this.service = service;
+        }
+      }
+
+      let container = new Container();
+      let app = container.get(ChildApp);
+      expect(app.service).toEqual(jasmine.any(Service));
+    });
+
+    it('loads dependencies for both classes', function() {
+      class ParentApp {
+        static inject() { return [Logger]; }
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+
+      class ChildApp extends ParentApp {
+        static inject() { return [Service]; }
+        constructor(service, ...rest) {
+          super(...rest);
+          this.service = service;
+        }
+      }
+
+      let container = new Container();
+      let app = container.get(ChildApp);
+      expect(app.service).toEqual(jasmine.any(Service));
+      expect(app.logger).toEqual(jasmine.any(Logger));
+    });
+  });
+
   describe('registration', () => {
     it('asserts keys are defined', () => {
       let container = new Container();

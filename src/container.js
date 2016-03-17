@@ -415,12 +415,25 @@ export class Container {
   _createInvocationHandler(fn: Function): InvocationHandler {
     let dependencies;
 
-    if (typeof fn.inject === 'function') {
-      dependencies = fn.inject();
-    } else if (fn.inject === undefined) {
+    if (fn.inject === undefined) {
       dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
     } else {
-      dependencies = fn.inject;
+      function getDependencies(f) {
+        if (!f.hasOwnProperty('inject')) {
+          return [];
+        }
+        if (typeof f.inject === 'function') {
+          return f.inject();
+        } else {
+          return f.inject;
+        }
+      }
+      dependencies = [];
+      let ctor = fn;
+      while (typeof ctor === 'function') {
+        dependencies.push(...getDependencies(ctor));
+        ctor = Object.getPrototypeOf(ctor);
+      }
     }
 
     let invoker = metadata.getOwn(metadata.invoker, fn)
