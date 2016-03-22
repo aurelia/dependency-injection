@@ -285,7 +285,7 @@ export class FactoryInvoker {
   /**
   * The singleton instance of the FactoryInvoker.
   */
-  static instance = new FactoryInvoker();
+  static instance: FactoryInvoker;
 
   /**
   * Invokes the function with the provided dependencies.
@@ -328,6 +328,8 @@ export class FactoryInvoker {
     return fn.apply(undefined, args);
   }
 }
+
+FactoryInvoker.instance = new FactoryInvoker();
 
 /**
 * Decorator: Specifies a custom registration strategy for the decorated class/function.
@@ -548,6 +550,18 @@ let classInvokers = {
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }
 };
+
+function getDependencies(f) {
+  if (!f.hasOwnProperty('inject')) {
+    return [];
+  }
+
+  if (typeof f.inject === 'function') {
+    return f.inject();
+  }
+
+  return f.inject;
+}
 
 /**
 * A lightweight, extensible dependency injection container.
@@ -842,12 +856,15 @@ export class Container {
   _createInvocationHandler(fn: Function): InvocationHandler {
     let dependencies;
 
-    if (typeof fn.inject === 'function') {
-      dependencies = fn.inject();
-    } else if (fn.inject === undefined) {
+    if (fn.inject === undefined) {
       dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
     } else {
-      dependencies = fn.inject;
+      dependencies = [];
+      let ctor = fn;
+      while (typeof ctor === 'function') {
+        dependencies.push(...getDependencies(ctor));
+        ctor = Object.getPrototypeOf(ctor);
+      }
     }
 
     let invoker = metadata.getOwn(metadata.invoker, fn)

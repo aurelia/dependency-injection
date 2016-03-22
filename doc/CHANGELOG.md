@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.2.0 (2016-03-22)
+
+
+#### Features
+
+* **inheritence:** allow injection w/ inheritence ([0615ac1d](http://github.com/aurelia/dependency-injection/commit/0615ac1db4c2f2e91fc1bb028217cc3540a8e6c7))
+
+
 ### 1.0.0-beta.1.1.5 (2016-03-04)
 
 

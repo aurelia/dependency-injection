@@ -1,12 +1,10 @@
 define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaMetadata, _aureliaPal) {
   'use strict';
 
-  exports.__esModule = true;
-
-  var _classInvokers;
-
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.Factory = exports.StrategyResolver = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.resolver = undefined;
   exports.invoker = invoker;
   exports.factory = factory;
   exports.registration = registration;
@@ -15,9 +13,15 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
   exports.autoinject = autoinject;
   exports.inject = inject;
 
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-  var resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
+  var _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6, _classInvokers;
+
+  var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
     if (!(typeof target.get === 'function')) {
       return 'Resolvers must implement: get(container: Container, key: any): any';
     }
@@ -25,11 +29,9 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     return true;
   });
 
-  exports.resolver = resolver;
-
-  var Lazy = (function () {
+  var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
     function Lazy(key) {
-      _classCallCheck(this, _Lazy);
+      _classCallCheck(this, Lazy);
 
       this._key = key;
     }
@@ -46,16 +48,11 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       return new Lazy(key);
     };
 
-    var _Lazy = Lazy;
-    Lazy = resolver()(Lazy) || Lazy;
     return Lazy;
-  })();
-
-  exports.Lazy = Lazy;
-
-  var All = (function () {
+  }()) || _class);
+  var All = exports.All = (_dec2 = resolver(), _dec2(_class2 = function () {
     function All(key) {
-      _classCallCheck(this, _All);
+      _classCallCheck(this, All);
 
       this._key = key;
     }
@@ -68,18 +65,13 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       return new All(key);
     };
 
-    var _All = All;
-    All = resolver()(All) || All;
     return All;
-  })();
-
-  exports.All = All;
-
-  var Optional = (function () {
+  }()) || _class2);
+  var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class3 = function () {
     function Optional(key) {
       var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-      _classCallCheck(this, _Optional);
+      _classCallCheck(this, Optional);
 
       this._key = key;
       this._checkParent = checkParent;
@@ -99,16 +91,11 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       return new Optional(key, checkParent);
     };
 
-    var _Optional = Optional;
-    Optional = resolver()(Optional) || Optional;
     return Optional;
-  })();
-
-  exports.Optional = Optional;
-
-  var Parent = (function () {
+  }()) || _class3);
+  var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class4 = function () {
     function Parent(key) {
-      _classCallCheck(this, _Parent);
+      _classCallCheck(this, Parent);
 
       this._key = key;
     }
@@ -121,16 +108,11 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       return new Parent(key);
     };
 
-    var _Parent = Parent;
-    Parent = resolver()(Parent) || Parent;
     return Parent;
-  })();
-
-  exports.Parent = Parent;
-
-  var StrategyResolver = (function () {
+  }()) || _class4);
+  var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class5 = function () {
     function StrategyResolver(strategy, state) {
-      _classCallCheck(this, _StrategyResolver);
+      _classCallCheck(this, StrategyResolver);
 
       this.strategy = strategy;
       this.state = state;
@@ -158,16 +140,11 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       }
     };
 
-    var _StrategyResolver = StrategyResolver;
-    StrategyResolver = resolver()(StrategyResolver) || StrategyResolver;
     return StrategyResolver;
-  })();
-
-  exports.StrategyResolver = StrategyResolver;
-
-  var Factory = (function () {
+  }()) || _class5);
+  var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class6 = function () {
     function Factory(key) {
-      _classCallCheck(this, _Factory);
+      _classCallCheck(this, Factory);
 
       this._key = key;
     }
@@ -188,13 +165,8 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       return new Factory(key);
     };
 
-    var _Factory = Factory;
-    Factory = resolver()(Factory) || Factory;
     return Factory;
-  })();
-
-  exports.Factory = Factory;
-
+  }()) || _class6);
   function invoker(value) {
     return function (target) {
       _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
@@ -209,7 +181,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     return potentialTarget ? deco(potentialTarget) : deco;
   }
 
-  var FactoryInvoker = (function () {
+  var FactoryInvoker = exports.FactoryInvoker = function () {
     function FactoryInvoker() {
       _classCallCheck(this, FactoryInvoker);
     }
@@ -240,16 +212,10 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
       return fn.apply(undefined, args);
     };
 
-    _createClass(FactoryInvoker, null, [{
-      key: 'instance',
-      value: new FactoryInvoker(),
-      enumerable: true
-    }]);
-
     return FactoryInvoker;
-  })();
+  }();
 
-  exports.FactoryInvoker = FactoryInvoker;
+  FactoryInvoker.instance = new FactoryInvoker();
 
   function registration(value) {
     return function (target) {
@@ -267,7 +233,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
   }
 
-  var TransientRegistration = (function () {
+  var TransientRegistration = exports.TransientRegistration = function () {
     function TransientRegistration(key) {
       _classCallCheck(this, TransientRegistration);
 
@@ -281,11 +247,9 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return TransientRegistration;
-  })();
+  }();
 
-  exports.TransientRegistration = TransientRegistration;
-
-  var SingletonRegistration = (function () {
+  var SingletonRegistration = exports.SingletonRegistration = function () {
     function SingletonRegistration(keyOrRegisterInChild) {
       var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
@@ -312,20 +276,17 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return SingletonRegistration;
-  })();
-
-  exports.SingletonRegistration = SingletonRegistration;
+  }();
 
   var badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
-  var _emptyParameters = Object.freeze([]);
+  var _emptyParameters = exports._emptyParameters = Object.freeze([]);
 
-  exports._emptyParameters = _emptyParameters;
   _aureliaMetadata.metadata.registration = 'aurelia:registration';
   _aureliaMetadata.metadata.invoker = 'aurelia:invoker';
 
   var resolverDecorates = resolver.decorates;
 
-  var InvocationHandler = (function () {
+  var InvocationHandler = exports.InvocationHandler = function () {
     function InvocationHandler(fn, invoker, dependencies) {
       _classCallCheck(this, InvocationHandler);
 
@@ -339,9 +300,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return InvocationHandler;
-  })();
-
-  exports.InvocationHandler = InvocationHandler;
+  }();
 
   function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
     var i = staticDependencies.length;
@@ -362,38 +321,56 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     invoke: function invoke(container, Type) {
       return new Type();
     },
+
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers[1] = {
     invoke: function invoke(container, Type, deps) {
       return new Type(container.get(deps[0]));
     },
+
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers[2] = {
     invoke: function invoke(container, Type, deps) {
       return new Type(container.get(deps[0]), container.get(deps[1]));
     },
+
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers[3] = {
     invoke: function invoke(container, Type, deps) {
       return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
     },
+
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers[4] = {
     invoke: function invoke(container, Type, deps) {
       return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
     },
+
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers[5] = {
     invoke: function invoke(container, Type, deps) {
       return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
     },
+
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers.fallback = {
     invoke: invokeWithDynamicDependencies,
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   }, _classInvokers);
 
-  var Container = (function () {
+  function getDependencies(f) {
+    if (!f.hasOwnProperty('inject')) {
+      return [];
+    }
+
+    if (typeof f.inject === 'function') {
+      return f.inject();
+    }
+
+    return f.inject;
+  }
+
+  var Container = exports.Container = function () {
     function Container(configuration) {
       _classCallCheck(this, Container);
 
@@ -457,7 +434,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     Container.prototype.autoRegister = function autoRegister(fn, key) {
-      var resolver = undefined;
+      var resolver = void 0;
 
       if (typeof fn === 'function') {
         var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
@@ -484,7 +461,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     Container.prototype.unregister = function unregister(key) {
-      this._resolvers['delete'](key);
+      this._resolvers.delete(key);
     };
 
     Container.prototype.hasResolver = function hasResolver(key) {
@@ -590,14 +567,19 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     Container.prototype._createInvocationHandler = function _createInvocationHandler(fn) {
-      var dependencies = undefined;
+      var dependencies = void 0;
 
-      if (typeof fn.inject === 'function') {
-        dependencies = fn.inject();
-      } else if (fn.inject === undefined) {
+      if (fn.inject === undefined) {
         dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
       } else {
-        dependencies = fn.inject;
+        dependencies = [];
+        var ctor = fn;
+        while (typeof ctor === 'function') {
+          var _dependencies;
+
+          (_dependencies = dependencies).push.apply(_dependencies, getDependencies(ctor));
+          ctor = Object.getPrototypeOf(ctor);
+        }
       }
 
       var invoker = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
@@ -607,9 +589,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return Container;
-  })();
-
-  exports.Container = Container;
+  }();
 
   function autoinject(potentialTarget) {
     var deco = function deco(target) {

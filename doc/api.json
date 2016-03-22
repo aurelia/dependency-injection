@@ -1390,8 +1390,10 @@
             "shortText": "The singleton instance of the FactoryInvoker."
           },
           "type": {
-            "type": "instrinct",
-            "name": "any"
+            "type": "reference",
+            "name": "FactoryInvoker",
+            "id": 92,
+            "moduleName": "\"aurelia-dependency-injection\""
           }
         },
         {

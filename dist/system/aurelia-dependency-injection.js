@@ -1,56 +1,12 @@
-System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
-  'use strict';
+'use strict';
 
-  var protocol, metadata, AggregateError, resolver, Lazy, All, Optional, Parent, StrategyResolver, Factory, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
+System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context) {
+  var protocol, metadata, AggregateError, _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6, _classInvokers, resolver, Lazy, All, Optional, Parent, StrategyResolver, Factory, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
 
-  var _classInvokers;
-
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-  _export('invoker', invoker);
-
-  _export('factory', factory);
-
-  _export('registration', registration);
-
-  _export('transient', transient);
-
-  _export('singleton', singleton);
-
-  _export('autoinject', autoinject);
-
-  _export('inject', inject);
-
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-  function invoker(value) {
-    return function (target) {
-      metadata.define(metadata.invoker, value, target);
-    };
-  }
-
-  function factory(potentialTarget) {
-    var deco = function deco(target) {
-      metadata.define(metadata.invoker, FactoryInvoker.instance, target);
-    };
-
-    return potentialTarget ? deco(potentialTarget) : deco;
-  }
-
-  function registration(value) {
-    return function (target) {
-      metadata.define(metadata.registration, value, target);
-    };
-  }
-
-  function transient(key) {
-    return registration(new TransientRegistration(key));
-  }
-
-  function singleton(keyOrRegisterInChild) {
-    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-    return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
   }
 
   function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
@@ -68,27 +24,16 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
     return Reflect.construct(fn, args);
   }
 
-  function autoinject(potentialTarget) {
-    var deco = function deco(target) {
-      target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    };
-
-    return potentialTarget ? deco(potentialTarget) : deco;
-  }
-
-  function inject() {
-    for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      rest[_key2] = arguments[_key2];
+  function getDependencies(f) {
+    if (!f.hasOwnProperty('inject')) {
+      return [];
     }
 
-    return function (target, key, descriptor) {
-      if (descriptor) {
-        var _fn = descriptor.value;
-        _fn.inject = rest;
-      } else {
-        target.inject = rest;
-      }
-    };
+    if (typeof f.inject === 'function') {
+      return f.inject();
+    }
+
+    return f.inject;
   }
 
   return {
@@ -99,19 +44,19 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
       AggregateError = _aureliaPal.AggregateError;
     }],
     execute: function () {
-      resolver = protocol.create('aurelia:resolver', function (target) {
+      _export('resolver', resolver = protocol.create('aurelia:resolver', function (target) {
         if (!(typeof target.get === 'function')) {
           return 'Resolvers must implement: get(container: Container, key: any): any';
         }
 
         return true;
-      });
+      }));
 
       _export('resolver', resolver);
 
-      Lazy = (function () {
+      _export('Lazy', Lazy = (_dec = resolver(), _dec(_class = function () {
         function Lazy(key) {
-          _classCallCheck(this, _Lazy);
+          _classCallCheck(this, Lazy);
 
           this._key = key;
         }
@@ -128,16 +73,14 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           return new Lazy(key);
         };
 
-        var _Lazy = Lazy;
-        Lazy = resolver()(Lazy) || Lazy;
         return Lazy;
-      })();
+      }()) || _class));
 
       _export('Lazy', Lazy);
 
-      All = (function () {
+      _export('All', All = (_dec2 = resolver(), _dec2(_class2 = function () {
         function All(key) {
-          _classCallCheck(this, _All);
+          _classCallCheck(this, All);
 
           this._key = key;
         }
@@ -150,18 +93,16 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           return new All(key);
         };
 
-        var _All = All;
-        All = resolver()(All) || All;
         return All;
-      })();
+      }()) || _class2));
 
       _export('All', All);
 
-      Optional = (function () {
+      _export('Optional', Optional = (_dec3 = resolver(), _dec3(_class3 = function () {
         function Optional(key) {
           var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-          _classCallCheck(this, _Optional);
+          _classCallCheck(this, Optional);
 
           this._key = key;
           this._checkParent = checkParent;
@@ -181,16 +122,14 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           return new Optional(key, checkParent);
         };
 
-        var _Optional = Optional;
-        Optional = resolver()(Optional) || Optional;
         return Optional;
-      })();
+      }()) || _class3));
 
       _export('Optional', Optional);
 
-      Parent = (function () {
+      _export('Parent', Parent = (_dec4 = resolver(), _dec4(_class4 = function () {
         function Parent(key) {
-          _classCallCheck(this, _Parent);
+          _classCallCheck(this, Parent);
 
           this._key = key;
         }
@@ -203,16 +142,14 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           return new Parent(key);
         };
 
-        var _Parent = Parent;
-        Parent = resolver()(Parent) || Parent;
         return Parent;
-      })();
+      }()) || _class4));
 
       _export('Parent', Parent);
 
-      StrategyResolver = (function () {
+      _export('StrategyResolver', StrategyResolver = (_dec5 = resolver(), _dec5(_class5 = function () {
         function StrategyResolver(strategy, state) {
-          _classCallCheck(this, _StrategyResolver);
+          _classCallCheck(this, StrategyResolver);
 
           this.strategy = strategy;
           this.state = state;
@@ -240,16 +177,14 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           }
         };
 
-        var _StrategyResolver = StrategyResolver;
-        StrategyResolver = resolver()(StrategyResolver) || StrategyResolver;
         return StrategyResolver;
-      })();
+      }()) || _class5));
 
       _export('StrategyResolver', StrategyResolver);
 
-      Factory = (function () {
+      _export('Factory', Factory = (_dec6 = resolver(), _dec6(_class6 = function () {
         function Factory(key) {
-          _classCallCheck(this, _Factory);
+          _classCallCheck(this, Factory);
 
           this._key = key;
         }
@@ -270,14 +205,30 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           return new Factory(key);
         };
 
-        var _Factory = Factory;
-        Factory = resolver()(Factory) || Factory;
         return Factory;
-      })();
+      }()) || _class6));
 
       _export('Factory', Factory);
 
-      FactoryInvoker = (function () {
+      function invoker(value) {
+        return function (target) {
+          metadata.define(metadata.invoker, value, target);
+        };
+      }
+
+      _export('invoker', invoker);
+
+      function factory(potentialTarget) {
+        var deco = function deco(target) {
+          metadata.define(metadata.invoker, FactoryInvoker.instance, target);
+        };
+
+        return potentialTarget ? deco(potentialTarget) : deco;
+      }
+
+      _export('factory', factory);
+
+      _export('FactoryInvoker', FactoryInvoker = function () {
         function FactoryInvoker() {
           _classCallCheck(this, FactoryInvoker);
         }
@@ -308,18 +259,36 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
           return fn.apply(undefined, args);
         };
 
-        _createClass(FactoryInvoker, null, [{
-          key: 'instance',
-          value: new FactoryInvoker(),
-          enumerable: true
-        }]);
-
         return FactoryInvoker;
-      })();
+      }());
 
       _export('FactoryInvoker', FactoryInvoker);
 
-      TransientRegistration = (function () {
+      FactoryInvoker.instance = new FactoryInvoker();
+
+      function registration(value) {
+        return function (target) {
+          metadata.define(metadata.registration, value, target);
+        };
+      }
+
+      _export('registration', registration);
+
+      function transient(key) {
+        return registration(new TransientRegistration(key));
+      }
+
+      _export('transient', transient);
+
+      function singleton(keyOrRegisterInChild) {
+        var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+        return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
+      }
+
+      _export('singleton', singleton);
+
+      _export('TransientRegistration', TransientRegistration = function () {
         function TransientRegistration(key) {
           _classCallCheck(this, TransientRegistration);
 
@@ -333,11 +302,11 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         return TransientRegistration;
-      })();
+      }());
 
       _export('TransientRegistration', TransientRegistration);
 
-      SingletonRegistration = (function () {
+      _export('SingletonRegistration', SingletonRegistration = function () {
         function SingletonRegistration(keyOrRegisterInChild) {
           var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
@@ -364,12 +333,13 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         return SingletonRegistration;
-      })();
+      }());
 
       _export('SingletonRegistration', SingletonRegistration);
 
       badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
-      _emptyParameters = Object.freeze([]);
+
+      _export('_emptyParameters', _emptyParameters = Object.freeze([]));
 
       _export('_emptyParameters', _emptyParameters);
 
@@ -378,7 +348,7 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
 
       resolverDecorates = resolver.decorates;
 
-      InvocationHandler = (function () {
+      _export('InvocationHandler', InvocationHandler = function () {
         function InvocationHandler(fn, invoker, dependencies) {
           _classCallCheck(this, InvocationHandler);
 
@@ -392,7 +362,7 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         return InvocationHandler;
-      })();
+      }());
 
       _export('InvocationHandler', InvocationHandler);
 
@@ -400,38 +370,44 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         invoke: function invoke(container, Type) {
           return new Type();
         },
+
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers[1] = {
         invoke: function invoke(container, Type, deps) {
           return new Type(container.get(deps[0]));
         },
+
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers[2] = {
         invoke: function invoke(container, Type, deps) {
           return new Type(container.get(deps[0]), container.get(deps[1]));
         },
+
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers[3] = {
         invoke: function invoke(container, Type, deps) {
           return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
         },
+
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers[4] = {
         invoke: function invoke(container, Type, deps) {
           return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
         },
+
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers[5] = {
         invoke: function invoke(container, Type, deps) {
           return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
         },
+
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers.fallback = {
         invoke: invokeWithDynamicDependencies,
         invokeWithDynamicDependencies: invokeWithDynamicDependencies
       }, _classInvokers);
 
-      Container = (function () {
+      _export('Container', Container = function () {
         function Container(configuration) {
           _classCallCheck(this, Container);
 
@@ -495,7 +471,7 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         Container.prototype.autoRegister = function autoRegister(fn, key) {
-          var resolver = undefined;
+          var resolver = void 0;
 
           if (typeof fn === 'function') {
             var _registration = metadata.get(metadata.registration, fn);
@@ -522,7 +498,7 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         Container.prototype.unregister = function unregister(key) {
-          this._resolvers['delete'](key);
+          this._resolvers.delete(key);
         };
 
         Container.prototype.hasResolver = function hasResolver(key) {
@@ -628,14 +604,19 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         Container.prototype._createInvocationHandler = function _createInvocationHandler(fn) {
-          var dependencies = undefined;
+          var dependencies = void 0;
 
-          if (typeof fn.inject === 'function') {
-            dependencies = fn.inject();
-          } else if (fn.inject === undefined) {
+          if (fn.inject === undefined) {
             dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
           } else {
-            dependencies = fn.inject;
+            dependencies = [];
+            var ctor = fn;
+            while (typeof ctor === 'function') {
+              var _dependencies;
+
+              (_dependencies = dependencies).push.apply(_dependencies, getDependencies(ctor));
+              ctor = Object.getPrototypeOf(ctor);
+            }
           }
 
           var invoker = metadata.getOwn(metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
@@ -645,9 +626,36 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export) {
         };
 
         return Container;
-      })();
+      }());
 
       _export('Container', Container);
+
+      function autoinject(potentialTarget) {
+        var deco = function deco(target) {
+          target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+        };
+
+        return potentialTarget ? deco(potentialTarget) : deco;
+      }
+
+      _export('autoinject', autoinject);
+
+      function inject() {
+        for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          rest[_key2] = arguments[_key2];
+        }
+
+        return function (target, key, descriptor) {
+          if (descriptor) {
+            var _fn = descriptor.value;
+            _fn.inject = rest;
+          } else {
+            target.inject = rest;
+          }
+        };
+      }
+
+      _export('inject', inject);
     }
   };
 });

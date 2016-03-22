@@ -1,6 +1,11 @@
 declare module 'aurelia-dependency-injection' {
-  import { protocol, metadata }  from 'aurelia-metadata';
-  import { AggregateError }  from 'aurelia-pal';
+  import {
+    protocol,
+    metadata
+  } from 'aurelia-metadata';
+  import {
+    AggregateError
+  } from 'aurelia-pal';
   
   /**
   * Used to allow functions/classes to specify custom dependency resolution logic.
@@ -69,6 +74,10 @@ declare module 'aurelia-dependency-injection' {
   * Decorator: Indicates that the decorated class/object is a custom resolver.
   */
   export const resolver: Function;
+  
+  /**
+  * Used to allow functions/classes to specify lazy resolution logic.
+  */
   
   /**
   * Used to allow functions/classes to specify lazy resolution logic.
@@ -232,12 +241,15 @@ declare module 'aurelia-dependency-injection' {
   /**
   * An Invoker that is used to invoke a factory method.
   */
+  /**
+  * An Invoker that is used to invoke a factory method.
+  */
   export class FactoryInvoker {
     
     /**
       * The singleton instance of the FactoryInvoker.
       */
-    static instance: any;
+    static instance: FactoryInvoker;
     
     /**
       * Invokes the function with the provided dependencies.
@@ -274,6 +286,9 @@ declare module 'aurelia-dependency-injection' {
   */
   export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean): any;
   
+  /**
+  * Used to allow functions/classes to indicate that they should be registered as transients with the container.
+  */
   /**
   * Used to allow functions/classes to indicate that they should be registered as transients with the container.
   */
