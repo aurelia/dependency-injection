@@ -122,6 +122,18 @@ let classInvokers = {
   }
 };
 
+function getDependencies(f) {
+  if (!f.hasOwnProperty('inject')) {
+    return [];
+  }
+
+  if (typeof f.inject === 'function') {
+    return f.inject();
+  }
+
+  return f.inject;
+}
+
 /**
 * A lightweight, extensible dependency injection container.
 */
@@ -418,16 +430,6 @@ export class Container {
     if (fn.inject === undefined) {
       dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
     } else {
-      function getDependencies(f) {
-        if (!f.hasOwnProperty('inject')) {
-          return [];
-        }
-        if (typeof f.inject === 'function') {
-          return f.inject();
-        } else {
-          return f.inject;
-        }
-      }
       dependencies = [];
       let ctor = fn;
       while (typeof ctor === 'function') {
