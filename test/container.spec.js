@@ -119,9 +119,6 @@ describe('container', () => {
       expect(() => container.get(null)).toThrow();
       expect(() => container.get(undefined)).toThrow();
 
-      expect(() => container.get(null)).toThrow();
-      expect(() => container.get(undefined)).toThrow();
-
       expect(() => container.registerInstance(null, {})).toThrow();
       expect(() => container.registerInstance(undefined, {})).toThrow();
 
