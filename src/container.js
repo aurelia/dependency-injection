@@ -76,43 +76,92 @@ function invokeWithDynamicDependencies(container, fn, staticDependencies, dynami
     args = args.concat(dynamicDependencies);
   }
 
-  return Reflect.construct(fn, args);
+  let instance = Reflect.construct(fn, args);
+  if (fn.injectProperties !== undefined) {
+    let injectProperties = fn.injectProperties;
+    for (let property in injectProperties) {
+      instance[property] = container.get(injectProperties[property]);
+    }
+  }
+  return instance;
 }
 
 let classInvokers = {
   [0]: {
     invoke(container, Type) {
-      return new Type();
+      let instance = new Type();
+      if (Type.injectProperties !== undefined) {
+        let injectProperties = Type.injectProperties;
+        for (let property in injectProperties) {
+          instance[property] = container.get(injectProperties[property]);
+        }
+      }
+      return instance;
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [1]: {
     invoke(container, Type, deps) {
-      return new Type(container.get(deps[0]));
+      let instance = new Type(container.get(deps[0]));
+      if (Type.injectProperties !== undefined) {
+        let injectProperties = Type.injectProperties;
+        for (let property in injectProperties) {
+          instance[property] = container.get(injectProperties[property]);
+        }
+      }
+      return instance;
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [2]: {
     invoke(container, Type, deps) {
-      return new Type(container.get(deps[0]), container.get(deps[1]));
+      let instance = new Type(container.get(deps[0]), container.get(deps[1]));
+      if (Type.injectProperties !== undefined) {
+        let injectProperties = Type.injectProperties;
+        for (let property in injectProperties) {
+          instance[property] = container.get(injectProperties[property]);
+        }
+      }
+      return instance;
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [3]: {
     invoke(container, Type, deps) {
-      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
+      let instance = new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
+      if (Type.injectProperties !== undefined) {
+        let injectProperties = Type.injectProperties;
+        for (let property in injectProperties) {
+          instance[property] = container.get(injectProperties[property]);
+        }
+      }
+      return instance;
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [4]: {
     invoke(container, Type, deps) {
-      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
+      let instance = new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
+      if (Type.injectProperties !== undefined) {
+        let injectProperties = Type.injectProperties;
+        for (let property in injectProperties) {
+          instance[property] = container.get(injectProperties[property]);
+        }
+      }
+      return instance;
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [5]: {
     invoke(container, Type, deps) {
-      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
+      let instance = new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
+      if (Type.injectProperties !== undefined) {
+        let injectProperties = Type.injectProperties;
+        for (let property in injectProperties) {
+          instance[property] = container.get(injectProperties[property]);
+        }
+      }
+      return instance;
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },

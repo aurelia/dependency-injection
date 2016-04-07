@@ -66,7 +66,14 @@ export class FactoryInvoker {
       args[i] = container.get(dependencies[i]);
     }
 
-    return fn.apply(undefined, args);
+    let instance = fn.apply(undefined, args);
+    if (fn.injectProperties !== undefined) {
+      let injectProperties = fn.injectProperties;
+      for (let property in injectProperties) {
+        instance[property] = container.get(injectProperties[property]);
+      }
+    }
+    return instance;
   }
 
   /**
@@ -89,7 +96,14 @@ export class FactoryInvoker {
       args = args.concat(dynamicDependencies);
     }
 
-    return fn.apply(undefined, args);
+    let instance = fn.apply(undefined, args);
+    if (fn.injectProperties !== undefined) {
+      let injectProperties = fn.injectProperties;
+      for (let property in injectProperties) {
+        instance[property] = container.get(injectProperties[property]);
+      }
+    }
+    return instance;
   }
 }
 
