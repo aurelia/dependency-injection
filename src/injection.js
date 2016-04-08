@@ -35,3 +35,13 @@ export function inject(...rest: any[]): any {
     }
   };
 }
+
+export function injectProperties(container, fn, instance) {
+    if (fn.injectProperties !== undefined) {
+      let dependencies = fn.injectProperties;
+      for (let property in dependencies) {
+        instance[property] = container.get(dependencies[property]);
+      }
+    }
+    return instance;
+}
