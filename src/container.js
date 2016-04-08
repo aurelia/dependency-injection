@@ -1,7 +1,6 @@
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
 import {resolver, StrategyResolver} from './resolvers';
-import {injectProperties} from './injection';
 
 const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 export const _emptyParameters = Object.freeze([]);
@@ -53,6 +52,22 @@ export class InvocationHandler {
       ? injectProperties(container, this.fn, this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies))
       : injectProperties(container, this.fn, this.invoker.invoke(container, this.fn, this.dependencies));
   }
+}
+
+/**
+* Injects property dependencies if the conventional `injectProperties` is defined.
+*/
+function injectProperties(container, fn, instance) {
+  if (fn.injectProperties !== undefined) {
+    let dependencies = fn.injectProperties;
+    for (let property in dependencies) {
+      instance[property] = container.get(dependencies[property]);
+    }
+  }
+  if (instance.postConstruct !== undefined) {
+    instance.postConstruct();
+  }
+  return instance;
 }
 
 /**
