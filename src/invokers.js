@@ -1,5 +1,4 @@
 import {metadata} from 'aurelia-metadata';
-import {injectProperties} from './injection';
 
 /**
 * Decorator: Specifies a custom Invoker for the decorated item.
@@ -67,7 +66,7 @@ export class FactoryInvoker {
       args[i] = container.get(dependencies[i]);
     }
 
-    return injectProperties(container, fn, fn.apply(undefined, args));
+    return fn.apply(undefined, args);
   }
 
   /**
@@ -90,7 +89,7 @@ export class FactoryInvoker {
       args = args.concat(dynamicDependencies);
     }
 
-    return injectProperties(container, fn, fn.apply(undefined, args));
+    return fn.apply(undefined, args);
   }
 }
 

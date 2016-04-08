@@ -50,8 +50,8 @@ export class InvocationHandler {
   */
   invoke(container: Container, dynamicDependencies?: any[]): any {
     return dynamicDependencies !== undefined
-      ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
-      : this.invoker.invoke(container, this.fn, this.dependencies);
+      ? injectProperties(container, this.fn, this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies))
+      : injectProperties(container, this.fn, this.invoker.invoke(container, this.fn, this.dependencies));
   }
 }
 
@@ -77,43 +77,43 @@ function invokeWithDynamicDependencies(container, fn, staticDependencies, dynami
     args = args.concat(dynamicDependencies);
   }
 
-  return injectProperties(container, fn, Reflect.construct(fn, args));
+  return Reflect.construct(fn, args);
 }
 
 let classInvokers = {
   [0]: {
     invoke(container, Type) {
-      return injectProperties(container, Type, new Type());
+      return new Type();
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [1]: {
     invoke(container, Type, deps) {
-      return injectProperties(container, Type, new Type(container.get(deps[0])));
+      return new Type(container.get(deps[0]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [2]: {
     invoke(container, Type, deps) {
-      return injectProperties(container, Type, new Type(container.get(deps[0]), container.get(deps[1])));
+      return new Type(container.get(deps[0]), container.get(deps[1]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [3]: {
     invoke(container, Type, deps) {
-      return injectProperties(container, Type, new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2])));
+      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [4]: {
     invoke(container, Type, deps) {
-      return injectProperties(container, Type, new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3])));
+      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
   [5]: {
     invoke(container, Type, deps) {
-      return injectProperties(container, Type, new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4])));
+      return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
   },
