@@ -49,6 +49,22 @@ describe('container', () => {
     });
   });
 
+  describe('inject-properties', function() {
+    class Logger {}
+
+    it('uses static injectProperties', function() {
+      class App {}
+
+      App.injectProperties = {
+        logger: Logger
+      };
+
+      let container = new Container();
+      let app = container.get(App);
+      expect(app.logger).toEqual(jasmine.any(Logger));
+    });
+  });
+
   describe('inheritence', function() {
     class Logger {}
     class Service {}
