@@ -12,7 +12,7 @@ export function autoinject(potentialTarget?: any, potentialKey?: any): any {
     } else if (descriptor === undefined) {
       // we are injecting into Class property
       if (target.constructor.injectProperties === undefined) {
-        target.constructor.injectProperties = {};
+        target.constructor.injectProperties = Object.create(null);
       }
       target.constructor.injectProperties[key] = metadata.getOwn("design:type", target, key);
     }
@@ -34,7 +34,7 @@ export function inject(...rest: any[]): any {
         fn.inject = rest;
       } else {
         if (target.constructor.injectProperties === undefined) {
-          target.constructor.injectProperties = {};
+          target.constructor.injectProperties = Object.create(null);
         }
         target.constructor.injectProperties[key] = rest[0];
         // we need the property to be writable to inject the dependency
