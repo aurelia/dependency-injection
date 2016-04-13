@@ -63,9 +63,9 @@ function injectProperties(container, fn, instance) {
     for (let property in dependencies) {
       instance[property] = container.get(dependencies[property]);
     }
-  }
-  if (instance.postConstruct !== undefined) {
-    instance.postConstruct();
+    if (instance.postConstruct !== undefined) {
+      instance.postConstruct();
+    }
   }
   return instance;
 }
