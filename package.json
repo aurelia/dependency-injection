@@ -90,7 +90,12 @@
   },
   "aurelia": {
     "documentation": {
-      "articles": []
+      "articles": [
+        {
+          "title": "Dependency Injection: Basics",
+          "href": "doc/article/en-US/dependency-injection-basics.md"
+        }
+      ]
     }
   }
 }
