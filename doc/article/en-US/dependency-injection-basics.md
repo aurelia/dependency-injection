@@ -9,7 +9,7 @@
     "url": "http://robeisenberg.com"
   },
   "contributors": [
-    
+
   ],
   "translators": [],
   "keywords": ["DI", "IoC"]
@@ -32,14 +32,14 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
   <source-code lang="ES 2016">
     import {CustomerService} from 'backend/customer-service';
     import {inject} from 'aurelia-framework';
-    
+
     @inject(CustomerService)
     export class CustomerEditScreen {
       constructor(customerService) {
         this.customerService = customerService;
         this.customer = null;
       }
-      
+
       activate(params) {
         return this.customerService.getCustomerById(params.customerId)
           .then(customer => this.customer = customer);
@@ -49,13 +49,13 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
   <source-code lang="TypeScript">
     import {CustomerService} from 'backend/customer-service';
     import {inject} from 'aurelia-framework';
-    
+
     @inject(CustomerService)
     export class CustomerEditScreen {
       constructor(private customerService: CustomerService) {
         this.customer = null;
       }
-      
+
       activate(params) {
         return this.customerService.getCustomerById(params.customerId)
           .then(customer => this.customer = customer);
@@ -72,7 +72,7 @@ Notice that we use the `inject` decorator and that the constructor signature mat
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
     import {EventAggregator from 'aurelia-event-aggregator';
     import {inject} from 'aurelia-framework';
-    
+
     @inject(CustomerService, CommonDialogs, EventAggregator)
     export class CustomerEditScreen {
       constructor(customerService, dialogs, ea) {
@@ -81,7 +81,7 @@ Notice that we use the `inject` decorator and that the constructor signature mat
         this.ea = ea;
         this.customer = null;
       }
-      
+
       activate(params) {
         return this.customerService.getCustomerById(params.customerId)
           .then(customer => this.customer = customer)
@@ -94,13 +94,13 @@ Notice that we use the `inject` decorator and that the constructor signature mat
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
     import {EventAggregator from 'aurelia-event-aggregator';
     import {inject} from 'aurelia-framework';
-    
+
     @inject(CustomerService, CommonDialogs, EventAggregator)
     export class CustomerEditScreen {
       constructor(private customerService: CustomerService, private dialogs: CommonDialogs, private ea: EventAggregator) {
         this.customer = null;
       }
-      
+
       activate(params) {
         return this.customerService.getCustomerById(params.customerId)
           .then(customer => this.customer = customer)
@@ -121,13 +121,13 @@ If you are using TypeScript, you can take advantage of an experimental feature o
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
     import {EventAggregator from 'aurelia-event-aggregator';
     import {autoinject} from 'aurelia-framework';
-    
+
     @autoinject()
     export class CustomerEditScreen {
       constructor(private customerService: CustomerService, private dialogs: CommonDialogs, private ea: EventAggregator) {
         this.customer = null;
       }
-      
+
       activate(params) {
         return this.customerService.getCustomerById(params.customerId)
           .then(customer => this.customer = customer)
@@ -147,17 +147,17 @@ If you aren't using Babel's or TypeScript's decorator support (or don't want to)
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
     import {EventAggregator from 'aurelia-event-aggregator';
-    
+
     export class CustomerEditScreen {
       static inject() { return [CustomerService, CommonDialogs, EventAggregator]; }
-      
+
       constructor(customerService, dialogs, ea) {
         this.customerService = customerService;
         this.dialogs = dialogs;
         this.ea = ea;
         this.customer = null;
       }
-      
+
       activate(params) {
         return this.customerService.getCustomerById(params.customerId)
           .then(customer => this.customer = customer)
@@ -191,7 +191,7 @@ Now, imagine that we have a `Container` named `root` and we call `root.createChi
 
 ### Example 3 - Child Container Resolution with Override
 
-Let's start with an instance of `Container` named `root`. We will then call `root.createChild()` to create a child container named `child`. Next we will call `child.createChild()` to create a grandchild container from it named `grandchild`. Finally, we'll call `child.registerSingleton(A, A)`. What happens when we call `grandchild.get(A)`? First, `grandchild` checks for a `Resolver`. Since it doesn't find one, it delegates to its `parent` which is the `child` from which it was created. `child` then checks for a `Resolver`. Since `child.registerSingleton(A, A)` was called on `child` this means that `child` will have a `Resolver` for `A`. At this points `child`'s resolver is used to `get` an instance of `A` which is returned to the developer. 
+Let's start with an instance of `Container` named `root`. We will then call `root.createChild()` to create a child container named `child`. Next we will call `child.createChild()` to create a grandchild container from it named `grandchild`. Finally, we'll call `child.registerSingleton(A, A)`. What happens when we call `grandchild.get(A)`? First, `grandchild` checks for a `Resolver`. Since it doesn't find one, it delegates to its `parent` which is the `child` from which it was created. `child` then checks for a `Resolver`. Since `child.registerSingleton(A, A)` was called on `child` this means that `child` will have a `Resolver` for `A`. At this points `child`'s resolver is used to `get` an instance of `A` which is returned to the developer.
 
 As you can see from these examples, the `Container` basically walks its hierarchy until it either finds a `Resolver` or reaches the root. If no `Resolver` is found in the root, it auto-registers the class as a singleton in the root. This means that all auto-registered classes are application-wide singletons, unless they are overriden by a child container.
 
@@ -208,7 +208,7 @@ When Aurelia creates a View, that view may contain occurrences of custom element
 > Info
 > Aurelia does not create child containers when there are plain HTML elements, or elements with only binding expressions, value converters, etc. It only creates them when the element itself is a custom element or if the element has custom attributes.
 
-> Warn
+> Warning
 > Despite that fact that the child container hierarchy is present in the DOM, you should be very wary of creating structural coupling between components in this way. The child container mechanism primarily exists to provide override services needed by custom elements and attributes such as `Element`/`DOM.Element`, `BoundViewFactory`, `ViewSlot`, `ElementEvents`/`DOM.Events`, `ViewResources` and `TargetInstruction`.
 
 ### Routed Components
@@ -234,7 +234,7 @@ The usual way to configure a class's lifetime is to use the `Container` API dire
 Here's a survey of the registration APIs you have available through a `Container` instance:
 
 * `container.registerSingleton(key: any, fn?: Function): void` - This method allows you to register a class as a singleton. This is the default, as discussed above, so there's rarely a reason to call this method. It is provided in the API for completeness. When calling, provide the *key* that will be used to look up the singleton and the *class* which should be used. It's common for the key and class to be the same. If they are the same, then only the *key* needs to be provided. Here are some examples:
-  * `container.registerSingleton(History, BrowserHistory);` 
+  * `container.registerSingleton(History, BrowserHistory);`
   * `container.registerSingleton(HttpClient);`
 * `container.registerTransient(key: any, fn?: Function): void` - This method allows you to register a class as transient. This means that every time the `container` is asked for the *key*, it will return a brand new instance of the *class*. As with the singleton behavior, the key is requried but the class is optional. If left off, the key will be treated as the class to be instantiated. Here's an example of using transient registration:
   * `container.registerTransient(LinkHandler, DefaultLinkHandler);`
@@ -255,7 +255,7 @@ As an alternative to explicitly registering types with the container, you can re
 * `singleton(overrideChild?:boolean)` - Normally, types are auto-registered as singletons in the root container. So, why do we provide this decorator? This decorator allows you to specy `true` as an argument to indicate that the singleton should be registered not in the root container, but in the immediate container to which the initial request was issued.
 * `registration(registration: Registration)` - In addition to the built-in singleton and transient registrations, you can create your own and associate it with a class. We'll discuss this in more detail in the DI customization article.
 
-> Warn: Registration Decorator Usage
+> Warning: Registration Decorator Usage
 > At present, the Decorators spec allows for decorators to use parens or not depending on whether or not the decorator requires arguments. This means that decorator invocation is dependent on how the decorator was implemented internally, which can be confusing from time to time. As a result of the way that the registration decorators are implemented, you *must* use them with parens.
 
 ## [Resolvers](aurelia-doc://section/6/version/1.0.0)
@@ -270,9 +270,9 @@ As mentioned above, the DI container uses `Resolvers` internally to provide all 
   * ex. `Optional.of(LoggedInUser)`
 * `Parent` - Skips starting dependency resolution from the current container and instead begins the lookup process on the parent container.
   * ex. `Parent.of(MyCustomElement)`
-  
+
 Here's an example of how we might expression a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
-  
+
 <code-listing heading="Using Resolvers">
   <source-code lang="ES 2016">
     import {Lazy, inject} from 'aurelia-framework';
