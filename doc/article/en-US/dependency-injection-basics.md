@@ -8,9 +8,7 @@
     "name": "Rob Eisenberg",
     "url": "http://robeisenberg.com"
   },
-  "contributors": [
-
-  ],
+  "contributors": [],
   "translators": [],
   "keywords": ["DI", "IoC"]
 }
@@ -70,7 +68,7 @@ Notice that we use the `inject` decorator and that the constructor signature mat
   <source-code lang="ES 2016">
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
-    import {EventAggregator from 'aurelia-event-aggregator';
+    import {EventAggregator} from 'aurelia-event-aggregator';
     import {inject} from 'aurelia-framework';
 
     @inject(CustomerService, CommonDialogs, EventAggregator)
@@ -92,7 +90,7 @@ Notice that we use the `inject` decorator and that the constructor signature mat
   <source-code lang="TypeScript">
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
-    import {EventAggregator from 'aurelia-event-aggregator';
+    import {EventAggregator} from 'aurelia-event-aggregator';
     import {inject} from 'aurelia-framework';
 
     @inject(CustomerService, CommonDialogs, EventAggregator)
@@ -119,7 +117,7 @@ If you are using TypeScript, you can take advantage of an experimental feature o
   <source-code lang="TypeScript">
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
-    import {EventAggregator from 'aurelia-event-aggregator';
+    import {EventAggregator} from 'aurelia-event-aggregator';
     import {autoinject} from 'aurelia-framework';
 
     @autoinject()
@@ -239,8 +237,8 @@ Here's a survey of the registration APIs you have available through a `Container
 * `container.registerTransient(key: any, fn?: Function): void` - This method allows you to register a class as transient. This means that every time the `container` is asked for the *key*, it will return a brand new instance of the *class*. As with the singleton behavior, the key is requried but the class is optional. If left off, the key will be treated as the class to be instantiated. Here's an example of using transient registration:
   * `container.registerTransient(LinkHandler, DefaultLinkHandler);`
 * `container.registerInstance(key: any, instance?: any): void` - If you already have an existing instance, you can add that to the container with this method. You just need to pick a key that the instance will be retrievable by. If not key is provided then the key becomes the instance.
-* `container.registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): void` - In addition to simply declaring behaviors, you can also provide a custom fundtion (a handler) that will respond any time the container is queried for the key. This custom handler has access to the container instance, the key and the internal resolver which stores the handler. This enables just about any sort of custom lifetime to be implemented by supplying a custom function. Here's an example:
-  * `container.registerHandler('Foo', () => new Bar())`
+* `container.registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): void` - In addition to simply declaring behaviors, you can also provide a custom function (a handler) that will respond any time the container is queried for the key. This custom handler has access to the container instance, the key and the internal resolver which stores the handler. This enables just about any sort of custom lifetime to be implemented by supplying a custom function. Here's an example:
+  * `container.registerHandler('Foo', () => new Bar());`
 * `container.registerResolver(key: any, resolver: Resolver): void` - You can also register a custom `Resolver` instance for the key. Under the hood, all previously discussed methods translate to using a built-in `Resolver` instance. However, you can always supply your own. We'll discuss this in more detail in the DI customization article.
 * `container.autoRegister(fn: any, key?: any): Resolver` - As you know, if a container can't find a registration during its resolution stage, it will auto-register the requested type. That is done internally through the use of `autoRegister`. However, you can use it yourself to auto-register a type with a particular container instance. Be default, this will result in a singleton registration, on the container this API is called on. However, if the type has registration decorators, that could provide an alternate registration. Whatever `Resolver` is established during auto-registration will be returned.
 
@@ -271,7 +269,7 @@ As mentioned above, the DI container uses `Resolvers` internally to provide all 
 * `Parent` - Skips starting dependency resolution from the current container and instead begins the lookup process on the parent container.
   * ex. `Parent.of(MyCustomElement)`
 
-Here's an example of how we might expression a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
+Here's an example of how we might express a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
 
 <code-listing heading="Using Resolvers">
   <source-code lang="ES 2016">
