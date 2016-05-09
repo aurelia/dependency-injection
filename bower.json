@@ -9,6 +9,8 @@
     "ioc"
   ],
   "homepage": "http://aurelia.io",
+  "main": "dist/commonjs/aurelia-dependency-injection.js",
+  "moduleType": "node",
   "license": "MIT",
   "authors": [
     "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)"
