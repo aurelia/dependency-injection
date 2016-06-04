@@ -1,9 +1,10 @@
 import {protocol} from 'aurelia-metadata';
+import {Container} from './container';
 
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
 */
-export const resolver: Function = protocol.create('aurelia:resolver', function(target) {
+export const resolver: Function & { decorates?: any } = protocol.create('aurelia:resolver', function(target): string | boolean {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
@@ -14,7 +15,7 @@ export const resolver: Function = protocol.create('aurelia:resolver', function(t
 /**
 * Used to allow functions/classes to specify custom dependency resolution logic.
 */
-interface Resolver {
+export interface Resolver {
   /**
   * Called by the container to allow custom resolution of dependencies for a function/class.
   * @param container The container to resolve from.
@@ -29,6 +30,9 @@ interface Resolver {
 */
 @resolver()
 export class Lazy {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the Lazy class.
   * @param key The key to lazily resolve.
@@ -61,6 +65,9 @@ export class Lazy {
 */
 @resolver()
 export class All {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the All class.
   * @param key The key to lazily resolve all matches for.
@@ -93,12 +100,18 @@ export class All {
 */
 @resolver()
 export class Optional {
+  /** @internal */
+  _key: any;
+
+  /** @internal */
+  _checkParent: boolean;
+
   /**
   * Creates an instance of the Optional class.
   * @param key The key to optionally resolve for.
   * @param checkParent Indicates whether or not the parent container hierarchy should be checked.
   */
-  constructor(key: any, checkParent?: boolean = false) {
+  constructor(key: any, checkParent: boolean = false) {
     this._key = key;
     this._checkParent = checkParent;
   }
@@ -122,7 +135,7 @@ export class Optional {
   * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
   * @return Returns an instance of Optional for the key.
   */
-  static of(key: any, checkParent?: boolean = false): Optional {
+  static of(key: any, checkParent: boolean = false): Optional {
     return new Optional(key, checkParent);
   }
 }
@@ -133,6 +146,9 @@ export class Optional {
 */
 @resolver()
 export class Parent {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the Parent class.
   * @param key The key to resolve from the parent container.
@@ -164,6 +180,9 @@ export class Parent {
 
 @resolver()
 export class StrategyResolver {
+  strategy: StrategyResolver | number;
+  state: any;
+
   /**
   * Creates an instance of the StrategyResolver class.
   * @param strategy The type of resolution strategy.
@@ -208,6 +227,9 @@ export class StrategyResolver {
 */
 @resolver()
 export class Factory {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the Factory class.
   * @param key The key to resolve from the parent container.
