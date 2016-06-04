@@ -69,7 +69,7 @@ gulp.task('build-ts-system', function () {
 });
 
 gulp.task('build-dts', function() {
-  var tsProjectDTS = ts.createProject(compilerTsOptions.es2015(), ts.reporter.defaultReporter());
+  var tsProjectDTS = ts.createProject(compilerTsOptions.dts(), ts.reporter.defaultReporter());
   var tsResult = indexSrc.pipe(ts(tsProjectDTS));
   return tsResult.dts
     .pipe(gulp.dest(paths.output));

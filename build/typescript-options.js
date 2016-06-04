@@ -38,3 +38,9 @@ exports.es2015 = function() {
   options.target = 'es2015';
   return options;
 };
+
+exports.dts = function() {
+  var options = exports.base();
+  options.removeComments = false;
+  return options;
+}
