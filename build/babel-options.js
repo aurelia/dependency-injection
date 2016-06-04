@@ -12,17 +12,10 @@ exports.base = function() {
     comments: false,
     compact: false,
     code:true,
-    presets: [ 'es2015-loose', 'stage-1'],
+    presets: [ 'es2015-loose', 'stage-1' ],
     plugins: [
       'syntax-flow',
       'transform-decorators-legacy',
-      ['babel-dts-generator', {
-          packageName: paths.packageName,
-          typings: '',
-          suppressModulePath: true,
-          suppressComments: false,
-          memberOutputFilter: /^_.*/
-      }],
       'transform-flow-strip-types'
     ]
   };
@@ -51,3 +44,9 @@ exports.es2015 = function() {
   options.presets = ['stage-1']
   return options;
 };
+
+exports.modules = function() {
+  var options = exports.base();
+  options.presets[0] = 'es2015-loose-native-modules';
+  return options;
+}
