@@ -40,7 +40,7 @@ gulp.task('build-index', function() {
     });
   }
   
-  src.pipe(through2.obj(function(file, enc, callback) {
+  return src.pipe(through2.obj(function(file, enc, callback) {
       file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
       this.push(file);
       return callback();
@@ -75,17 +75,17 @@ function srcForTypeScript() {
       if (path.extname == '.js') {
         path.extname = '.ts';
       }
-  }));
+    }));
 }
 
 compileToModules.forEach(function(moduleType){
   gulp.task('build-babel-' + moduleType, function () {
-    srcForBabel()
+    return srcForBabel()
       .pipe(to5(assign({}, compilerOptions[moduleType]())))
       .pipe(cleanGeneratedCode())
       .pipe(gulp.dest(paths.output + moduleType));
   });
-  
+
   if (moduleType === 'native-modules') return; // typescript doesn't support the combination of: es5 + native modules
 
   gulp.task('build-ts-' + moduleType, function () {
