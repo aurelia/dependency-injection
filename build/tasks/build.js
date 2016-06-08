@@ -12,16 +12,22 @@ var rename = require('gulp-rename');
 var tools = require('aurelia-tools');
 var ts = require('gulp-typescript');
 var jsName = paths.packageName + '.js';
+var compileToModules = ['es2015', 'commonjs', 'amd', 'system', 'native-modules'];
+
+function cleanGeneratedCode() {
+  return through2.obj(function(file, enc, callback) {
+    file.contents = new Buffer(tools.cleanGeneratedCode(file.contents.toString('utf8')));
+    this.push(file);
+    return callback();
+  });
+}
 
 gulp.task('build-index', function() {
   var importsToAdd = [];
-  var files = ['resolvers.js', 'invokers.js', 'registrations.js', 'container.js', 'injection.js'].map(function(file){
-    return paths.root + file;
-  });
 
-  return gulp.src(files)
+  return gulp.src(paths.files)
     .pipe(through2.obj(function(file, enc, callback) {
-      file.contents = new Buffer(tools.extractImports(file.contents.toString("utf8"), importsToAdd));
+      file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
       this.push(file);
       return callback();
     }))
@@ -32,84 +38,49 @@ gulp.task('build-index', function() {
     .pipe(gulp.dest(paths.output));
 });
 
-var indexSrc = gulp
-  .src(paths.output + paths.packageName + '.js')
-  .pipe(rename(function (path) {
-    if (path.extname == '.js') {
-      path.extname = '.ts'
-    }
-  }))
+function indexForTypeScript() {
+  return gulp
+    .src(paths.output + paths.packageName + '.js')
+    .pipe(rename(function (path) {
+      if (path.extname == '.js') {
+        path.extname = '.ts';
+      }
+  }));
+}
 
-gulp.task('build-ts-es2015', function () {
-  var tsProjectES2015 = ts.createProject(compilerTsOptions.es2015(), ts.reporter.defaultReporter());
-  var tsResult = indexSrc.pipe(ts(tsProjectES2015));
-  return tsResult.js
-    .pipe(gulp.dest(paths.output + 'es2015'));
-});
-
-gulp.task('build-ts-commonjs', function () {
-  var tsProjectCommonJS = ts.createProject(compilerTsOptions.commonjs(), ts.reporter.defaultReporter());
-  var tsResult = indexSrc.pipe(ts(tsProjectCommonJS));
-  return tsResult.js
-    .pipe(gulp.dest(paths.output + 'commonjs'));
-});
-
-gulp.task('build-ts-amd', function () {
-  var tsProjectAmd = ts.createProject(compilerTsOptions.amd(), ts.reporter.defaultReporter());
-  var tsResult = indexSrc.pipe(ts(tsProjectAmd));
-  return tsResult.js
-    .pipe(gulp.dest(paths.output + 'amd'));
-});
-
-gulp.task('build-ts-system', function () {
-  var tsProjectSystem = ts.createProject(compilerTsOptions.system(), ts.reporter.defaultReporter());
-  var tsResult = indexSrc.pipe(ts(tsProjectSystem));
-  return tsResult.js
-    .pipe(gulp.dest(paths.output + 'system'));
+compileToModules.forEach(function(moduleType){
+  gulp.task('build-babel-' + moduleType, function () {
+    return gulp.src(paths.output + jsName)
+      .pipe(to5(assign({}, compilerOptions[moduleType]())))
+      .pipe(cleanGeneratedCode())
+      .pipe(gulp.dest(paths.output + moduleType));
+  });
+  
+  if (moduleType === 'native-modules') return; // typescript doesn't support the combination of: es5 + native modules
+  gulp.task('build-ts-' + moduleType, function () {
+    var tsProject = ts.createProject(
+      compilerTsOptions({ module: moduleType, target: moduleType == 'es2015' ? 'es2015' : 'es5' }), ts.reporter.defaultReporter());
+    var tsResult = indexForTypeScript().pipe(ts(tsProject));
+    return tsResult.js
+      .pipe(gulp.dest(paths.output + moduleType));
+  });
 });
 
 gulp.task('build-dts', function() {
-  var tsProjectDTS = ts.createProject(compilerTsOptions.dts(), ts.reporter.defaultReporter());
-  var tsResult = indexSrc.pipe(ts(tsProjectDTS));
+  var tsProject = ts.createProject(
+    compilerTsOptions({ removeComments: false, target: "es2015", module: "es2015" }), ts.reporter.defaultReporter());
+  var tsResult = indexForTypeScript().pipe(ts(tsProject));
   return tsResult.dts
     .pipe(gulp.dest(paths.output));
-})
-
-gulp.task('build-babel-es2015', function () {
-  return gulp.src(paths.output + jsName)
-    .pipe(to5(assign({}, compilerOptions.es2015())))
-    .pipe(gulp.dest(paths.output + 'es2015'));
-});
-
-gulp.task('build-babel-commonjs', function () {
-  return gulp.src(paths.output + jsName)
-    .pipe(to5(assign({}, compilerOptions.commonjs())))
-    .pipe(gulp.dest(paths.output + 'commonjs'));
-});
-
-gulp.task('build-babel-amd', function () {
-  return gulp.src(paths.output + jsName)
-    .pipe(to5(assign({}, compilerOptions.amd())))
-    .pipe(gulp.dest(paths.output + 'amd'));
-});
-
-gulp.task('build-babel-system', function () {
-  return gulp.src(paths.output + jsName)
-    .pipe(to5(assign({}, compilerOptions.system())))
-    .pipe(gulp.dest(paths.output + 'system'));
-});
-
-gulp.task('build-babel-modules', function () {
-  return gulp.src(paths.output + jsName)
-    .pipe(to5(assign({}, compilerOptions.modules())))
-    .pipe(gulp.dest(paths.output + 'modules'));
 });
 
 gulp.task('build', function(callback) {
   return runSequence(
     'clean',
     'build-index',
-    ['build-babel-es2015', 'build-babel-commonjs', 'build-babel-amd', 'build-babel-system', 'build-babel-modules', 'build-dts'],
+    compileToModules
+      .map(function(moduleType) { return 'build-babel-' + moduleType })
+      .concat(paths.useTypeScriptForDTS ? ['build-dts'] : []),
     callback
   );
 });
@@ -118,7 +89,11 @@ gulp.task('build-ts', function(callback) {
   return runSequence(
     'clean',
     'build-index',
-    ['build-ts-es2015', 'build-ts-commonjs', 'build-ts-amd', 'build-ts-system', /** TypeScript cannot yet transpile to es5 with es2015 modules */ 'build-babel-modules', 'build-dts'],
+    'build-babel-native-modules',
+    compileToModules
+      .filter(function(moduleType) { return moduleType !== 'native-modules' })
+      .map(function(moduleType) { return 'build-ts-' + moduleType })
+      .concat(paths.useTypeScriptForDTS ? ['build-dts'] : []),
     callback
   );
 });
