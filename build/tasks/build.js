@@ -11,6 +11,9 @@ var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 var tools = require('aurelia-tools');
 var ts = require('gulp-typescript');
+var gutil = require('gulp-util');
+var gulpIgnore = require('gulp-ignore');
+var merge = require('merge2');
 var jsName = paths.packageName + '.js';
 var compileToModules = ['es2015', 'commonjs', 'amd', 'system', 'native-modules'];
 
@@ -23,10 +26,21 @@ function cleanGeneratedCode() {
 }
 
 gulp.task('build-index', function() {
-  var importsToAdd = [];
+  var importsToAdd = paths.importsToAdd.slice();
 
-  return gulp.src(paths.files)
-    .pipe(through2.obj(function(file, enc, callback) {
+  var src = gulp.src(paths.files);
+
+  if (paths.sort) {
+    src = src.pipe(tools.sortFiles());
+  }
+
+  if (paths.ignore) {
+    paths.ignore.forEach(function(filename){
+      src = src.pipe(gulpIgnore.exclude(filename));
+    });
+  }
+  
+  src.pipe(through2.obj(function(file, enc, callback) {
       file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
       this.push(file);
       return callback();
@@ -38,7 +52,23 @@ gulp.task('build-index', function() {
     .pipe(gulp.dest(paths.output));
 });
 
-function indexForTypeScript() {
+function gulpFileFromString(filename, string) {
+  var src = require('stream').Readable({ objectMode: true });
+  src._read = function() {
+    this.push(new gutil.File({ cwd: paths.appRoot, base: paths.output, path: filename, contents: new Buffer(string) }))
+    this.push(null)
+  }
+  return src;
+}
+
+function srcForBabel() {
+  return merge(
+    gulp.src(paths.output + jsName), 
+    gulpFileFromString(paths.output + 'index.js', "export * from './" + paths.packageName + "';")
+  );
+}
+
+function srcForTypeScript() {
   return gulp
     .src(paths.output + paths.packageName + '.js')
     .pipe(rename(function (path) {
@@ -50,17 +80,18 @@ function indexForTypeScript() {
 
 compileToModules.forEach(function(moduleType){
   gulp.task('build-babel-' + moduleType, function () {
-    return gulp.src(paths.output + jsName)
+    srcForBabel()
       .pipe(to5(assign({}, compilerOptions[moduleType]())))
       .pipe(cleanGeneratedCode())
       .pipe(gulp.dest(paths.output + moduleType));
   });
   
   if (moduleType === 'native-modules') return; // typescript doesn't support the combination of: es5 + native modules
+
   gulp.task('build-ts-' + moduleType, function () {
     var tsProject = ts.createProject(
       compilerTsOptions({ module: moduleType, target: moduleType == 'es2015' ? 'es2015' : 'es5' }), ts.reporter.defaultReporter());
-    var tsResult = indexForTypeScript().pipe(ts(tsProject));
+    var tsResult = srcForTypeScript().pipe(ts(tsProject));
     return tsResult.js
       .pipe(gulp.dest(paths.output + moduleType));
   });
@@ -69,7 +100,7 @@ compileToModules.forEach(function(moduleType){
 gulp.task('build-dts', function() {
   var tsProject = ts.createProject(
     compilerTsOptions({ removeComments: false, target: "es2015", module: "es2015" }), ts.reporter.defaultReporter());
-  var tsResult = indexForTypeScript().pipe(ts(tsProject));
+  var tsResult = srcForTypeScript().pipe(ts(tsProject));
   return tsResult.dts
     .pipe(gulp.dest(paths.output));
 });
