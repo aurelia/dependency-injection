@@ -1,4 +1,5 @@
 import {metadata} from 'aurelia-metadata';
+import {Container} from './container';
 
 /**
 * Decorator: Specifies a custom Invoker for the decorated item.
@@ -23,7 +24,7 @@ export function factory(potentialTarget?: any): any {
 /**
 * A strategy for invoking a function, resulting in an object instance.
 */
-interface Invoker {
+export interface Invoker {
   /**
   * Invokes the function with the provided dependencies.
   * @param fn The constructor or factory function.

@@ -1,4 +1,5 @@
-import {StrategyResolver} from './resolvers';
+import {StrategyResolver, Resolver} from './resolvers';
+import {Container} from './container';
 import {metadata} from 'aurelia-metadata';
 
 /**
@@ -20,14 +21,14 @@ export function transient(key?: any): any {
 /**
 * Decorator: Specifies to register the decorated item with a "singleton" lieftime.
 */
-export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean = false): any {
+export function singleton(keyOrRegisterInChild?: any, registerInChild: boolean = false): any {
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
 /**
 * Customizes how a particular function is resolved by the Container.
 */
-interface Registration {
+export interface Registration {
   /**
   * Called by the container to register the resolver.
   * @param container The container the resolver is being registered with.
@@ -42,6 +43,9 @@ interface Registration {
 * Used to allow functions/classes to indicate that they should be registered as transients with the container.
 */
 export class TransientRegistration {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of TransientRegistration.
   * @param key The key to register as.
@@ -68,11 +72,17 @@ export class TransientRegistration {
 * Used to allow functions/classes to indicate that they should be registered as singletons with the container.
 */
 export class SingletonRegistration {
+  /** @internal */
+  _registerInChild: any;
+
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of SingletonRegistration.
   * @param key The key to register as.
   */
-  constructor(keyOrRegisterInChild?: any, registerInChild?: boolean = false) {
+  constructor(keyOrRegisterInChild?: any, registerInChild: boolean = false) {
     if (typeof keyOrRegisterInChild === 'boolean') {
       this._registerInChild = keyOrRegisterInChild;
     } else {

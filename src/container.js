@@ -1,6 +1,7 @@
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
-import {resolver, StrategyResolver} from './resolvers';
+import {resolver, StrategyResolver, Resolver} from './resolvers';
+import {Invoker} from './invokers';
 
 const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
 export const _emptyParameters = Object.freeze([]);
@@ -57,11 +58,13 @@ export class InvocationHandler {
 /**
 * Used to configure a Container instance.
 */
-interface ContainerConfiguration {
+export interface ContainerConfiguration {
   /**
   * An optional callback which will be called when any function needs an InvocationHandler created (called once per Function).
   */
   onHandlerCreated?: (handler: InvocationHandler) => InvocationHandler;
+
+  handlers?: Map<any, any>;
 }
 
 function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
@@ -152,6 +155,18 @@ export class Container {
   * The root container in the DI hierarchy.
   */
   root: Container;
+
+  /** @internal */
+  _configuration: ContainerConfiguration;
+
+  /** @internal */
+  _onHandlerCreated: (handler: InvocationHandler) => InvocationHandler;
+
+  /** @internal */
+  _handlers: Map<any, any>;
+
+  /** @internal */
+  _resolvers: Map<any, any>;
 
   /**
   * Creates an instance of Container.
@@ -304,7 +319,7 @@ export class Container {
   * @param checkParent Indicates whether or not to check the parent container hierarchy.
   * @return Returns true if the key has been registred; false otherwise.
   */
-  hasResolver(key: any, checkParent?: boolean = false): boolean {
+  hasResolver(key: any, checkParent: boolean = false): boolean {
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
@@ -409,7 +424,7 @@ export class Container {
   * @param dynamicDependencies Additional function dependencies to use during invocation.
   * @return Returns the instance resulting from calling the function.
   */
-  invoke(fn: Function, dynamicDependencies?: any[]) {
+  invoke(fn: Function & { name?: string }, dynamicDependencies?: any[]) {
     try {
       let handler = this._handlers.get(fn);
 
@@ -424,7 +439,7 @@ export class Container {
     }
   }
 
-  _createInvocationHandler(fn: Function): InvocationHandler {
+  _createInvocationHandler(fn: Function & { inject?: any }): InvocationHandler {
     let dependencies;
 
     if (fn.inject === undefined) {
