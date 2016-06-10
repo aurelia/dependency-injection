@@ -13,13 +13,9 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
   exports.autoinject = autoinject;
   exports.inject = inject;
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
-  var _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6, _classInvokers;
+  var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _classInvokers;
 
   var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
     if (!(typeof target.get === 'function')) {
@@ -31,7 +27,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
   var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
     function Lazy(key) {
-      _classCallCheck(this, Lazy);
+      
 
       this._key = key;
     }
@@ -50,9 +46,9 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
     return Lazy;
   }()) || _class);
-  var All = exports.All = (_dec2 = resolver(), _dec2(_class2 = function () {
+  var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
     function All(key) {
-      _classCallCheck(this, All);
+      
 
       this._key = key;
     }
@@ -66,12 +62,12 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return All;
-  }()) || _class2);
-  var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class3 = function () {
+  }()) || _class3);
+  var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
     function Optional(key) {
       var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-      _classCallCheck(this, Optional);
+      
 
       this._key = key;
       this._checkParent = checkParent;
@@ -92,10 +88,10 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return Optional;
-  }()) || _class3);
-  var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class4 = function () {
+  }()) || _class5);
+  var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
     function Parent(key) {
-      _classCallCheck(this, Parent);
+      
 
       this._key = key;
     }
@@ -109,10 +105,10 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return Parent;
-  }()) || _class4);
-  var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class5 = function () {
+  }()) || _class7);
+  var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
     function StrategyResolver(strategy, state) {
-      _classCallCheck(this, StrategyResolver);
+      
 
       this.strategy = strategy;
       this.state = state;
@@ -141,10 +137,10 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return StrategyResolver;
-  }()) || _class5);
-  var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class6 = function () {
+  }()) || _class9);
+  var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
     function Factory(key) {
-      _classCallCheck(this, Factory);
+      
 
       this._key = key;
     }
@@ -166,7 +162,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     };
 
     return Factory;
-  }()) || _class6);
+  }()) || _class11);
   function invoker(value) {
     return function (target) {
       _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
@@ -183,7 +179,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
   var FactoryInvoker = exports.FactoryInvoker = function () {
     function FactoryInvoker() {
-      _classCallCheck(this, FactoryInvoker);
+      
     }
 
     FactoryInvoker.prototype.invoke = function invoke(container, fn, dependencies) {
@@ -235,7 +231,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
   var TransientRegistration = exports.TransientRegistration = function () {
     function TransientRegistration(key) {
-      _classCallCheck(this, TransientRegistration);
+      
 
       this._key = key;
     }
@@ -253,7 +249,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
     function SingletonRegistration(keyOrRegisterInChild) {
       var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-      _classCallCheck(this, SingletonRegistration);
+      
 
       if (typeof keyOrRegisterInChild === 'boolean') {
         this._registerInChild = keyOrRegisterInChild;
@@ -288,7 +284,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
   var InvocationHandler = exports.InvocationHandler = function () {
     function InvocationHandler(fn, invoker, dependencies) {
-      _classCallCheck(this, InvocationHandler);
+      
 
       this.fn = fn;
       this.invoker = invoker;
@@ -372,7 +368,7 @@ define(['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aurel
 
   var Container = exports.Container = function () {
     function Container(configuration) {
-      _classCallCheck(this, Container);
+      
 
       if (configuration === undefined) {
         configuration = {};

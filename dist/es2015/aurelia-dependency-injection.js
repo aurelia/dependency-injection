@@ -1,4 +1,4 @@
-var _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6;
+var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11;
 
 import { protocol, metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
@@ -25,7 +25,7 @@ export let Lazy = (_dec = resolver(), _dec(_class = class Lazy {
   }
 }) || _class);
 
-export let All = (_dec2 = resolver(), _dec2(_class2 = class All {
+export let All = (_dec2 = resolver(), _dec2(_class3 = class All {
   constructor(key) {
     this._key = key;
   }
@@ -37,9 +37,9 @@ export let All = (_dec2 = resolver(), _dec2(_class2 = class All {
   static of(key) {
     return new All(key);
   }
-}) || _class2);
+}) || _class3);
 
-export let Optional = (_dec3 = resolver(), _dec3(_class3 = class Optional {
+export let Optional = (_dec3 = resolver(), _dec3(_class5 = class Optional {
   constructor(key, checkParent = false) {
     this._key = key;
     this._checkParent = checkParent;
@@ -56,9 +56,9 @@ export let Optional = (_dec3 = resolver(), _dec3(_class3 = class Optional {
   static of(key, checkParent = false) {
     return new Optional(key, checkParent);
   }
-}) || _class3);
+}) || _class5);
 
-export let Parent = (_dec4 = resolver(), _dec4(_class4 = class Parent {
+export let Parent = (_dec4 = resolver(), _dec4(_class7 = class Parent {
   constructor(key) {
     this._key = key;
   }
@@ -70,9 +70,9 @@ export let Parent = (_dec4 = resolver(), _dec4(_class4 = class Parent {
   static of(key) {
     return new Parent(key);
   }
-}) || _class4);
+}) || _class7);
 
-export let StrategyResolver = (_dec5 = resolver(), _dec5(_class5 = class StrategyResolver {
+export let StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = class StrategyResolver {
   constructor(strategy, state) {
     this.strategy = strategy;
     this.state = state;
@@ -99,9 +99,9 @@ export let StrategyResolver = (_dec5 = resolver(), _dec5(_class5 = class Strateg
         throw new Error('Invalid strategy: ' + this.strategy);
     }
   }
-}) || _class5);
+}) || _class9);
 
-export let Factory = (_dec6 = resolver(), _dec6(_class6 = class Factory {
+export let Factory = (_dec6 = resolver(), _dec6(_class11 = class Factory {
   constructor(key) {
     this._key = key;
   }
@@ -113,7 +113,7 @@ export let Factory = (_dec6 = resolver(), _dec6(_class6 = class Factory {
   static of(key) {
     return new Factory(key);
   }
-}) || _class6);
+}) || _class11);
 
 export function invoker(value) {
   return function (target) {

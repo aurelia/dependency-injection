@@ -1,27 +1,11 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.Factory = exports.StrategyResolver = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.resolver = undefined;
-
 var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _classInvokers;
 
-exports.invoker = invoker;
-exports.factory = factory;
-exports.registration = registration;
-exports.transient = transient;
-exports.singleton = singleton;
-exports.autoinject = autoinject;
-exports.inject = inject;
-
-var _aureliaMetadata = require('aurelia-metadata');
-
-var _aureliaPal = require('aurelia-pal');
 
 
+import { protocol, metadata } from 'aurelia-metadata';
+import { AggregateError } from 'aurelia-pal';
 
-var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
+export var resolver = protocol.create('aurelia:resolver', function (target) {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
@@ -29,7 +13,7 @@ var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:reso
   return true;
 });
 
-var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
+export var Lazy = (_dec = resolver(), _dec(_class = function () {
   function Lazy(key) {
     
 
@@ -50,7 +34,8 @@ var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
 
   return Lazy;
 }()) || _class);
-var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
+
+export var All = (_dec2 = resolver(), _dec2(_class3 = function () {
   function All(key) {
     
 
@@ -67,7 +52,8 @@ var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
 
   return All;
 }()) || _class3);
-var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
+
+export var Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
   function Optional(key) {
     var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
@@ -93,7 +79,8 @@ var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function 
 
   return Optional;
 }()) || _class5);
-var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
+
+export var Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
   function Parent(key) {
     
 
@@ -110,7 +97,8 @@ var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
 
   return Parent;
 }()) || _class7);
-var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
+
+export var StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
   function StrategyResolver(strategy, state) {
     
 
@@ -142,7 +130,8 @@ var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_cl
 
   return StrategyResolver;
 }()) || _class9);
-var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
+
+export var Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
   function Factory(key) {
     
 
@@ -167,21 +156,22 @@ var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function (
 
   return Factory;
 }()) || _class11);
-function invoker(value) {
+
+export function invoker(value) {
   return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
+    metadata.define(metadata.invoker, value, target);
   };
 }
 
-function factory(potentialTarget) {
+export function factory(potentialTarget) {
   var deco = function deco(target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, FactoryInvoker.instance, target);
+    metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
 }
 
-var FactoryInvoker = exports.FactoryInvoker = function () {
+export var FactoryInvoker = function () {
   function FactoryInvoker() {
     
   }
@@ -217,23 +207,23 @@ var FactoryInvoker = exports.FactoryInvoker = function () {
 
 FactoryInvoker.instance = new FactoryInvoker();
 
-function registration(value) {
+export function registration(value) {
   return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
+    metadata.define(metadata.registration, value, target);
   };
 }
 
-function transient(key) {
+export function transient(key) {
   return registration(new TransientRegistration(key));
 }
 
-function singleton(keyOrRegisterInChild) {
+export function singleton(keyOrRegisterInChild) {
   var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
-var TransientRegistration = exports.TransientRegistration = function () {
+export var TransientRegistration = function () {
   function TransientRegistration(key) {
     
 
@@ -249,7 +239,7 @@ var TransientRegistration = exports.TransientRegistration = function () {
   return TransientRegistration;
 }();
 
-var SingletonRegistration = exports.SingletonRegistration = function () {
+export var SingletonRegistration = function () {
   function SingletonRegistration(keyOrRegisterInChild) {
     var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
@@ -279,14 +269,14 @@ var SingletonRegistration = exports.SingletonRegistration = function () {
 }();
 
 var badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
-var _emptyParameters = exports._emptyParameters = Object.freeze([]);
+export var _emptyParameters = Object.freeze([]);
 
-_aureliaMetadata.metadata.registration = 'aurelia:registration';
-_aureliaMetadata.metadata.invoker = 'aurelia:invoker';
+metadata.registration = 'aurelia:registration';
+metadata.invoker = 'aurelia:invoker';
 
 var resolverDecorates = resolver.decorates;
 
-var InvocationHandler = exports.InvocationHandler = function () {
+export var InvocationHandler = function () {
   function InvocationHandler(fn, invoker, dependencies) {
     
 
@@ -370,7 +360,7 @@ function getDependencies(f) {
   return f.inject;
 }
 
-var Container = exports.Container = function () {
+export var Container = function () {
   function Container(configuration) {
     
 
@@ -437,7 +427,7 @@ var Container = exports.Container = function () {
     var resolver = void 0;
 
     if (typeof fn === 'function') {
-      var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
+      var _registration = metadata.get(metadata.registration, fn);
 
       if (_registration === undefined) {
         resolver = new StrategyResolver(1, fn);
@@ -562,7 +552,7 @@ var Container = exports.Container = function () {
 
       return _handler.invoke(this, dynamicDependencies);
     } catch (e) {
-      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
+      throw new AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
     }
   };
 
@@ -570,7 +560,7 @@ var Container = exports.Container = function () {
     var dependencies = void 0;
 
     if (fn.inject === undefined) {
-      dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
+      dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
     } else {
       dependencies = [];
       var ctor = fn;
@@ -582,7 +572,7 @@ var Container = exports.Container = function () {
       }
     }
 
-    var invoker = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
+    var invoker = metadata.getOwn(metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
 
     var handler = new InvocationHandler(fn, invoker, dependencies);
     return this._onHandlerCreated !== undefined ? this._onHandlerCreated(handler) : handler;
@@ -591,15 +581,15 @@ var Container = exports.Container = function () {
   return Container;
 }();
 
-function autoinject(potentialTarget) {
+export function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    target.inject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
+    target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
 }
 
-function inject() {
+export function inject() {
   for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     rest[_key2] = arguments[_key2];
   }

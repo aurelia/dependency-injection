@@ -4,7 +4,7 @@ import {AggregateError} from 'aurelia-pal';
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
 */
-export const resolver: Function = protocol.create('aurelia:resolver', function(target) {
+export const resolver: Function & { decorates?: any } = protocol.create('aurelia:resolver', function(target): string | boolean {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
@@ -15,7 +15,7 @@ export const resolver: Function = protocol.create('aurelia:resolver', function(t
 /**
 * Used to allow functions/classes to specify custom dependency resolution logic.
 */
-interface Resolver {
+export interface Resolver {
   /**
   * Called by the container to allow custom resolution of dependencies for a function/class.
   * @param container The container to resolve from.
@@ -30,6 +30,9 @@ interface Resolver {
 */
 @resolver()
 export class Lazy {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the Lazy class.
   * @param key The key to lazily resolve.
@@ -62,6 +65,9 @@ export class Lazy {
 */
 @resolver()
 export class All {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the All class.
   * @param key The key to lazily resolve all matches for.
@@ -94,12 +100,18 @@ export class All {
 */
 @resolver()
 export class Optional {
+  /** @internal */
+  _key: any;
+
+  /** @internal */
+  _checkParent: boolean;
+
   /**
   * Creates an instance of the Optional class.
   * @param key The key to optionally resolve for.
   * @param checkParent Indicates whether or not the parent container hierarchy should be checked.
   */
-  constructor(key: any, checkParent?: boolean = false) {
+  constructor(key: any, checkParent: boolean = false) {
     this._key = key;
     this._checkParent = checkParent;
   }
@@ -123,7 +135,7 @@ export class Optional {
   * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
   * @return Returns an instance of Optional for the key.
   */
-  static of(key: any, checkParent?: boolean = false): Optional {
+  static of(key: any, checkParent: boolean = false): Optional {
     return new Optional(key, checkParent);
   }
 }
@@ -134,6 +146,9 @@ export class Optional {
 */
 @resolver()
 export class Parent {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the Parent class.
   * @param key The key to resolve from the parent container.
@@ -165,6 +180,9 @@ export class Parent {
 
 @resolver()
 export class StrategyResolver {
+  strategy: StrategyResolver | number;
+  state: any;
+
   /**
   * Creates an instance of the StrategyResolver class.
   * @param strategy The type of resolution strategy.
@@ -209,6 +227,9 @@ export class StrategyResolver {
 */
 @resolver()
 export class Factory {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of the Factory class.
   * @param key The key to resolve from the parent container.
@@ -259,7 +280,7 @@ export function factory(potentialTarget?: any): any {
 /**
 * A strategy for invoking a function, resulting in an object instance.
 */
-interface Invoker {
+export interface Invoker {
   /**
   * Invokes the function with the provided dependencies.
   * @param fn The constructor or factory function.
@@ -350,14 +371,14 @@ export function transient(key?: any): any {
 /**
 * Decorator: Specifies to register the decorated item with a "singleton" lieftime.
 */
-export function singleton(keyOrRegisterInChild?: any, registerInChild?: boolean = false): any {
+export function singleton(keyOrRegisterInChild?: any, registerInChild: boolean = false): any {
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
 /**
 * Customizes how a particular function is resolved by the Container.
 */
-interface Registration {
+export interface Registration {
   /**
   * Called by the container to register the resolver.
   * @param container The container the resolver is being registered with.
@@ -372,6 +393,9 @@ interface Registration {
 * Used to allow functions/classes to indicate that they should be registered as transients with the container.
 */
 export class TransientRegistration {
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of TransientRegistration.
   * @param key The key to register as.
@@ -398,11 +422,17 @@ export class TransientRegistration {
 * Used to allow functions/classes to indicate that they should be registered as singletons with the container.
 */
 export class SingletonRegistration {
+  /** @internal */
+  _registerInChild: any;
+
+  /** @internal */
+  _key: any;
+
   /**
   * Creates an instance of SingletonRegistration.
   * @param key The key to register as.
   */
-  constructor(keyOrRegisterInChild?: any, registerInChild?: boolean = false) {
+  constructor(keyOrRegisterInChild?: any, registerInChild: boolean = false) {
     if (typeof keyOrRegisterInChild === 'boolean') {
       this._registerInChild = keyOrRegisterInChild;
     } else {
@@ -486,11 +516,13 @@ export class InvocationHandler {
 /**
 * Used to configure a Container instance.
 */
-interface ContainerConfiguration {
+export interface ContainerConfiguration {
   /**
   * An optional callback which will be called when any function needs an InvocationHandler created (called once per Function).
   */
   onHandlerCreated?: (handler: InvocationHandler) => InvocationHandler;
+
+  handlers?: Map<any, any>;
 }
 
 function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
@@ -581,6 +613,18 @@ export class Container {
   * The root container in the DI hierarchy.
   */
   root: Container;
+
+  /** @internal */
+  _configuration: ContainerConfiguration;
+
+  /** @internal */
+  _onHandlerCreated: (handler: InvocationHandler) => InvocationHandler;
+
+  /** @internal */
+  _handlers: Map<any, any>;
+
+  /** @internal */
+  _resolvers: Map<any, any>;
 
   /**
   * Creates an instance of Container.
@@ -733,7 +777,7 @@ export class Container {
   * @param checkParent Indicates whether or not to check the parent container hierarchy.
   * @return Returns true if the key has been registred; false otherwise.
   */
-  hasResolver(key: any, checkParent?: boolean = false): boolean {
+  hasResolver(key: any, checkParent: boolean = false): boolean {
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
@@ -838,7 +882,7 @@ export class Container {
   * @param dynamicDependencies Additional function dependencies to use during invocation.
   * @return Returns the instance resulting from calling the function.
   */
-  invoke(fn: Function, dynamicDependencies?: any[]) {
+  invoke(fn: Function & { name?: string }, dynamicDependencies?: any[]) {
     try {
       let handler = this._handlers.get(fn);
 
@@ -853,7 +897,7 @@ export class Container {
     }
   }
 
-  _createInvocationHandler(fn: Function): InvocationHandler {
+  _createInvocationHandler(fn: Function & { inject?: any }): InvocationHandler {
     let dependencies;
 
     if (fn.inject === undefined) {
