@@ -3,6 +3,7 @@
 [![npm Version](https://img.shields.io/npm/v/aurelia-dependency-injection.svg)](https://www.npmjs.com/package/aurelia-dependency-injection)
 [![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.io)
 [![Join the chat at https://gitter.im/aurelia/discuss](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aurelia/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CircleCI](https://circleci.com/gh/aurelia/dependency-injection.svg?style=shield)](https://circleci.com/gh/aurelia/dependency-injection)
 
 This library is part of the [Aurelia](http://www.aurelia.io/) platform and contains a lightweight, extensible dependency injection container for JavaScript.
 
