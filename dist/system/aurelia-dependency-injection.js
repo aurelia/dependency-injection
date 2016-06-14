@@ -3,7 +3,7 @@
 System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context) {
   "use strict";
 
-  var protocol, metadata, AggregateError, _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _classInvokers, resolver, Lazy, All, Optional, Parent, StrategyResolver, Factory, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
+  var protocol, metadata, AggregateError, _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers, resolver, Lazy, All, Optional, Parent, StrategyResolver, Factory, NewInstance, FactoryInvoker, TransientRegistration, SingletonRegistration, badKeyError, _emptyParameters, resolverDecorates, InvocationHandler, classInvokers, Container;
 
   
 
@@ -207,6 +207,34 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
       }()) || _class11));
 
       _export('Factory', Factory);
+
+      _export('NewInstance', NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
+        function NewInstance(key) {
+          
+
+          this.key = key;
+          this.asKey = key;
+        }
+
+        NewInstance.prototype.get = function get(container) {
+          var instance = container.invoke(this.key);
+          container.registerInstance(this.asKey, instance);
+          return instance;
+        };
+
+        NewInstance.prototype.as = function as(key) {
+          this.asKey = key;
+          return this;
+        };
+
+        NewInstance.of = function of(key) {
+          return new NewInstance(key);
+        };
+
+        return NewInstance;
+      }()) || _class13));
+
+      _export('NewInstance', NewInstance);
 
       function invoker(value) {
         return function (target) {

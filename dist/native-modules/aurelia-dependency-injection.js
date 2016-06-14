@@ -1,4 +1,4 @@
-var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _classInvokers;
+var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers;
 
 
 
@@ -156,6 +156,32 @@ export var Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
 
   return Factory;
 }()) || _class11);
+
+export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
+  function NewInstance(key) {
+    
+
+    this.key = key;
+    this.asKey = key;
+  }
+
+  NewInstance.prototype.get = function get(container) {
+    var instance = container.invoke(this.key);
+    container.registerInstance(this.asKey, instance);
+    return instance;
+  };
+
+  NewInstance.prototype.as = function as(key) {
+    this.asKey = key;
+    return this;
+  };
+
+  NewInstance.of = function of(key) {
+    return new NewInstance(key);
+  };
+
+  return NewInstance;
+}()) || _class13);
 
 export function invoker(value) {
   return function (target) {

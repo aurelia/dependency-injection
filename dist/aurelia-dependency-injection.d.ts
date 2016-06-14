@@ -146,6 +146,33 @@ export declare class Factory {
     static of(key: any): Factory;
 }
 /**
+* Used to inject a new instance of a dependency, without regard for existing
+* instances in the container. Instances can optionally be registered in the container
+* under a different key by supplying a key using the `as` method.
+*/
+export declare class NewInstance {
+    constructor(key: any);
+    /**
+    * Called by the container to instantiate the dependency and potentially register
+    * as another key if the `as` method was used.
+    * @param container The container to resolve the parent from.
+    * @return Returns the matching instance from the parent container
+    */
+    get(container: any): any;
+    /**
+    * Instructs the NewInstance resolver to register the resolved instance using the supplied key.
+    * @param key The key to register the instance with.
+    * @return Returns the NewInstance resolver.
+    */
+    as(key: any): this;
+    /**
+    * Creates an NewInstance Resolver for the supplied key.
+    * @param key The key to resolve/instantiate.
+    * @return Returns an instance of NewInstance for the key.
+    */
+    static of(key: any): NewInstance;
+}
+/**
 * Decorator: Specifies a custom Invoker for the decorated item.
 */
 export declare function invoker(value: Invoker): any;

@@ -1,4 +1,4 @@
-var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11;
+var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13;
 
 import { protocol, metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
@@ -114,6 +114,28 @@ export let Factory = (_dec6 = resolver(), _dec6(_class11 = class Factory {
     return new Factory(key);
   }
 }) || _class11);
+
+export let NewInstance = (_dec7 = resolver(), _dec7(_class13 = class NewInstance {
+  constructor(key) {
+    this.key = key;
+    this.asKey = key;
+  }
+
+  get(container) {
+    const instance = container.invoke(this.key);
+    container.registerInstance(this.asKey, instance);
+    return instance;
+  }
+
+  as(key) {
+    this.asKey = key;
+    return this;
+  }
+
+  static of(key) {
+    return new NewInstance(key);
+  }
+}) || _class13);
 
 export function invoker(value) {
   return function (target) {
