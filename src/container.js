@@ -205,54 +205,60 @@ export class Container {
   /**
   * Registers an existing object instance with the container.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param instance The instance that will be resolved when the key is matched.
+  * @param instance The instance that will be resolved when the key is matched. This defaults to the key value when instance is not supplied.
+  * @return The resolver that was registered.
   */
-  registerInstance(key: any, instance?: any): void {
-    this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
+  registerInstance(key: any, instance?: any): Resolver {
+    return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
   }
 
   /**
   * Registers a type (constructor function) such that the container always returns the same instance for each request.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param [fn] The constructor function to use when the dependency needs to be instantiated.
+  * @param fn The constructor function to use when the dependency needs to be instantiated. This defaults to the key value when fn is not supplied.
+  * @return The resolver that was registered.
   */
-  registerSingleton(key: any, fn?: Function): void {
-    this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+  registerSingleton(key: any, fn?: Function): Resolver {
+    return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
   }
 
   /**
   * Registers a type (constructor function) such that the container returns a new instance for each request.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param [fn] The constructor function to use when the dependency needs to be instantiated.
+  * @param fn The constructor function to use when the dependency needs to be instantiated. This defaults to the key value when fn is not supplied.
+  * @return The resolver that was registered.
   */
-  registerTransient(key: any, fn?: Function): void {
-    this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
+  registerTransient(key: any, fn?: Function): Resolver {
+    return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
   }
 
   /**
   * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param handler The resolution function to use when the dependency is needed.
+  * @return The resolver that was registered.
   */
-  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): void {
-    this.registerResolver(key, new StrategyResolver(3, handler));
+  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): Resolver {
+    return this.registerResolver(key, new StrategyResolver(3, handler));
   }
 
   /**
   * Registers an additional key that serves as an alias to the original DI key.
   * @param originalKey The key that originally identified the dependency; usually a constructor function.
   * @param aliasKey An alternate key which can also be used to resolve the same dependency  as the original.
+  * @return The resolver that was registered.
   */
-  registerAlias(originalKey: any, aliasKey: any): void {
-    this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
+  registerAlias(originalKey: any, aliasKey: any): Resolver {
+    return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
   }
 
   /**
   * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param resolver The resolver to use when the dependency is needed.
+  * @return The resolver that was registered.
   */
-  registerResolver(key: any, resolver: Resolver): void {
+  registerResolver(key: any, resolver: Resolver): Resolver {
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
@@ -267,31 +273,29 @@ export class Container {
     } else {
       allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
+
+    return resolver;
   }
 
   /**
   * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
-  * @param fn The constructor function to use when the dependency needs to be instantiated.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+  * @param fn The constructor function to use when the dependency needs to be instantiated. This defaults to the key value when fn is not supplied.
   */
-  autoRegister(fn: any, key?: any): Resolver {
-    let resolver;
+  autoRegister(key: any, fn?: Function): Resolver {
+    fn = fn === undefined ? key : fn;
 
     if (typeof fn === 'function') {
       let registration = metadata.get(metadata.registration, fn);
 
       if (registration === undefined) {
-        resolver = new StrategyResolver(1, fn);
-        this.registerResolver(key === undefined ? fn : key, resolver);
-      } else {
-        resolver = registration.registerResolver(this, key === undefined ? fn : key, fn);
+        return this.registerResolver(key, new StrategyResolver(1, fn));
       }
-    } else {
-      resolver = new StrategyResolver(0, fn);
-      this.registerResolver(key === undefined ? fn : key, resolver);
+
+      return registration.registerResolver(this, key, fn);
     }
 
-    return resolver;
+    return this.registerResolver(key, new StrategyResolver(0, fn));
   }
 
   /**

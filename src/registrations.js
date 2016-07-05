@@ -62,9 +62,7 @@ export class TransientRegistration {
   * @return The resolver that was registered.
   */
   registerResolver(container: Container, key: any, fn: Function): Resolver {
-    let resolver = new StrategyResolver(2, fn);
-    container.registerResolver(this._key || key, resolver);
-    return resolver;
+    return container.registerTransient(this._key || key, fn);
   }
 }
 
@@ -99,14 +97,8 @@ export class SingletonRegistration {
   * @return The resolver that was registered.
   */
   registerResolver(container: Container, key: any, fn: Function): Resolver {
-    let resolver = new StrategyResolver(1, fn);
-
-    if (this._registerInChild) {
-      container.registerResolver(this._key || key, resolver);
-    } else {
-      container.root.registerResolver(this._key || key, resolver);
-    }
-
-    return resolver;
+    return this._registerInChild
+      ? container.registerSingleton(this._key || key, fn)
+      : container.root.registerSingleton(this._key || key, fn);
   }
 }
