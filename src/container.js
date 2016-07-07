@@ -50,9 +50,25 @@ export class InvocationHandler {
   */
   invoke(container: Container, dynamicDependencies?: any[]): any {
     return dynamicDependencies !== undefined
-      ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
-      : this.invoker.invoke(container, this.fn, this.dependencies);
+      ? injectProperties(container, this.fn, this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies))
+      : injectProperties(container, this.fn, this.invoker.invoke(container, this.fn, this.dependencies));
   }
+}
+
+/**
+* Injects property dependencies if the conventional `injectProperties` is defined.
+*/
+function injectProperties(container, fn, instance) {
+  if (fn.injectProperties !== undefined) {
+    let dependencies = fn.injectProperties;
+    for (let property in dependencies) {
+      instance[property] = container.get(dependencies[property]);
+    }
+    if (instance.afterConstructor !== undefined) {
+      instance.afterConstructor();
+    }
+  }
+  return instance;
 }
 
 /**

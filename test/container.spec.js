@@ -49,6 +49,40 @@ describe('container', () => {
     });
   });
 
+  describe('inject-properties', function() {
+    class Logger {
+      check = false;
+    }
+
+    it('uses static injectProperties', function() {
+      class App {}
+
+      App.injectProperties = {
+        logger: Logger
+      };
+
+      let container = new Container();
+      let app = container.get(App);
+      expect(app.logger).toEqual(jasmine.any(Logger));
+    });
+
+    it('calls afterConstructor hook', function() {
+      class App {
+        afterConstructor() {
+          this.logger.check = true;
+        }
+      }
+
+      App.injectProperties = {
+        logger: Logger
+      };
+
+      let container = new Container();
+      let app = container.get(App);
+      expect(app.logger.check).toBe(true);
+    });
+  });
+
   describe('inheritence', function() {
     class Logger {}
     class Service {}
