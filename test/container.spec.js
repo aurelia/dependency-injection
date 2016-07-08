@@ -591,11 +591,11 @@ describe('container', () => {
           expect(app.logger).toBe(null);
         });
 
-        it('doesn\'t check the parent container hierarchy when checkParent is false or default', () => {
+        it('doesn\'t check the parent container hierarchy when checkParent is false', () => {
           class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger)]; }
+            static inject() { return [Optional.of(Logger, false)]; }
             constructor(logger) {
               this.logger = logger;
             }
@@ -612,11 +612,11 @@ describe('container', () => {
           expect(app.logger).toBe(null);
         });
 
-        it('checks the parent container hierarchy when checkParent is true', () => {
+        it('checks the parent container hierarchy when checkParent is true or default', () => {
           class Logger {}
 
           class App {
-            static inject() { return [Optional.of(Logger, true)]; }
+            static inject() { return [Optional.of(Logger)]; }
             constructor(logger) {
               this.logger = logger;
             }

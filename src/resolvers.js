@@ -111,7 +111,7 @@ export class Optional {
   * @param key The key to optionally resolve for.
   * @param checkParent Indicates whether or not the parent container hierarchy should be checked.
   */
-  constructor(key: any, checkParent: boolean = false) {
+  constructor(key: any, checkParent: boolean = true) {
     this._key = key;
     this._checkParent = checkParent;
   }
@@ -132,10 +132,10 @@ export class Optional {
   /**
   * Creates an Optional Resolver for the supplied key.
   * @param key The key to optionally resolve for.
-  * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
+  * @param [checkParent=true] Indicates whether or not the parent container hierarchy should be checked.
   * @return Returns an instance of Optional for the key.
   */
-  static of(key: any, checkParent: boolean = false): Optional {
+  static of(key: any, checkParent: boolean = true): Optional {
     return new Optional(key, checkParent);
   }
 }
