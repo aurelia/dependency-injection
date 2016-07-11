@@ -1,6 +1,6 @@
 import './setup';
 import {Container} from '../src/container';
-import {Lazy, All, Optional, Parent, Factory} from '../src/resolvers';
+import {Lazy, All, Optional, Parent, Factory, NewInstance} from '../src/resolvers';
 import {transient, singleton} from '../src/registrations';
 import {inject} from '../src/injection';
 import {decorators} from 'aurelia-metadata';
@@ -717,6 +717,60 @@ describe('container', () => {
         it('passes data in to the constructor as the second argument', () => {
           app = container.get(App);
           expect(app.service.data).toEqual(data);
+        });
+      });
+
+      describe('NewInstance', () => {
+        class Logger {
+          constructor(dep?) {
+            this.dep = dep;
+          }
+        }
+
+        class Dependency {}
+
+        it('inject a new instance of a dependency, without regard for existing instances in the container', () => {
+          class App1 {
+            static inject() { return [NewInstance.of(Logger)]; }
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          expect(app1.logger).toEqual(jasmine.any(Logger));
+        });
+
+        it('inject a new instance of a dependency, with instance dynamic dependency', () => {
+          class App1 {
+            static inject() { return [NewInstance.of(Logger, Dependency)]; }
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          expect(app1.logger).toEqual(jasmine.any(Logger));
+          expect(app1.logger.dep).toEqual(jasmine.any(Dependency));
+        });
+
+        it('inject a new instance of a dependency, with resolver dynamic dependency', () => {
+          class App1 {
+            static inject() { return [NewInstance.of(Logger, Lazy.of(Dependency))]; }
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          expect(app1.logger).toEqual(jasmine.any(Logger));
+          expect(app1.logger.dep()).toEqual(jasmine.any(Dependency));
         });
       });
     });
