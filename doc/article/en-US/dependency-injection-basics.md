@@ -144,7 +144,7 @@ If you aren't using Babel's or TypeScript's decorator support (or don't want to)
   <source-code lang="ES 2015">
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
-    import {EventAggregator from 'aurelia-event-aggregator';
+    import {EventAggregator} from 'aurelia-event-aggregator';
 
     export class CustomerEditScreen {
       static inject() { return [CustomerService, CommonDialogs, EventAggregator]; }
