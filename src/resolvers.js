@@ -264,9 +264,10 @@ export class Factory {
 */
 @resolver()
 export class NewInstance {
-  constructor(key) {
+  constructor(key, ...dynamicDependencies: any[]) {
     this.key = key;
     this.asKey = key;
+    this.dynamicDependencies = dynamicDependencies;
   }
 
   /**
@@ -276,7 +277,10 @@ export class NewInstance {
   * @return Returns the matching instance from the parent container
   */
   get(container) {
-    const instance = container.invoke(this.key);
+    let dynamicDependencies = this.dynamicDependencies.length > 0 ?
+      this.dynamicDependencies.map(dependency => dependency["protocol:aurelia:resolver"] ?
+        dependency.get(container) : container.invoke(dependency)) : undefined;
+    const instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -296,7 +300,7 @@ export class NewInstance {
   * @param key The key to resolve/instantiate.
   * @return Returns an instance of NewInstance for the key.
   */
-  static of(key) {
-    return new NewInstance(key);
+  static of(key, ...dynamicDependencies: any[]) {
+    return new NewInstance(key, ...dynamicDependencies);
   }
 }
