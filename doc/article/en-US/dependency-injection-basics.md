@@ -21,7 +21,7 @@ A dependency injection container is a tool that can simplify the process of deco
 
 ## [Injection](aurelia-doc://section/2/version/1.0.0)
 
-Let's say we have a `CustomerEditScreen` that needs to load a `Customer` entity by ID from a web service. We wouldn't want to place all the details of our AJAX implementation inside our `CustomerEditScreen` class. Instead, we would want to factor that into a `CustomerService` class that our `CustomerEditScreen`, or any other class, can use when it needs to load a `Customer`. Aurelia's dependency injection container let's you accomplish this by declaring that the `CustomerEditScreen` needs to have a `CustomerService` injected at creation time.
+Let's say we have a `CustomerEditScreen` that needs to load a `Customer` entity by ID from a web service. We wouldn't want to place all the details of our AJAX implementation inside our `CustomerEditScreen` class. Instead, we would want to factor that into a `CustomerService` class that our `CustomerEditScreen`, or any other class, can use when it needs to load a `Customer`. Aurelia's dependency injection container lets you accomplish this by declaring that the `CustomerEditScreen` needs to have a `CustomerService` injected at creation time.
 
 The mechanism for declaring a class's dependencies depends on the language you have chosen to author your application with.
 Typically, you would use Decorators, an ES Next feature supported by both Babel and TypeScript. Here's what it looks like to declare that the `CustomerEditScreen` needs a `CustomerService`:
