@@ -201,7 +201,7 @@ There are basically three cases where child containers get created and used by A
 
 ### Custom Elements and Custom Attributes
 
-When Aurelia creates a View, that view may contain occurrences of custom elements and custom attributes. Any time an HTML element is found to either *be* a custom element or *have* custom attributes, Aurelia creates a child container for that element, parented to the closest custom element container (or the view itself). It then manually registers the elements/attributes in the child container as singletons. This ensures that the elements and attributes aren't singletons at the application level or even the view level, which would not make sense. Instead, they are scoped to their location in the DOM. As a result of this, the HTML bahaviors have access to classes registered above them in the DOM and on the same element. Likewise, they can be injected into classes that are created through their child element containers.
+When Aurelia creates a View, that view may contain occurrences of custom elements and custom attributes. Any time an HTML element is found to either *be* a custom element or *have* custom attributes, Aurelia creates a child container for that element, parented to the closest custom element container (or the view itself). It then manually registers the elements/attributes in the child container as singletons. This ensures that the elements and attributes aren't singletons at the application level or even the view level, which would not make sense. Instead, they are scoped to their location in the DOM. As a result of this, the HTML behaviors have access to classes registered above them in the DOM and on the same element. Likewise, they can be injected into classes that are created through their child element containers.
 
 > Info
 > Aurelia does not create child containers when there are plain HTML elements, or elements with only binding expressions, value converters, etc. It only creates them when the element itself is a custom element or if the element has custom attributes.
@@ -215,7 +215,7 @@ Each time the `Router` navigates to a screen, it creates a child container to en
 
 ### Dynamic Components
 
-Dyanamic composition, whether through the `<compose>` element of through the `CompositionEngine`, also creates child containers with auto-registration behavior, just like the `Router`. In fact, the `RouteLoader` simply calls the `CompositionEngine` internally to do the heavy lifting.
+Dynamic composition, whether through the `<compose>` element or through the `CompositionEngine`, also creates child containers with auto-registration behavior, just like the `Router`. In fact, the `RouteLoader` simply calls the `CompositionEngine` internally to do the heavy lifting.
 
 ### The General Rule for Aurelia's DI Use
 
@@ -223,7 +223,7 @@ Everything is an application-level singleton except for those things which are c
 
 ## [Explicit Configuration](aurelia-doc://section/5/version/1.0.0)
 
-For the most part, Aurelia's DI will do what you want with object lifetime. However, you may desire to change the behavior of individual classes for the specific needs of your application. This is easy to do by either directly using the `Container` API or by decoratoring your class with a `Registration`.
+For the most part, Aurelia's DI will do what you want with object lifetime. However, you may desire to change the behavior of individual classes for the specific needs of your application. This is easy to do by either directly using the `Container` API or by decorating your class with a `Registration`.
 
 ### The Container Registration API
 
