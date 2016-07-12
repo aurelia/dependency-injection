@@ -40,7 +40,7 @@ export let All = (_dec2 = resolver(), _dec2(_class3 = class All {
 }) || _class3);
 
 export let Optional = (_dec3 = resolver(), _dec3(_class5 = class Optional {
-  constructor(key, checkParent = false) {
+  constructor(key, checkParent = true) {
     this._key = key;
     this._checkParent = checkParent;
   }
@@ -53,7 +53,7 @@ export let Optional = (_dec3 = resolver(), _dec3(_class5 = class Optional {
     return null;
   }
 
-  static of(key, checkParent = false) {
+  static of(key, checkParent = true) {
     return new Optional(key, checkParent);
   }
 }) || _class5);
@@ -201,9 +201,7 @@ export let TransientRegistration = class TransientRegistration {
   }
 
   registerResolver(container, key, fn) {
-    let resolver = new StrategyResolver(2, fn);
-    container.registerResolver(this._key || key, resolver);
-    return resolver;
+    return container.registerTransient(this._key || key, fn);
   }
 };
 
@@ -218,15 +216,7 @@ export let SingletonRegistration = class SingletonRegistration {
   }
 
   registerResolver(container, key, fn) {
-    let resolver = new StrategyResolver(1, fn);
-
-    if (this._registerInChild) {
-      container.registerResolver(this._key || key, resolver);
-    } else {
-      container.root.registerResolver(this._key || key, resolver);
-    }
-
-    return resolver;
+    return this._registerInChild ? container.registerSingleton(this._key || key, fn) : container.root.registerSingleton(this._key || key, fn);
   }
 };
 
@@ -345,23 +335,23 @@ export let Container = class Container {
   }
 
   registerInstance(key, instance) {
-    this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
+    return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
   }
 
   registerSingleton(key, fn) {
-    this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+    return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
   }
 
   registerTransient(key, fn) {
-    this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
+    return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
   }
 
   registerHandler(key, handler) {
-    this.registerResolver(key, new StrategyResolver(3, handler));
+    return this.registerResolver(key, new StrategyResolver(3, handler));
   }
 
   registerAlias(originalKey, aliasKey) {
-    this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
+    return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
   }
 
   registerResolver(key, resolver) {
@@ -379,26 +369,24 @@ export let Container = class Container {
     } else {
       allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
+
+    return resolver;
   }
 
-  autoRegister(fn, key) {
-    let resolver;
+  autoRegister(key, fn) {
+    fn = fn === undefined ? key : fn;
 
     if (typeof fn === 'function') {
       let registration = metadata.get(metadata.registration, fn);
 
       if (registration === undefined) {
-        resolver = new StrategyResolver(1, fn);
-        this.registerResolver(key === undefined ? fn : key, resolver);
-      } else {
-        resolver = registration.registerResolver(this, key === undefined ? fn : key, fn);
+        return this.registerResolver(key, new StrategyResolver(1, fn));
       }
-    } else {
-      resolver = new StrategyResolver(0, fn);
-      this.registerResolver(key === undefined ? fn : key, resolver);
+
+      return registration.registerResolver(this, key, fn);
     }
 
-    return resolver;
+    return this.registerResolver(key, new StrategyResolver(0, fn));
   }
 
   autoRegisterAll(fns) {
