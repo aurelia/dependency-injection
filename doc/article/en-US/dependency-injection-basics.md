@@ -249,7 +249,7 @@ Here's a survey of the registration APIs you have available through a `Container
 
 As an alternative to explicitly registering types with the container, you can rely on auto-registration, but specify the auto-registration behavior you desire, overriding the default container-root-singleton behavior. To provide auto-registration behavior, you simply decorate your type with an auto-registration decorator. What follows is a basic explanation of built-in registration decorators:
 
-* `transient()` - Simply decorator your class with `transient()` and when it's requested from the container, a new instance will be created for each request.
+* `transient()` - Simply decorate your class with `transient()` and when it's requested from the container, a new instance will be created for each request.
 * `singleton(overrideChild?:boolean)` - Normally, types are auto-registered as singletons in the root container. So, why do we provide this decorator? This decorator allows you to specify `true` as an argument to indicate that the singleton should be registered not in the root container, but in the immediate container to which the initial request was issued.
 * `registration(registration: Registration)` - In addition to the built-in singleton and transient registrations, you can create your own and associate it with a class. We'll discuss this in more detail in the DI customization article.
 
