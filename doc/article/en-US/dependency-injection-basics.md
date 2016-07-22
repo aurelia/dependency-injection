@@ -62,7 +62,7 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
   </source-code>
 </code-listing>
 
-Notice that we use the `inject` decorator and that the constructor signature matches the list of dependencies in the `inject` deocrator. This tells the DI that any time it wants to create an instance of `CustomerEditScreen` it must first obtain an instance of `CustomerService` which it can *inject* into the constructor of `CustomerEditScreen` during instantiation. You can have as many injected dependencies as you need. Simply ensure that the `inject` decorator and the constructor match one another. Here's a quick example of multiple dependencies:
+Notice that we use the `inject` decorator and that the constructor signature matches the list of dependencies in the `inject` decorator. This tells the DI that any time it wants to create an instance of `CustomerEditScreen` it must first obtain an instance of `CustomerService` which it can *inject* into the constructor of `CustomerEditScreen` during instantiation. You can have as many injected dependencies as you need. Simply ensure that the `inject` decorator and the constructor match one another. Here's a quick example of multiple dependencies:
 
 <code-listing heading="CustomerEditScreen Multiple Injection">
   <source-code lang="ES 2016">
@@ -136,7 +136,7 @@ If you are using TypeScript, you can take advantage of an experimental feature o
 </code-listing>
 
 > Info
-> Interestingly, you don't need to use our `autoinject` deocorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
+> Interestingly, you don't need to use our `autoinject` decorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
 
 If you aren't using Babel's or TypeScript's decorator support (or don't want to), you can easily provide `inject` metadata using a simple static method on your class:
 
