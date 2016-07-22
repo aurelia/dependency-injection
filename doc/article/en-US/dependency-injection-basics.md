@@ -136,7 +136,7 @@ If you are using TypeScript, you can take advantage of an experimental feature o
 </code-listing>
 
 > Info
-> Interestingly, you don't need to use our `autoinject` deocorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
+> Interestingly, you don't need to use our `autoinject` decorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
 
 If you aren't using Babel's or TypeScript's decorator support (or don't want to), you can easily provide `inject` metadata using a simple static method on your class:
 
@@ -268,6 +268,19 @@ As mentioned above, the DI container uses `Resolvers` internally to provide all 
   * ex. `Optional.of(LoggedInUser)`
 * `Parent` - Skips starting dependency resolution from the current container and instead begins the lookup process on the parent container.
   * ex. `Parent.of(MyCustomElement)`
+* `Factory` - Used to allow injecting dependencies, but also passing data to the constructor.
+  * ex. `Factory.of(CustomClass)`
+* `NewInstance` - Used to inject a new instance of a dependency, without regard for existing instances in the container.
+  * ex. `NewInstance.of(CustomClass).as(Another)`
+
+If using TypeScript, keep in mind that `@autoinject` won't allow you to use `Resolvers`. Instead, you may use argument decorators, without duplicating argument order, which you otherwise have to maintain when using the class decorator or the static `inject` property. Available function parameter decorators are:
+
+* `lazy(key)`
+* `all(key)`
+* `optional(key)`
+* `parent(key)`
+* `factory(key, asValue?)`
+* `newInstance(key)`
 
 Here's an example of how we might express a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
 
@@ -296,12 +309,11 @@ Here's an example of how we might express a dependency on `HttpClient` that we m
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Lazy, inject} from 'aurelia-framework';
+    import {lazy} from 'aurelia-framework';
     import {HttpClient} from 'aurelia-fetch-client';
 
-    @inject(Lazy.of(HttpClient))
     export class CustomerDetail {
-      constructor(private getHTTP: () => HttpClient){ }
+      constructor(@lazy(HttpClient) private getHTTP: () => HttpClient){ }
     }
   </source-code>
 </code-listing>
