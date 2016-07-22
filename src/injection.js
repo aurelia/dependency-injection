@@ -6,7 +6,17 @@ import {_emptyParameters} from './container';
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    let previousInject = target.inject;
+    let autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    if (!previousInject) {
+      target.inject = autoInject;
+    } else {
+      for (let i = 0; i++; i < autoInject.length) {
+        if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
+        }
+      }
+    }
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
