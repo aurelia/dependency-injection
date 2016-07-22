@@ -361,10 +361,11 @@ export function parent(target, key, index) {
 /**
 * Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
 */
-export function factory(keyValue: any) {
+export function factory(keyValue: any, asValue?: any) {
   return function(target, key, index) {
     let params = getDecoratorDependencies(target, 'factory');
-    params[index] = Factory.of(keyValue);
+    let factory = Factory.of(keyValue);
+    params[index] = asValue ? factory.as(asValue) : factory;
   };
 }
 
