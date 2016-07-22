@@ -301,15 +301,16 @@ export class NewInstance {
   }
 }
 
-function getDeocratorDependencies(target, name) {
+export function getDecoratorDependencies(target, name) {
   let dependencies = target.inject;
   if (typeof dependencies === 'function') {
     throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
   }
   if (!dependencies) {
-    dependencies = metadata.getOwn(metadata.paramTypes, target).concat();
+    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
     target.inject = dependencies;
   }
+
   return dependencies;
 }
 
@@ -318,7 +319,7 @@ function getDeocratorDependencies(target, name) {
 */
 export function lazy(keyValue: any) {
   return function(target, key, index) {
-    let params = getDeocratorDependencies(target, 'lazy');
+    let params = getDecoratorDependencies(target, 'lazy');
     params[index] = Lazy.of(keyValue);
   };
 }
@@ -328,7 +329,7 @@ export function lazy(keyValue: any) {
 */
 export function all(keyValue: any) {
   return function(target, key, index) {
-    let params = getDeocratorDependencies(target, 'all');
+    let params = getDecoratorDependencies(target, 'all');
     params[index] = All.of(keyValue);
   };
 }
@@ -339,7 +340,7 @@ export function all(keyValue: any) {
 export function optional(checkParentOrTarget: boolean = true) {
   let deco = function(checkParent: boolean) {
     return function(target, key, index) {
-      let params = getDeocratorDependencies(target, 'optional');
+      let params = getDecoratorDependencies(target, 'optional');
       params[index] = Optional.of(params[index], checkParent);
     };
   };
@@ -353,7 +354,7 @@ export function optional(checkParentOrTarget: boolean = true) {
 * Decorator: Specifies the dependency to look at the parent container for resolution
 */
 export function parent(target, key, index) {
-  let params = getDeocratorDependencies(target, 'parent');
+  let params = getDecoratorDependencies(target, 'parent');
   params[index] = Parent.of(params[index]);
 }
 
@@ -362,7 +363,7 @@ export function parent(target, key, index) {
 */
 export function factory(keyValue: any) {
   return function(target, key, index) {
-    let params = getDeocratorDependencies(target, 'factory');
+    let params = getDecoratorDependencies(target, 'factory');
     params[index] = Factory.of(keyValue);
   };
 }
@@ -373,7 +374,7 @@ export function factory(keyValue: any) {
 export function newInstance(asKeyOrTarget?: any) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
-      let params = getDeocratorDependencies(target, 'newInstance');
+      let params = getDecoratorDependencies(target, 'newInstance');
       params[index] = NewInstance.of(params[index]);
       if (!!asKey) {
         params[index].as(asKey);
