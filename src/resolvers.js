@@ -264,6 +264,9 @@ export class Factory {
 */
 @resolver()
 export class NewInstance {
+  key;
+  asKey;
+  
   constructor(key) {
     this.key = key;
     this.asKey = key;

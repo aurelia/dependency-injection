@@ -7,7 +7,7 @@ import {_emptyParameters} from './container';
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
     let previousInject = target.inject;
-    let autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
     if (!previousInject) {
       target.inject = autoInject;
     } else {
@@ -34,7 +34,7 @@ export function inject(...rest: any[]): any {
         throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
       }
       if (!params) {
-        params = metadata.getOwn(metadata.paramTypes, target).concat();
+        params = metadata.getOwn(metadata.paramTypes, target).slice();
         target.inject = params;
       }
       params[descriptor] = rest[0];
