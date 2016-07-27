@@ -151,6 +151,8 @@ export declare class Factory {
 * under a different key by supplying a key using the `as` method.
 */
 export declare class NewInstance {
+    key: any;
+    asKey: any;
     constructor(key: any);
     /**
     * Called by the container to instantiate the dependency and potentially register
@@ -172,14 +174,31 @@ export declare class NewInstance {
     */
     static of(key: any): NewInstance;
 }
+export declare function getDecoratorDependencies(target: any, name: any): any;
+/**
+* Decorator: Specifies the dependency should be lazy loaded
+*/
+export declare function lazy(keyValue: any): (target: any, key: any, index: any) => void;
+/**
+* Decorator: Specifies the dependency should load all instances of the given key.
+*/
+export declare function all(keyValue: any): (target: any, key: any, index: any) => void;
+/**
+* Decorator: Specifies the dependency as optional
+*/
+export declare function optional(checkParentOrTarget?: boolean): (target: any, key: any, index: any) => void;
+/**
+* Decorator: Specifies the dependency to look at the parent container for resolution
+*/
+export declare function parent(target: any, key: any, index: any): void;
+/**
+* Decorator: Specifies the dependency as a new instance
+*/
+export declare function newInstance(asKeyOrTarget?: any): (target: any, key: any, index: any) => void;
 /**
 * Decorator: Specifies a custom Invoker for the decorated item.
 */
 export declare function invoker(value: Invoker): any;
-/**
-* Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor.
-*/
-export declare function factory(potentialTarget?: any): any;
 /**
 * A strategy for invoking a function, resulting in an object instance.
 */

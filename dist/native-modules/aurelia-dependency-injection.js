@@ -183,6 +183,77 @@ export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
   return NewInstance;
 }()) || _class13);
 
+export function getDecoratorDependencies(target, name) {
+  var dependencies = target.inject;
+  if (typeof dependencies === 'function') {
+    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+  }
+  if (!dependencies) {
+    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
+    target.inject = dependencies;
+  }
+
+  return dependencies;
+}
+
+export function lazy(keyValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'lazy');
+    params[index] = Lazy.of(keyValue);
+  };
+}
+
+export function all(keyValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'all');
+    params[index] = All.of(keyValue);
+  };
+}
+
+export function optional() {
+  var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+  var deco = function deco(checkParent) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'optional');
+      params[index] = Optional.of(params[index], checkParent);
+    };
+  };
+  if (typeof checkParentOrTarget === 'boolean') {
+    return deco(checkParentOrTarget);
+  }
+  return deco(true);
+}
+
+export function parent(target, key, index) {
+  var params = getDecoratorDependencies(target, 'parent');
+  params[index] = Parent.of(params[index]);
+}
+
+export function factory(keyValue, asValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'factory');
+    var factory = Factory.of(keyValue);
+    params[index] = asValue ? factory.as(asValue) : factory;
+  };
+}
+
+export function newInstance(asKeyOrTarget) {
+  var deco = function deco(asKey) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'newInstance');
+      params[index] = NewInstance.of(params[index]);
+      if (!!asKey) {
+        params[index].as(asKey);
+      }
+    };
+  };
+  if (arguments.length === 1) {
+    return deco(asKeyOrTarget);
+  }
+  return deco();
+}
+
 export function invoker(value) {
   return function (target) {
     metadata.define(metadata.invoker, value, target);
@@ -597,7 +668,17 @@ export var Container = function () {
 
 export function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    var previousInject = target.inject;
+    var autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    if (!previousInject) {
+      target.inject = autoInject;
+    } else {
+      for (var i = 0; i++; i < autoInject.length) {
+        if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
+        }
+      }
+    }
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
@@ -609,6 +690,19 @@ export function inject() {
   }
 
   return function (target, key, descriptor) {
+    if (typeof descriptor === 'number' && rest.length === 1) {
+      var params = target.inject;
+      if (typeof params === 'function') {
+        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+      }
+      if (!params) {
+        params = metadata.getOwn(metadata.paramTypes, target).slice();
+        target.inject = params;
+      }
+      params[descriptor] = rest[0];
+      return;
+    }
+
     if (descriptor) {
       var _fn = descriptor.value;
       _fn.inject = rest;

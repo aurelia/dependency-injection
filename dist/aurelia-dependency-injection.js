@@ -264,6 +264,9 @@ export class Factory {
 */
 @resolver()
 export class NewInstance {
+  key;
+  asKey;
+
   constructor(key) {
     this.key = key;
     this.asKey = key;
@@ -299,6 +302,93 @@ export class NewInstance {
   static of(key) {
     return new NewInstance(key);
   }
+}
+
+export function getDecoratorDependencies(target, name) {
+  let dependencies = target.inject;
+  if (typeof dependencies === 'function') {
+    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+  }
+  if (!dependencies) {
+    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
+    target.inject = dependencies;
+  }
+
+  return dependencies;
+}
+
+/**
+* Decorator: Specifies the dependency should be lazy loaded
+*/
+export function lazy(keyValue: any) {
+  return function(target, key, index) {
+    let params = getDecoratorDependencies(target, 'lazy');
+    params[index] = Lazy.of(keyValue);
+  };
+}
+
+/**
+* Decorator: Specifies the dependency should load all instances of the given key.
+*/
+export function all(keyValue: any) {
+  return function(target, key, index) {
+    let params = getDecoratorDependencies(target, 'all');
+    params[index] = All.of(keyValue);
+  };
+}
+
+/**
+* Decorator: Specifies the dependency as optional
+*/
+export function optional(checkParentOrTarget: boolean = true) {
+  let deco = function(checkParent: boolean) {
+    return function(target, key, index) {
+      let params = getDecoratorDependencies(target, 'optional');
+      params[index] = Optional.of(params[index], checkParent);
+    };
+  };
+  if (typeof checkParentOrTarget === 'boolean') {
+    return deco(checkParentOrTarget);
+  }
+  return deco(true);
+}
+
+/**
+* Decorator: Specifies the dependency to look at the parent container for resolution
+*/
+export function parent(target, key, index) {
+  let params = getDecoratorDependencies(target, 'parent');
+  params[index] = Parent.of(params[index]);
+}
+
+/**
+* Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
+*/
+export function factory(keyValue: any, asValue?: any) {
+  return function(target, key, index) {
+    let params = getDecoratorDependencies(target, 'factory');
+    let factory = Factory.of(keyValue);
+    params[index] = asValue ? factory.as(asValue) : factory;
+  };
+}
+
+/**
+* Decorator: Specifies the dependency as a new instance
+*/
+export function newInstance(asKeyOrTarget?: any) {
+  let deco = function(asKey?: any) {
+    return function(target, key, index) {
+      let params = getDecoratorDependencies(target, 'newInstance');
+      params[index] = NewInstance.of(params[index]);
+      if (!!asKey) {
+        params[index].as(asKey);
+      }
+    };
+  };
+  if (arguments.length === 1) {
+    return deco(asKeyOrTarget);
+  }
+  return deco();
 }
 
 /**
@@ -964,7 +1054,17 @@ export class Container {
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    let previousInject = target.inject;
+    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    if (!previousInject) {
+      target.inject = autoInject;
+    } else {
+      for (let i = 0; i++; i < autoInject.length) {
+        if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
+        }
+      }
+    }
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
@@ -975,6 +1075,19 @@ export function autoinject(potentialTarget?: any): any {
 */
 export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
+    // handle when used as a parameter
+    if (typeof descriptor === 'number' && rest.length === 1) {
+      let params = target.inject;
+      if (typeof params === 'function') {
+        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+      }
+      if (!params) {
+        params = metadata.getOwn(metadata.paramTypes, target).slice();
+        target.inject = params;
+      }
+      params[descriptor] = rest[0];
+      return;
+    }
     // if it's true then we injecting rest into function and not Class constructor
     if (descriptor) {
       const fn = descriptor.value;

@@ -7,6 +7,131 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
 
   
 
+  function getDecoratorDependencies(target, name) {
+    var dependencies = target.inject;
+    if (typeof dependencies === 'function') {
+      throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+    }
+    if (!dependencies) {
+      dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
+      target.inject = dependencies;
+    }
+
+    return dependencies;
+  }
+
+  _export('getDecoratorDependencies', getDecoratorDependencies);
+
+  function lazy(keyValue) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'lazy');
+      params[index] = Lazy.of(keyValue);
+    };
+  }
+
+  _export('lazy', lazy);
+
+  function all(keyValue) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'all');
+      params[index] = All.of(keyValue);
+    };
+  }
+
+  _export('all', all);
+
+  function optional() {
+    var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+    var deco = function deco(checkParent) {
+      return function (target, key, index) {
+        var params = getDecoratorDependencies(target, 'optional');
+        params[index] = Optional.of(params[index], checkParent);
+      };
+    };
+    if (typeof checkParentOrTarget === 'boolean') {
+      return deco(checkParentOrTarget);
+    }
+    return deco(true);
+  }
+
+  _export('optional', optional);
+
+  function parent(target, key, index) {
+    var params = getDecoratorDependencies(target, 'parent');
+    params[index] = Parent.of(params[index]);
+  }
+
+  _export('parent', parent);
+
+  function factory(keyValue, asValue) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'factory');
+      var factory = Factory.of(keyValue);
+      params[index] = asValue ? factory.as(asValue) : factory;
+    };
+  }
+
+  _export('factory', factory);
+
+  function newInstance(asKeyOrTarget) {
+    var deco = function deco(asKey) {
+      return function (target, key, index) {
+        var params = getDecoratorDependencies(target, 'newInstance');
+        params[index] = NewInstance.of(params[index]);
+        if (!!asKey) {
+          params[index].as(asKey);
+        }
+      };
+    };
+    if (arguments.length === 1) {
+      return deco(asKeyOrTarget);
+    }
+    return deco();
+  }
+
+  _export('newInstance', newInstance);
+
+  function invoker(value) {
+    return function (target) {
+      metadata.define(metadata.invoker, value, target);
+    };
+  }
+
+  _export('invoker', invoker);
+
+  function factory(potentialTarget) {
+    var deco = function deco(target) {
+      metadata.define(metadata.invoker, FactoryInvoker.instance, target);
+    };
+
+    return potentialTarget ? deco(potentialTarget) : deco;
+  }
+
+  _export('factory', factory);
+
+  function registration(value) {
+    return function (target) {
+      metadata.define(metadata.registration, value, target);
+    };
+  }
+
+  _export('registration', registration);
+
+  function transient(key) {
+    return registration(new TransientRegistration(key));
+  }
+
+  _export('transient', transient);
+
+  function singleton(keyOrRegisterInChild) {
+    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+    return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
+  }
+
+  _export('singleton', singleton);
+
   function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
     var i = staticDependencies.length;
     var args = new Array(i);
@@ -33,6 +158,56 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
 
     return f.inject;
   }
+
+  function autoinject(potentialTarget) {
+    var deco = function deco(target) {
+      var previousInject = target.inject;
+      var autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+      if (!previousInject) {
+        target.inject = autoInject;
+      } else {
+        for (var i = 0; i++; i < autoInject.length) {
+          if (!previousInject[i]) {
+            previousInject[i] = autoInject[i];
+          }
+        }
+      }
+    };
+
+    return potentialTarget ? deco(potentialTarget) : deco;
+  }
+
+  _export('autoinject', autoinject);
+
+  function inject() {
+    for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      rest[_key2] = arguments[_key2];
+    }
+
+    return function (target, key, descriptor) {
+      if (typeof descriptor === 'number' && rest.length === 1) {
+        var params = target.inject;
+        if (typeof params === 'function') {
+          throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+        }
+        if (!params) {
+          params = metadata.getOwn(metadata.paramTypes, target).slice();
+          target.inject = params;
+        }
+        params[descriptor] = rest[0];
+        return;
+      }
+
+      if (descriptor) {
+        var _fn = descriptor.value;
+        _fn.inject = rest;
+      } else {
+        target.inject = rest;
+      }
+    };
+  }
+
+  _export('inject', inject);
 
   return {
     setters: [function (_aureliaMetadata) {
@@ -236,24 +411,6 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
 
       _export('NewInstance', NewInstance);
 
-      function invoker(value) {
-        return function (target) {
-          metadata.define(metadata.invoker, value, target);
-        };
-      }
-
-      _export('invoker', invoker);
-
-      function factory(potentialTarget) {
-        var deco = function deco(target) {
-          metadata.define(metadata.invoker, FactoryInvoker.instance, target);
-        };
-
-        return potentialTarget ? deco(potentialTarget) : deco;
-      }
-
-      _export('factory', factory);
-
       _export('FactoryInvoker', FactoryInvoker = function () {
         function FactoryInvoker() {
           
@@ -291,28 +448,6 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
       _export('FactoryInvoker', FactoryInvoker);
 
       FactoryInvoker.instance = new FactoryInvoker();
-
-      function registration(value) {
-        return function (target) {
-          metadata.define(metadata.registration, value, target);
-        };
-      }
-
-      _export('registration', registration);
-
-      function transient(key) {
-        return registration(new TransientRegistration(key));
-      }
-
-      _export('transient', transient);
-
-      function singleton(keyOrRegisterInChild) {
-        var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-        return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
-      }
-
-      _export('singleton', singleton);
 
       _export('TransientRegistration', TransientRegistration = function () {
         function TransientRegistration(key) {
@@ -643,33 +778,6 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
       }());
 
       _export('Container', Container);
-
-      function autoinject(potentialTarget) {
-        var deco = function deco(target) {
-          target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-        };
-
-        return potentialTarget ? deco(potentialTarget) : deco;
-      }
-
-      _export('autoinject', autoinject);
-
-      function inject() {
-        for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-          rest[_key2] = arguments[_key2];
-        }
-
-        return function (target, key, descriptor) {
-          if (descriptor) {
-            var _fn = descriptor.value;
-            _fn.inject = rest;
-          } else {
-            target.inject = rest;
-          }
-        };
-      }
-
-      _export('inject', inject);
     }
   };
 });
