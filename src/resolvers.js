@@ -267,7 +267,7 @@ export class NewInstance {
   key;
   asKey;
 
-  constructor(key) {
+  constructor(key, ...dynamicDependencies: any[]) {
     this.key = key;
     this.asKey = key;
     this.dynamicDependencies = dynamicDependencies;
@@ -282,7 +282,7 @@ export class NewInstance {
   get(container) {
     let dynamicDependencies = this.dynamicDependencies.length > 0 ?
       this.dynamicDependencies.map(dependency => dependency["protocol:aurelia:resolver"] ?
-        dependency.get(container) : container.invoke(dependency)) : undefined;
+        dependency.get(container) : container.get(dependency)) : undefined;
     const instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
@@ -379,17 +379,17 @@ export function factory(keyValue: any, asValue?: any) {
 /**
 * Decorator: Specifies the dependency as a new instance
 */
-export function newInstance(asKeyOrTarget?: any) {
+export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
       let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index]);
+      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
       if (!!asKey) {
         params[index].as(asKey);
       }
     };
   };
-  if (arguments.length === 1) {
+  if (arguments.length >= 1) {
     return deco(asKeyOrTarget);
   }
   return deco();
