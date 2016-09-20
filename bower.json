@@ -1,6 +1,6 @@
 {
   "name": "aurelia-dependency-injection",
-  "version": "1.0.0-rc.1.0.0",
+  "version": "1.0.0",
   "description": "A lightweight, extensible dependency injection container for JavaScript.",
   "keywords": [
     "aurelia",
@@ -20,7 +20,7 @@
     "url": "http://github.com/aurelia/dependency-injection"
   },
   "dependencies": {
-    "aurelia-metadata": "^1.0.0-rc.1.0.0",
-    "aurelia-pal": "^1.0.0-rc.1.0.0"
+    "aurelia-metadata": "^1.0.0",
+    "aurelia-pal": "^1.0.0"
   }
 }

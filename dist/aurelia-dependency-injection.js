@@ -111,7 +111,7 @@ export class Optional {
   * @param key The key to optionally resolve for.
   * @param checkParent Indicates whether or not the parent container hierarchy should be checked.
   */
-  constructor(key: any, checkParent: boolean = false) {
+  constructor(key: any, checkParent: boolean = true) {
     this._key = key;
     this._checkParent = checkParent;
   }
@@ -132,10 +132,10 @@ export class Optional {
   /**
   * Creates an Optional Resolver for the supplied key.
   * @param key The key to optionally resolve for.
-  * @param [checkParent=false] Indicates whether or not the parent container hierarchy should be checked.
+  * @param [checkParent=true] Indicates whether or not the parent container hierarchy should be checked.
   * @return Returns an instance of Optional for the key.
   */
-  static of(key: any, checkParent: boolean = false): Optional {
+  static of(key: any, checkParent: boolean = true): Optional {
     return new Optional(key, checkParent);
   }
 }
@@ -264,6 +264,9 @@ export class Factory {
 */
 @resolver()
 export class NewInstance {
+  key;
+  asKey;
+
   constructor(key) {
     this.key = key;
     this.asKey = key;
@@ -299,6 +302,93 @@ export class NewInstance {
   static of(key) {
     return new NewInstance(key);
   }
+}
+
+export function getDecoratorDependencies(target, name) {
+  let dependencies = target.inject;
+  if (typeof dependencies === 'function') {
+    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+  }
+  if (!dependencies) {
+    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
+    target.inject = dependencies;
+  }
+
+  return dependencies;
+}
+
+/**
+* Decorator: Specifies the dependency should be lazy loaded
+*/
+export function lazy(keyValue: any) {
+  return function(target, key, index) {
+    let params = getDecoratorDependencies(target, 'lazy');
+    params[index] = Lazy.of(keyValue);
+  };
+}
+
+/**
+* Decorator: Specifies the dependency should load all instances of the given key.
+*/
+export function all(keyValue: any) {
+  return function(target, key, index) {
+    let params = getDecoratorDependencies(target, 'all');
+    params[index] = All.of(keyValue);
+  };
+}
+
+/**
+* Decorator: Specifies the dependency as optional
+*/
+export function optional(checkParentOrTarget: boolean = true) {
+  let deco = function(checkParent: boolean) {
+    return function(target, key, index) {
+      let params = getDecoratorDependencies(target, 'optional');
+      params[index] = Optional.of(params[index], checkParent);
+    };
+  };
+  if (typeof checkParentOrTarget === 'boolean') {
+    return deco(checkParentOrTarget);
+  }
+  return deco(true);
+}
+
+/**
+* Decorator: Specifies the dependency to look at the parent container for resolution
+*/
+export function parent(target, key, index) {
+  let params = getDecoratorDependencies(target, 'parent');
+  params[index] = Parent.of(params[index]);
+}
+
+/**
+* Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
+*/
+export function factory(keyValue: any, asValue?: any) {
+  return function(target, key, index) {
+    let params = getDecoratorDependencies(target, 'factory');
+    let factory = Factory.of(keyValue);
+    params[index] = asValue ? factory.as(asValue) : factory;
+  };
+}
+
+/**
+* Decorator: Specifies the dependency as a new instance
+*/
+export function newInstance(asKeyOrTarget?: any) {
+  let deco = function(asKey?: any) {
+    return function(target, key, index) {
+      let params = getDecoratorDependencies(target, 'newInstance');
+      params[index] = NewInstance.of(params[index]);
+      if (!!asKey) {
+        params[index].as(asKey);
+      }
+    };
+  };
+  if (arguments.length === 1) {
+    return deco(asKeyOrTarget);
+  }
+  return deco();
 }
 
 /**
@@ -456,9 +546,7 @@ export class TransientRegistration {
   * @return The resolver that was registered.
   */
   registerResolver(container: Container, key: any, fn: Function): Resolver {
-    let resolver = new StrategyResolver(2, fn);
-    container.registerResolver(this._key || key, resolver);
-    return resolver;
+    return container.registerTransient(this._key || key, fn);
   }
 }
 
@@ -493,15 +581,9 @@ export class SingletonRegistration {
   * @return The resolver that was registered.
   */
   registerResolver(container: Container, key: any, fn: Function): Resolver {
-    let resolver = new StrategyResolver(1, fn);
-
-    if (this._registerInChild) {
-      container.registerResolver(this._key || key, resolver);
-    } else {
-      container.root.registerResolver(this._key || key, resolver);
-    }
-
-    return resolver;
+    return this._registerInChild
+      ? container.registerSingleton(this._key || key, fn)
+      : container.root.registerSingleton(this._key || key, fn);
   }
 }
 
@@ -707,54 +789,60 @@ export class Container {
   /**
   * Registers an existing object instance with the container.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param instance The instance that will be resolved when the key is matched.
+  * @param instance The instance that will be resolved when the key is matched. This defaults to the key value when instance is not supplied.
+  * @return The resolver that was registered.
   */
-  registerInstance(key: any, instance?: any): void {
-    this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
+  registerInstance(key: any, instance?: any): Resolver {
+    return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
   }
 
   /**
   * Registers a type (constructor function) such that the container always returns the same instance for each request.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param [fn] The constructor function to use when the dependency needs to be instantiated.
+  * @param fn The constructor function to use when the dependency needs to be instantiated. This defaults to the key value when fn is not supplied.
+  * @return The resolver that was registered.
   */
-  registerSingleton(key: any, fn?: Function): void {
-    this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+  registerSingleton(key: any, fn?: Function): Resolver {
+    return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
   }
 
   /**
   * Registers a type (constructor function) such that the container returns a new instance for each request.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-  * @param [fn] The constructor function to use when the dependency needs to be instantiated.
+  * @param fn The constructor function to use when the dependency needs to be instantiated. This defaults to the key value when fn is not supplied.
+  * @return The resolver that was registered.
   */
-  registerTransient(key: any, fn?: Function): void {
-    this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
+  registerTransient(key: any, fn?: Function): Resolver {
+    return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
   }
 
   /**
   * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param handler The resolution function to use when the dependency is needed.
+  * @return The resolver that was registered.
   */
-  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): void {
-    this.registerResolver(key, new StrategyResolver(3, handler));
+  registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): Resolver {
+    return this.registerResolver(key, new StrategyResolver(3, handler));
   }
 
   /**
   * Registers an additional key that serves as an alias to the original DI key.
   * @param originalKey The key that originally identified the dependency; usually a constructor function.
   * @param aliasKey An alternate key which can also be used to resolve the same dependency  as the original.
+  * @return The resolver that was registered.
   */
-  registerAlias(originalKey: any, aliasKey: any): void {
-    this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
+  registerAlias(originalKey: any, aliasKey: any): Resolver {
+    return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
   }
 
   /**
   * Registers a custom resolution function such that the container calls this function for each request to obtain the instance.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
   * @param resolver The resolver to use when the dependency is needed.
+  * @return The resolver that was registered.
   */
-  registerResolver(key: any, resolver: Resolver): void {
+  registerResolver(key: any, resolver: Resolver): Resolver {
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
@@ -769,31 +857,29 @@ export class Container {
     } else {
       allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
+
+    return resolver;
   }
 
   /**
   * Registers a type (constructor function) by inspecting its registration annotations. If none are found, then the default singleton registration is used.
-  * @param fn The constructor function to use when the dependency needs to be instantiated.
   * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+  * @param fn The constructor function to use when the dependency needs to be instantiated. This defaults to the key value when fn is not supplied.
   */
-  autoRegister(fn: any, key?: any): Resolver {
-    let resolver;
+  autoRegister(key: any, fn?: Function): Resolver {
+    fn = fn === undefined ? key : fn;
 
     if (typeof fn === 'function') {
       let registration = metadata.get(metadata.registration, fn);
 
       if (registration === undefined) {
-        resolver = new StrategyResolver(1, fn);
-        this.registerResolver(key === undefined ? fn : key, resolver);
-      } else {
-        resolver = registration.registerResolver(this, key === undefined ? fn : key, fn);
+        return this.registerResolver(key, new StrategyResolver(1, fn));
       }
-    } else {
-      resolver = new StrategyResolver(0, fn);
-      this.registerResolver(key === undefined ? fn : key, resolver);
+
+      return registration.registerResolver(this, key, fn);
     }
 
-    return resolver;
+    return this.registerResolver(key, new StrategyResolver(0, fn));
   }
 
   /**
@@ -968,7 +1054,17 @@ export class Container {
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    target.inject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    let previousInject = target.inject;
+    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+    if (!previousInject) {
+      target.inject = autoInject;
+    } else {
+      for (let i = 0; i++; i < autoInject.length) {
+        if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
+        }
+      }
+    }
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
@@ -979,6 +1075,19 @@ export function autoinject(potentialTarget?: any): any {
 */
 export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
+    // handle when used as a parameter
+    if (typeof descriptor === 'number' && rest.length === 1) {
+      let params = target.inject;
+      if (typeof params === 'function') {
+        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+      }
+      if (!params) {
+        params = metadata.getOwn(metadata.paramTypes, target).slice();
+        target.inject = params;
+      }
+      params[descriptor] = rest[0];
+      return;
+    }
     // if it's true then we injecting rest into function and not Class constructor
     if (descriptor) {
       const fn = descriptor.value;

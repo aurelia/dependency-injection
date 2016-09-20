@@ -21,7 +21,7 @@ A dependency injection container is a tool that can simplify the process of deco
 
 ## [Injection](aurelia-doc://section/2/version/1.0.0)
 
-Let's say we have a `CustomerEditScreen` that needs to load a `Customer` entity by ID from a web service. We wouldn't want to place all the details of our AJAX implementation inside our `CustomerEditScreen` class. Instead, we would want to factor that into a `CustomerService` class that our `CustomerEditScreen`, or any other class, can use when it needs to load a `Customer`. Aurelia's dependency injection container let's you accomplish this by declaring that the `CustomerEditScreen` needs to have a `CustomerService` injected at creation time.
+Let's say we have a `CustomerEditScreen` that needs to load a `Customer` entity by ID from a web service. We wouldn't want to place all the details of our AJAX implementation inside our `CustomerEditScreen` class. Instead, we would want to factor that into a `CustomerService` class that our `CustomerEditScreen`, or any other class, can use when it needs to load a `Customer`. Aurelia's dependency injection container lets you accomplish this by declaring that the `CustomerEditScreen` needs to have a `CustomerService` injected at creation time.
 
 The mechanism for declaring a class's dependencies depends on the language you have chosen to author your application with.
 Typically, you would use Decorators, an ES Next feature supported by both Babel and TypeScript. Here's what it looks like to declare that the `CustomerEditScreen` needs a `CustomerService`:
@@ -62,7 +62,7 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
   </source-code>
 </code-listing>
 
-Notice that we use the `inject` decorator and that the constructor signature matches the list of dependencies in the `inject` deocrator. This tells the DI that any time it wants to create an instance of `CustomerEditScreen` it must first obtain an instance of `CustomerService` which it can *inject* into the constructor of `CustomerEditScreen` during instantiation. You can have as many injected dependencies as you need. Simply ensure that the `inject` decorator and the constructor match one another. Here's a quick example of multiple dependencies:
+Notice that we use the `inject` decorator and that the constructor signature matches the list of dependencies in the `inject` decorator. This tells the DI that any time it wants to create an instance of `CustomerEditScreen` it must first obtain an instance of `CustomerService` which it can *inject* into the constructor of `CustomerEditScreen` during instantiation. You can have as many injected dependencies as you need. Simply ensure that the `inject` decorator and the constructor match one another. Here's a quick example of multiple dependencies:
 
 <code-listing heading="CustomerEditScreen Multiple Injection">
   <source-code lang="ES 2016">
@@ -136,7 +136,7 @@ If you are using TypeScript, you can take advantage of an experimental feature o
 </code-listing>
 
 > Info
-> Interestingly, you don't need to use our `autoinject` deocorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
+> Interestingly, you don't need to use our `autoinject` decorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
 
 If you aren't using Babel's or TypeScript's decorator support (or don't want to), you can easily provide `inject` metadata using a simple static method on your class:
 
@@ -144,7 +144,7 @@ If you aren't using Babel's or TypeScript's decorator support (or don't want to)
   <source-code lang="ES 2015">
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
-    import {EventAggregator from 'aurelia-event-aggregator';
+    import {EventAggregator} from 'aurelia-event-aggregator';
 
     export class CustomerEditScreen {
       static inject() { return [CustomerService, CommonDialogs, EventAggregator]; }
@@ -189,7 +189,7 @@ Now, imagine that we have a `Container` named `root` and we call `root.createChi
 
 ### Example 3 - Child Container Resolution with Override
 
-Let's start with an instance of `Container` named `root`. We will then call `root.createChild()` to create a child container named `child`. Next we will call `child.createChild()` to create a grandchild container from it named `grandchild`. Finally, we'll call `child.registerSingleton(A, A)`. What happens when we call `grandchild.get(A)`? First, `grandchild` checks for a `Resolver`. Since it doesn't find one, it delegates to its `parent` which is the `child` from which it was created. `child` then checks for a `Resolver`. Since `child.registerSingleton(A, A)` was called on `child` this means that `child` will have a `Resolver` for `A`. At this points `child`'s resolver is used to `get` an instance of `A` which is returned to the developer.
+Let's start with an instance of `Container` named `root`. We will then call `root.createChild()` to create a child container named `child`. Next we will call `child.createChild()` to create a grandchild container from it named `grandchild`. Finally, we'll call `child.registerSingleton(A, A)`. What happens when we call `grandchild.get(A)`? First, `grandchild` checks for a `Resolver`. Since it doesn't find one, it delegates to its `parent` which is the `child` from which it was created. `child` then checks for a `Resolver`. Since `child.registerSingleton(A, A)` was called on `child` this means that `child` will have a `Resolver` for `A`. At this point `child`'s resolver is used to `get` an instance of `A` which is returned to the developer.
 
 As you can see from these examples, the `Container` basically walks its hierarchy until it either finds a `Resolver` or reaches the root. If no `Resolver` is found in the root, it auto-registers the class as a singleton in the root. This means that all auto-registered classes are application-wide singletons, unless they are overriden by a child container.
 
@@ -201,7 +201,7 @@ There are basically three cases where child containers get created and used by A
 
 ### Custom Elements and Custom Attributes
 
-When Aurelia creates a View, that view may contain occurrences of custom elements and custom attributes. Any time an HTML element is found to either *be* a custom element or *have* custom attributes, Aurelia creates a child container for that element, parented to the closest custom element container (or the view itself). It then manually registers the elements/attributes in the child container as singletons. This ensures that the elements and attributes aren't singletons at the application level or even the view level, which would not make sense. Instead, they are scoped to their location in the DOM. As a result of this, the HTML bahaviors have access to classes registered above them in the DOM and on the same element. Likewise, they can be injected into classes that are created through their child element containers.
+When Aurelia creates a View, that view may contain occurrences of custom elements and custom attributes. Any time an HTML element is found to either *be* a custom element or *have* custom attributes, Aurelia creates a child container for that element, parented to the closest custom element container (or the view itself). It then manually registers the elements/attributes in the child container as singletons. This ensures that the elements and attributes aren't singletons at the application level or even the view level, which would not make sense. Instead, they are scoped to their location in the DOM. As a result of this, the HTML behaviors have access to classes registered above them in the DOM and on the same element. Likewise, they can be injected into classes that are created through their child element containers.
 
 > Info
 > Aurelia does not create child containers when there are plain HTML elements, or elements with only binding expressions, value converters, etc. It only creates them when the element itself is a custom element or if the element has custom attributes.
@@ -215,7 +215,7 @@ Each time the `Router` navigates to a screen, it creates a child container to en
 
 ### Dynamic Components
 
-Dyanamic composition, whether through the `<compose>` element of through the `CompositionEngine`, also creates child containers with auto-registration behavior, just like the `Router`. In fact, the `RouteLoader` simply calls the `CompositionEngine` internally to do the heavy lifting.
+Dynamic composition, whether through the `<compose>` element or through the `CompositionEngine`, also creates child containers with auto-registration behavior, just like the `Router`. In fact, the `RouteLoader` simply calls the `CompositionEngine` internally to do the heavy lifting.
 
 ### The General Rule for Aurelia's DI Use
 
@@ -223,7 +223,7 @@ Everything is an application-level singleton except for those things which are c
 
 ## [Explicit Configuration](aurelia-doc://section/5/version/1.0.0)
 
-For the most part, Aurelia's DI will do what you want with object lifetime. However, you may desire to change the behavior of individual classes for the specific needs of your application. This is easy to do by either directly using the `Container` API or by decoratoring your class with a `Registration`.
+For the most part, Aurelia's DI will do what you want with object lifetime. However, you may desire to change the behavior of individual classes for the specific needs of your application. This is easy to do by either directly using the `Container` API or by decorating your class with a `Registration`.
 
 ### The Container Registration API
 
@@ -236,11 +236,11 @@ Here's a survey of the registration APIs you have available through a `Container
   * `container.registerSingleton(HttpClient);`
 * `container.registerTransient(key: any, fn?: Function): void` - This method allows you to register a class as transient. This means that every time the `container` is asked for the *key*, it will return a brand new instance of the *class*. As with the singleton behavior, the key is requried but the class is optional. If left off, the key will be treated as the class to be instantiated. Here's an example of using transient registration:
   * `container.registerTransient(LinkHandler, DefaultLinkHandler);`
-* `container.registerInstance(key: any, instance?: any): void` - If you already have an existing instance, you can add that to the container with this method. You just need to pick a key that the instance will be retrievable by. If not key is provided then the key becomes the instance.
+* `container.registerInstance(key: any, instance?: any): void` - If you already have an existing instance, you can add that to the container with this method. You just need to pick a key that the instance will be retrievable by. If no key is provided then the key becomes the instance.
 * `container.registerHandler(key: any, handler: (container?: Container, key?: any, resolver?: Resolver) => any): void` - In addition to simply declaring behaviors, you can also provide a custom function (a handler) that will respond any time the container is queried for the key. This custom handler has access to the container instance, the key and the internal resolver which stores the handler. This enables just about any sort of custom lifetime to be implemented by supplying a custom function. Here's an example:
   * `container.registerHandler('Foo', () => new Bar());`
 * `container.registerResolver(key: any, resolver: Resolver): void` - You can also register a custom `Resolver` instance for the key. Under the hood, all previously discussed methods translate to using a built-in `Resolver` instance. However, you can always supply your own. We'll discuss this in more detail in the DI customization article.
-* `container.autoRegister(fn: any, key?: any): Resolver` - As you know, if a container can't find a registration during its resolution stage, it will auto-register the requested type. That is done internally through the use of `autoRegister`. However, you can use it yourself to auto-register a type with a particular container instance. Be default, this will result in a singleton registration, on the container this API is called on. However, if the type has registration decorators, that could provide an alternate registration. Whatever `Resolver` is established during auto-registration will be returned.
+* `container.autoRegister(fn: any, key?: any): Resolver` - As you know, if a container can't find a registration during its resolution stage, it will auto-register the requested type. That is done internally through the use of `autoRegister`. However, you can use it yourself to auto-register a type with a particular container instance. By default, this will result in a singleton registration, on the container this API is called on. However, if the type has registration decorators, that could provide an alternate registration. Whatever `Resolver` is established during auto-registration will be returned.
 
 > Info: Registration Keys
 > All registration APIs take a `key`. This key is typically the class itself (for convenience). However, the key can be *any* type, including strings and objects. This is possible because Aurelia's DI implementation uses a `Map` object to correlate a *key* to a `Resolver`. When using class-oriented registration APIs, if the key is not a class, you must provide the class to be created as the second argument to the API call.
@@ -249,7 +249,7 @@ Here's a survey of the registration APIs you have available through a `Container
 
 As an alternative to explicitly registering types with the container, you can rely on auto-registration, but specify the auto-registration behavior you desire, overriding the default container-root-singleton behavior. To provide auto-registration behavior, you simply decorate your type with an auto-registration decorator. What follows is a basic explanation of built-in registration decorators:
 
-* `transient()` - Simply decorator your class with `transient()` and when it's requested from the container, a new instance will be created for each request.
+* `transient()` - Simply decorate your class with `transient()` and when it's requested from the container, a new instance will be created for each request.
 * `singleton(overrideChild?:boolean)` - Normally, types are auto-registered as singletons in the root container. So, why do we provide this decorator? This decorator allows you to specify `true` as an argument to indicate that the singleton should be registered not in the root container, but in the immediate container to which the initial request was issued.
 * `registration(registration: Registration)` - In addition to the built-in singleton and transient registrations, you can create your own and associate it with a class. We'll discuss this in more detail in the DI customization article.
 
@@ -268,6 +268,19 @@ As mentioned above, the DI container uses `Resolvers` internally to provide all 
   * ex. `Optional.of(LoggedInUser)`
 * `Parent` - Skips starting dependency resolution from the current container and instead begins the lookup process on the parent container.
   * ex. `Parent.of(MyCustomElement)`
+* `Factory` - Used to allow injecting dependencies, but also passing data to the constructor.
+  * ex. `Factory.of(CustomClass)`
+* `NewInstance` - Used to inject a new instance of a dependency, without regard for existing instances in the container.
+  * ex. `NewInstance.of(CustomClass).as(Another)`
+
+If using TypeScript, keep in mind that `@autoinject` won't allow you to use `Resolvers`. Instead, you may use argument decorators, without duplicating argument order, which you otherwise have to maintain when using the class decorator or the static `inject` property. Available function parameter decorators are:
+
+* `lazy(key)`
+* `all(key)`
+* `optional(key)`
+* `parent(key)`
+* `factory(key, asValue?)`
+* `newInstance(key)`
 
 Here's an example of how we might express a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
 
@@ -296,12 +309,11 @@ Here's an example of how we might express a dependency on `HttpClient` that we m
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Lazy, inject} from 'aurelia-framework';
+    import {lazy} from 'aurelia-framework';
     import {HttpClient} from 'aurelia-fetch-client';
 
-    @inject(Lazy.of(HttpClient))
     export class CustomerDetail {
-      constructor(private getHTTP: () => HttpClient){ }
+      constructor(@lazy(HttpClient) private getHTTP: () => HttpClient){ }
     }
   </source-code>
 </code-listing>

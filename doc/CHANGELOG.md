@@ -1,3 +1,34 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/aurelia/dependency-injection/compare/1.0.0-rc.1.0.1...v1.0.0) (2016-07-27)
+
+
+### Bug Fixes
+
+* **injection:** allow combining with [@autoinject](https://github.com/autoinject) ([7219579](https://github.com/aurelia/dependency-injection/commit/7219579))
+
+
+### Features
+
+* **resolver:** added decorators for lazy, all, optional, parent, factory and newInstance ([24e19a2](https://github.com/aurelia/dependency-injection/commit/24e19a2))
+* **resolvers:** add asValue to factory argument decorator ([28db168](https://github.com/aurelia/dependency-injection/commit/28db168))
+
+
+
+<a name="1.0.0-rc.1.0.1"></a>
+# [1.0.0-rc.1.0.1](https://github.com/aurelia/dependency-injection/compare/1.0.0-rc.1.0.0...v1.0.0-rc.1.0.1) (2016-07-12)
+
+
+### Bug Fixes
+
+* **Optional:** change checkParent default to true ([a8a8620](https://github.com/aurelia/dependency-injection/commit/a8a8620)), closes [#94](https://github.com/aurelia/dependency-injection/issues/94)
+
+
+### Features
+
+* **container:** return Resolvers from registration methods ([3fc10cb](https://github.com/aurelia/dependency-injection/commit/3fc10cb)), closes [#82](https://github.com/aurelia/dependency-injection/issues/82)
+
+
+
 <a name="1.0.0-rc.1.0.0"></a>
 # [1.0.0-rc.1.0.0](https://github.com/aurelia/dependency-injection/compare/1.0.0-beta.2.1.1...v1.0.0-rc.1.0.0) (2016-06-22)
 

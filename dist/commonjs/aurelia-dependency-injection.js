@@ -7,6 +7,13 @@ exports.Container = exports.InvocationHandler = exports._emptyParameters = expor
 
 var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers;
 
+exports.getDecoratorDependencies = getDecoratorDependencies;
+exports.lazy = lazy;
+exports.all = all;
+exports.optional = optional;
+exports.parent = parent;
+exports.factory = factory;
+exports.newInstance = newInstance;
 exports.invoker = invoker;
 exports.factory = factory;
 exports.registration = registration;
@@ -69,7 +76,7 @@ var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
 }()) || _class3);
 var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
   function Optional(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
     
 
@@ -86,7 +93,7 @@ var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function 
   };
 
   Optional.of = function of(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
     return new Optional(key, checkParent);
   };
@@ -192,6 +199,77 @@ var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class13 = fu
 
   return NewInstance;
 }()) || _class13);
+function getDecoratorDependencies(target, name) {
+  var dependencies = target.inject;
+  if (typeof dependencies === 'function') {
+    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+  }
+  if (!dependencies) {
+    dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
+    target.inject = dependencies;
+  }
+
+  return dependencies;
+}
+
+function lazy(keyValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'lazy');
+    params[index] = Lazy.of(keyValue);
+  };
+}
+
+function all(keyValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'all');
+    params[index] = All.of(keyValue);
+  };
+}
+
+function optional() {
+  var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+  var deco = function deco(checkParent) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'optional');
+      params[index] = Optional.of(params[index], checkParent);
+    };
+  };
+  if (typeof checkParentOrTarget === 'boolean') {
+    return deco(checkParentOrTarget);
+  }
+  return deco(true);
+}
+
+function parent(target, key, index) {
+  var params = getDecoratorDependencies(target, 'parent');
+  params[index] = Parent.of(params[index]);
+}
+
+function factory(keyValue, asValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'factory');
+    var factory = Factory.of(keyValue);
+    params[index] = asValue ? factory.as(asValue) : factory;
+  };
+}
+
+function newInstance(asKeyOrTarget) {
+  var deco = function deco(asKey) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'newInstance');
+      params[index] = NewInstance.of(params[index]);
+      if (!!asKey) {
+        params[index].as(asKey);
+      }
+    };
+  };
+  if (arguments.length === 1) {
+    return deco(asKeyOrTarget);
+  }
+  return deco();
+}
+
 function invoker(value) {
   return function (target) {
     _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
@@ -266,9 +344,7 @@ var TransientRegistration = exports.TransientRegistration = function () {
   }
 
   TransientRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
-    var resolver = new StrategyResolver(2, fn);
-    container.registerResolver(this._key || key, resolver);
-    return resolver;
+    return container.registerTransient(this._key || key, fn);
   };
 
   return TransientRegistration;
@@ -289,15 +365,7 @@ var SingletonRegistration = exports.SingletonRegistration = function () {
   }
 
   SingletonRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
-    var resolver = new StrategyResolver(1, fn);
-
-    if (this._registerInChild) {
-      container.registerResolver(this._key || key, resolver);
-    } else {
-      container.root.registerResolver(this._key || key, resolver);
-    }
-
-    return resolver;
+    return this._registerInChild ? container.registerSingleton(this._key || key, fn) : container.root.registerSingleton(this._key || key, fn);
   };
 
   return SingletonRegistration;
@@ -422,23 +490,23 @@ var Container = exports.Container = function () {
   };
 
   Container.prototype.registerInstance = function registerInstance(key, instance) {
-    this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
+    return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
   };
 
   Container.prototype.registerSingleton = function registerSingleton(key, fn) {
-    this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+    return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
   };
 
   Container.prototype.registerTransient = function registerTransient(key, fn) {
-    this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
+    return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
   };
 
   Container.prototype.registerHandler = function registerHandler(key, handler) {
-    this.registerResolver(key, new StrategyResolver(3, handler));
+    return this.registerResolver(key, new StrategyResolver(3, handler));
   };
 
   Container.prototype.registerAlias = function registerAlias(originalKey, aliasKey) {
-    this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
+    return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
   };
 
   Container.prototype.registerResolver = function registerResolver(key, resolver) {
@@ -456,26 +524,24 @@ var Container = exports.Container = function () {
     } else {
       allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
     }
+
+    return resolver;
   };
 
-  Container.prototype.autoRegister = function autoRegister(fn, key) {
-    var resolver = void 0;
+  Container.prototype.autoRegister = function autoRegister(key, fn) {
+    fn = fn === undefined ? key : fn;
 
     if (typeof fn === 'function') {
       var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
 
       if (_registration === undefined) {
-        resolver = new StrategyResolver(1, fn);
-        this.registerResolver(key === undefined ? fn : key, resolver);
-      } else {
-        resolver = _registration.registerResolver(this, key === undefined ? fn : key, fn);
+        return this.registerResolver(key, new StrategyResolver(1, fn));
       }
-    } else {
-      resolver = new StrategyResolver(0, fn);
-      this.registerResolver(key === undefined ? fn : key, resolver);
+
+      return _registration.registerResolver(this, key, fn);
     }
 
-    return resolver;
+    return this.registerResolver(key, new StrategyResolver(0, fn));
   };
 
   Container.prototype.autoRegisterAll = function autoRegisterAll(fns) {
@@ -618,7 +684,17 @@ var Container = exports.Container = function () {
 
 function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    target.inject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
+    var previousInject = target.inject;
+    var autoInject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
+    if (!previousInject) {
+      target.inject = autoInject;
+    } else {
+      for (var i = 0; i++; i < autoInject.length) {
+        if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
+        }
+      }
+    }
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
@@ -630,6 +706,19 @@ function inject() {
   }
 
   return function (target, key, descriptor) {
+    if (typeof descriptor === 'number' && rest.length === 1) {
+      var params = target.inject;
+      if (typeof params === 'function') {
+        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+      }
+      if (!params) {
+        params = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
+        target.inject = params;
+      }
+      params[descriptor] = rest[0];
+      return;
+    }
+
     if (descriptor) {
       var _fn = descriptor.value;
       _fn.inject = rest;

@@ -1,6 +1,6 @@
 import './setup';
 import {Container} from '../src/container';
-import {Lazy, All, Optional, Parent, Factory, NewInstance} from '../src/resolvers';
+import {Lazy, All, Optional, Parent, Factory, lazy, all, optional, parent, factory} from '../src/resolvers';
 import {transient, singleton} from '../src/registrations';
 import {inject} from '../src/injection';
 import {decorators} from 'aurelia-metadata';
@@ -509,6 +509,26 @@ describe('container', () => {
 
           expect(logger()).toEqual(jasmine.any(Logger));
         });
+
+        it('provides a function which, when called, will return the instance using decorator', () => {
+          class Logger {}
+
+          class App1 {
+            static inject = [Logger];
+            constructor(getLogger) {
+              this.getLogger = getLogger;
+            }
+          }
+
+          lazy(Logger)(App1, null, 0);
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          let logger = app1.getLogger;
+
+          expect(logger()).toEqual(jasmine.any(Logger));
+        });
       });
 
       describe('All', ()=> {
@@ -536,6 +556,55 @@ describe('container', () => {
           expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
           expect(app.loggers[1]).toEqual(jasmine.any(Logger));
         });
+
+        it('resolves all matching dependencies as an array of instances using decorator', () => {
+          class LoggerBase {}
+
+          class VerboseLogger extends LoggerBase {}
+
+          class Logger extends LoggerBase {}
+
+          class App {
+            static inject = [LoggerBase];
+            constructor(loggers) {
+              this.loggers = loggers;
+            }
+          }
+
+          all(LoggerBase)(App, null, 0);
+
+          let container = new Container();
+          container.registerSingleton(LoggerBase, VerboseLogger);
+          container.registerTransient(LoggerBase, Logger);
+          let app = container.get(App);
+
+          expect(app.loggers).toEqual(jasmine.any(Array));
+          expect(app.loggers.length).toBe(2);
+          expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
+          expect(app.loggers[1]).toEqual(jasmine.any(Logger));
+        });
+      });
+
+      describe('inject as param decorator', ()=> {
+        it('resolves a matching dependency using the inject decorator', () => {
+          class Logger {}
+
+          class App1 {
+            static inject = [Logger];
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          inject(Logger)(App1, null, 0);
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          let logger = app1.logger;
+
+          expect(logger).toEqual(jasmine.any(Logger));
+        });
       });
 
       describe('Optional', ()=> {
@@ -556,6 +625,25 @@ describe('container', () => {
           expect(app.logger).toEqual(jasmine.any(Logger));
         });
 
+        it('injects the instance if its registered in the container using decorator', () => {
+          class Logger {}
+
+          class App {
+            static inject = [Logger];
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          optional(Logger)(App, null, 0);
+
+          let container = new Container();
+          container.registerSingleton(Logger, Logger);
+          let app = container.get(App);
+
+          expect(app.logger).toEqual(jasmine.any(Logger));
+        });
+
         it('injects null if key is not registered in the container', () => {
           class VerboseLogger {}
           class Logger {}
@@ -566,6 +654,26 @@ describe('container', () => {
               this.logger = logger;
             }
           }
+
+          let container = new Container();
+          container.registerSingleton(VerboseLogger, Logger);
+          let app = container.get(App);
+
+          expect(app.logger).toBe(null);
+        });
+
+        it('injects null if key is not registered in the container using decorator', () => {
+          class VerboseLogger {}
+          class Logger {}
+
+          class App {
+            static inject = [Logger];
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          optional(Logger)(App, null, 0);
 
           let container = new Container();
           container.registerSingleton(VerboseLogger, Logger);
@@ -659,6 +767,32 @@ describe('container', () => {
           expect(app.logger).toBe(parentInstance);
         });
 
+        it('bypasses the current container and injects instance from parent container using decorator', () =>{
+          class Logger {}
+
+          class App {
+            static inject = [Logger];
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          parent(App, null, 0);
+
+          let parentContainer = new Container();
+          let parentInstance = new Logger();
+          parentContainer.registerInstance(Logger, parentInstance);
+
+          let childContainer = parentContainer.createChild();
+          let childInstance = new Logger();
+          childContainer.registerInstance(Logger, childInstance);
+          childContainer.registerSingleton(App, App);
+
+          let app = childContainer.get(App);
+
+          expect(app.logger).toBe(parentInstance);
+        });
+
         it('returns null when no parent container exists', () =>{
           class Logger {}
 
@@ -668,6 +802,27 @@ describe('container', () => {
               this.logger = logger;
             }
           }
+
+          let container = new Container();
+          let instance = new Logger();
+          container.registerInstance(Logger, instance);
+
+          let app = container.get(App);
+
+          expect(app.logger).toBe(null);
+        });
+
+        it('returns null when no parent container exists using decorator', () =>{
+          class Logger {}
+
+          class App {
+            static inject = [Logger];
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          parent(App, null, 0);
 
           let container = new Container();
           let instance = new Logger();
@@ -720,57 +875,48 @@ describe('container', () => {
         });
       });
 
-      describe('NewInstance', () => {
-        class Logger {
-          constructor(dep?) {
-            this.dep = dep;
+      describe('Factory decorator', () => {
+        let container;
+        let app;
+        let logger;
+        let service;
+        let data = 'test';
+
+        class Logger {}
+
+        class Service {
+          static inject= [Logger];
+          constructor(getLogger, data) {
+            this.getLogger = getLogger;
+            this.data = data;
           }
         }
 
-        class Dependency {}
+        factory(Logger)(Service, null, 0);
 
-        it('inject a new instance of a dependency, without regard for existing instances in the container', () => {
-          class App1 {
-            static inject() { return [NewInstance.of(Logger)]; }
-            constructor(logger) {
-              this.logger = logger;
-            }
+        class App {
+          static inject = [Service];
+          constructor(GetService) {
+            this.GetService = GetService;
+            this.service = new GetService(data);
           }
+        }
 
-          let container = new Container();
-          let app1 = container.get(App1);
+        factory(Service)(App, null, 0);
 
-          expect(app1.logger).toEqual(jasmine.any(Logger));
+        beforeEach(() => {
+          container = new Container();
         });
 
-        it('inject a new instance of a dependency, with instance dynamic dependency', () => {
-          class App1 {
-            static inject() { return [NewInstance.of(Logger, Dependency)]; }
-            constructor(logger) {
-              this.logger = logger;
-            }
-          }
-
-          let container = new Container();
-          let app1 = container.get(App1);
-
-          expect(app1.logger).toEqual(jasmine.any(Logger));
-          expect(app1.logger.dep).toEqual(jasmine.any(Dependency));
+        it('provides a function which, when called, will return the instance', () => {
+          app = container.get(App);
+          service = app.GetService;
+          expect(service()).toEqual(jasmine.any(Service));
         });
 
-        it('inject a new instance of a dependency, with resolver dynamic dependency', () => {
-          class App1 {
-            static inject() { return [NewInstance.of(Logger, Lazy.of(Dependency))]; }
-            constructor(logger) {
-              this.logger = logger;
-            }
-          }
-
-          let container = new Container();
-          let app1 = container.get(App1);
-
-          expect(app1.logger).toEqual(jasmine.any(Logger));
-          expect(app1.logger.dep()).toEqual(jasmine.any(Dependency));
+        it('passes data in to the constructor as the second argument', () => {
+          app = container.get(App);
+          expect(app.service.data).toEqual(data);
         });
       });
     });
