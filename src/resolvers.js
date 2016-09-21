@@ -281,7 +281,7 @@ export class NewInstance {
   */
   get(container) {
     let dynamicDependencies = this.dynamicDependencies.length > 0 ?
-      this.dynamicDependencies.map(dependency => dependency["protocol:aurelia:resolver"] ?
+      this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ?
         dependency.get(container) : container.get(dependency)) : undefined;
     const instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
