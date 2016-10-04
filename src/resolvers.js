@@ -267,6 +267,11 @@ export class NewInstance {
   key;
   asKey;
 
+  /**
+  * Creates an instance of the NewInstance class.
+  * @param key The key to resolve/instantiate.
+  * @param dynamicDependencies An optional list of dynamic dependencies.
+  */
   constructor(key, ...dynamicDependencies: any[]) {
     this.key = key;
     this.asKey = key;
@@ -301,6 +306,7 @@ export class NewInstance {
   /**
   * Creates an NewInstance Resolver for the supplied key.
   * @param key The key to resolve/instantiate.
+  * @param dynamicDependencies An optional list of dynamic dependencies.
   * @return Returns an instance of NewInstance for the key.
   */
   static of(key, ...dynamicDependencies: any[]) {
