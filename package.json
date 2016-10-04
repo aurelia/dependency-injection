@@ -22,10 +22,15 @@
   },
   "jspm": {
     "registry": "npm",
+    "jspmPackage": true,
     "main": "aurelia-dependency-injection",
     "format": "amd",
     "directories": {
       "dist": "dist/amd"
+    },
+    "peerDependencies": {
+      "aurelia-metadata": "^1.0.0",
+      "aurelia-pal": "^1.0.0"
     },
     "dependencies": {
       "aurelia-metadata": "^1.0.0",

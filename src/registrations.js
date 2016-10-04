@@ -1,5 +1,5 @@
 import {StrategyResolver, Resolver} from './resolvers';
-import {Container} from './container';
+import {Container, congigurations} from './container';
 import {metadata} from 'aurelia-metadata';
 import {factory} from './invokers';
 
@@ -10,8 +10,8 @@ export function registration(value: Registration): any {
   return function(target, key, descriptor) {
     if (key && key.length > 0) {
       value.factoryFn = target[key].bind(target);
-     // TODO: move key to metadata
-     target = metadata.get('design:returntype', target, key);
+      // TODO: move key to metadata
+      target = metadata.get('design:returntype', target, key);
     }
 
     if (value instanceof ConfigurationRegistration) {
@@ -69,7 +69,7 @@ export class Registration {
     }
 
     return fn;
-  };
+  }
 }
 
 /**
@@ -84,6 +84,7 @@ export class TransientRegistration extends Registration {
   * @param key The key to register as.
   */
   constructor(key?: any) {
+    super();
     this._key = key;
   }
 
@@ -114,6 +115,8 @@ export class SingletonRegistration extends Registration {
   * @param key The key to register as.
   */
   constructor(keyOrRegisterInChild?: any, registerInChild: boolean = false) {
+    super();
+
     if (typeof keyOrRegisterInChild === 'boolean') {
       this._registerInChild = keyOrRegisterInChild;
     } else {
@@ -151,6 +154,7 @@ class ConfigurationRegistration extends Registration {
    * @param createChild Indicates if a child container should be created
    */
   constructor(createChild: boolean) {
+    super();
     this.createChild = createChild;
   }
 

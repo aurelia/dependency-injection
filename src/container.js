@@ -10,7 +10,7 @@ export const _emptyParameters = Object.freeze([]);
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
 
-let congigurations = new Set();
+export const congigurations = new Set();
 metadata.define(metadata.registration, congigurations, ConfigurationRegistration);
 
 let resolverDecorates = resolver.decorates;
@@ -188,7 +188,7 @@ export class Container {
     this._configInitialized = false;
     this.root = this;
     this.parent = null;
- }
+  }
 
   /**
   * Makes this container instance globally reachable through Container.instance.
