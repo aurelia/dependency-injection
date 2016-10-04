@@ -1,5 +1,6 @@
 import {metadata} from 'aurelia-metadata';
 import {AggregateError} from 'aurelia-pal';
+import {ConfigurationRegistration} from './registrations';
 import {resolver, StrategyResolver, Resolver} from './resolvers';
 import {Invoker} from './invokers';
 
@@ -8,6 +9,9 @@ export const _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
+
+let congigurations = new Set();
+metadata.define(metadata.registration, congigurations, ConfigurationRegistration);
 
 let resolverDecorates = resolver.decorates;
 
@@ -181,9 +185,10 @@ export class Container {
     this._onHandlerCreated = configuration.onHandlerCreated;
     this._handlers = configuration.handlers || (configuration.handlers = new Map());
     this._resolvers = new Map();
+    this._configInitialized = false;
     this.root = this;
     this.parent = null;
-  }
+ }
 
   /**
   * Makes this container instance globally reachable through Container.instance.
@@ -332,11 +337,29 @@ export class Container {
   }
 
   /**
+   * Run registration for all config classes
+   *
+   * @private
+   */
+  _registerAllConfigs() {
+    if (!this._configInitialized) {
+      this._configInitialized = true; // this method is not recursive
+      let configs = metadata.get(metadata.registration, ConfigurationRegistration);
+      configs.forEach((config) => {
+        config.registerResolver(this, config.target);
+        this._get(config.target);
+      });
+    }
+  }
+
+  /**
   * Resolves a single instance based on the provided key.
   * @param key The key that identifies the object to resolve.
   * @return Returns the resolved instance.
   */
   get(key: any): any {
+    this._registerAllConfigs();
+
     if (key === null || key === undefined) {
       throw new Error(badKeyError);
     }
