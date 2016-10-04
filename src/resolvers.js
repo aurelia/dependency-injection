@@ -267,9 +267,15 @@ export class NewInstance {
   key;
   asKey;
 
-  constructor(key) {
+  /**
+  * Creates an instance of the NewInstance class.
+  * @param key The key to resolve/instantiate.
+  * @param dynamicDependencies An optional list of dynamic dependencies.
+  */
+  constructor(key, ...dynamicDependencies: any[]) {
     this.key = key;
     this.asKey = key;
+    this.dynamicDependencies = dynamicDependencies;
   }
 
   /**
@@ -279,7 +285,10 @@ export class NewInstance {
   * @return Returns the matching instance from the parent container
   */
   get(container) {
-    const instance = container.invoke(this.key);
+    let dynamicDependencies = this.dynamicDependencies.length > 0 ?
+      this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ?
+        dependency.get(container) : container.get(dependency)) : undefined;
+    const instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -297,10 +306,11 @@ export class NewInstance {
   /**
   * Creates an NewInstance Resolver for the supplied key.
   * @param key The key to resolve/instantiate.
+  * @param dynamicDependencies An optional list of dynamic dependencies.
   * @return Returns an instance of NewInstance for the key.
   */
-  static of(key) {
-    return new NewInstance(key);
+  static of(key, ...dynamicDependencies: any[]) {
+    return new NewInstance(key, ...dynamicDependencies);
   }
 }
 
@@ -375,17 +385,17 @@ export function factory(keyValue: any, asValue?: any) {
 /**
 * Decorator: Specifies the dependency as a new instance
 */
-export function newInstance(asKeyOrTarget?: any) {
+export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
       let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index]);
+      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
       if (!!asKey) {
         params[index].as(asKey);
       }
     };
   };
-  if (arguments.length === 1) {
+  if (arguments.length >= 1) {
     return deco(asKeyOrTarget);
   }
   return deco();
