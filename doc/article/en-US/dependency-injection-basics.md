@@ -27,6 +27,23 @@ The mechanism for declaring a class's dependencies depends on the language you h
 Typically, you would use Decorators, an ES Next feature supported by both Babel and TypeScript. Here's what it looks like to declare that the `CustomerEditScreen` needs a `CustomerService`:
 
 <code-listing heading="CustomerEditScreen Injection">
+  <source-code lang="ES 2015">
+    import {CustomerService} from 'backend/customer-service';
+
+    export class CustomerEditScreen {
+      static inject() { return [CustomerService]; }
+    
+      constructor(customerService) {
+        this.customerService = customerService;
+        this.customer = null;
+      }
+
+      activate(params) {
+        return this.customerService.getCustomerById(params.customerId)
+          .then(customer => this.customer = customer);
+      }
+    }
+  </source-code>
   <source-code lang="ES 2016">
     import {CustomerService} from 'backend/customer-service';
     import {inject} from 'aurelia-framework';
@@ -65,6 +82,29 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
 Notice that we use the `inject` decorator and that the constructor signature matches the list of dependencies in the `inject` decorator. This tells the DI that any time it wants to create an instance of `CustomerEditScreen` it must first obtain an instance of `CustomerService` which it can *inject* into the constructor of `CustomerEditScreen` during instantiation. You can have as many injected dependencies as you need. Simply ensure that the `inject` decorator and the constructor match one another. Here's a quick example of multiple dependencies:
 
 <code-listing heading="CustomerEditScreen Multiple Injection">
+  <source-code lang="ES 2015">
+    import {CustomerService} from 'backend/customer-service';
+    import {CommonDialogs} from 'resources/dialogs/common-dialogs';
+    import {EventAggregator} from 'aurelia-event-aggregator';
+
+
+    export class CustomerEditScreen {
+      static inject() { return [CustomerService, CommonDialogs, EventAggregator]; }
+      
+      constructor(customerService, dialogs, ea) {
+        this.customerService = customerService;
+        this.dialogs = dialogs;
+        this.ea = ea;
+        this.customer = null;
+      }
+
+      activate(params) {
+        return this.customerService.getCustomerById(params.customerId)
+          .then(customer => this.customer = customer)
+          .then(customer => this.ea.publish('edit:begin', customer));
+      }
+    }
+  </source-code>
   <source-code lang="ES 2016">
     import {CustomerService} from 'backend/customer-service';
     import {CommonDialogs} from 'resources/dialogs/common-dialogs';
@@ -120,7 +160,7 @@ If you are using TypeScript, you can take advantage of an experimental feature o
     import {EventAggregator} from 'aurelia-event-aggregator';
     import {autoinject} from 'aurelia-framework';
 
-    @autoinject()
+    @autoinject
     export class CustomerEditScreen {
       constructor(private customerService: CustomerService, private dialogs: CommonDialogs, private ea: EventAggregator) {
         this.customer = null;
@@ -138,7 +178,7 @@ If you are using TypeScript, you can take advantage of an experimental feature o
 > Info
 > Interestingly, you don't need to use our `autoinject` decorator at all to get the above to work. The TypeScript compiler will emit the type metadata if *any* decorator is added to the class. Aurelia can read this metadata regardless of what decorator triggers TypeScript to add it. We simply provide the `autoinject` decorator for consistency and clarity.
 
-If you aren't using Babel's or TypeScript's decorator support (or don't want to), you can easily provide `inject` metadata using a simple static method on your class:
+If you aren't using Babel's or TypeScript's decorator support (or don't want to), you can easily provide `inject` metadata using a simple static method or property on your class:
 
 <code-listing heading="CustomerEditScreen Inject Method">
   <source-code lang="ES 2015">
@@ -148,6 +188,28 @@ If you aren't using Babel's or TypeScript's decorator support (or don't want to)
 
     export class CustomerEditScreen {
       static inject() { return [CustomerService, CommonDialogs, EventAggregator]; }
+
+      constructor(customerService, dialogs, ea) {
+        this.customerService = customerService;
+        this.dialogs = dialogs;
+        this.ea = ea;
+        this.customer = null;
+      }
+
+      activate(params) {
+        return this.customerService.getCustomerById(params.customerId)
+          .then(customer => this.customer = customer)
+          .then(customer => this.ea.publish('edit:begin', customer));
+      }
+    }
+  </source-code>
+  <source-code lang="ES 2016/Typescript">
+    import {CustomerService} from 'backend/customer-service';
+    import {CommonDialogs} from 'resources/dialogs/common-dialogs';
+    import {EventAggregator} from 'aurelia-event-aggregator';
+
+    export class CustomerEditScreen {
+      static inject = [CustomerService, CommonDialogs, EventAggregator];
 
       constructor(customerService, dialogs, ea) {
         this.customerService = customerService;
