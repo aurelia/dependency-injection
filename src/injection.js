@@ -11,7 +11,7 @@ export function autoinject(potentialTarget?: any): any {
     if (!previousInject) {
       target.inject = autoInject;
     } else {
-      for (var i = 0; i < autoInject.length; i++) {
+      for (let i = 0; i < autoInject.length; i++) {
         //check if previously injected.
         if (previousInject[i] && previousInject[i] !== autoInject[i]) {
           const prevIndex = previousInject.indexOf(autoInject[i]);
