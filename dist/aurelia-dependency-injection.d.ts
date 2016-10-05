@@ -153,7 +153,12 @@ export declare class Factory {
 export declare class NewInstance {
     key: any;
     asKey: any;
-    constructor(key: any);
+    /**
+    * Creates an instance of the NewInstance class.
+    * @param key The key to resolve/instantiate.
+    * @param dynamicDependencies An optional list of dynamic dependencies.
+    */
+    constructor(key: any, ...dynamicDependencies: any[]);
     /**
     * Called by the container to instantiate the dependency and potentially register
     * as another key if the `as` method was used.
@@ -170,9 +175,10 @@ export declare class NewInstance {
     /**
     * Creates an NewInstance Resolver for the supplied key.
     * @param key The key to resolve/instantiate.
+    * @param dynamicDependencies An optional list of dynamic dependencies.
     * @return Returns an instance of NewInstance for the key.
     */
-    static of(key: any): NewInstance;
+    static of(key: any, ...dynamicDependencies: any[]): NewInstance;
 }
 export declare function getDecoratorDependencies(target: any, name: any): any;
 /**
@@ -194,7 +200,7 @@ export declare function parent(target: any, key: any, index: any): void;
 /**
 * Decorator: Specifies the dependency as a new instance
 */
-export declare function newInstance(asKeyOrTarget?: any): (target: any, key: any, index: any) => void;
+export declare function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]): (target: any, key: any, index: any) => void;
 /**
 * Decorator: Specifies a custom Invoker for the decorated item.
 */

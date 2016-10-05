@@ -116,14 +116,15 @@ export let Factory = (_dec6 = resolver(), _dec6(_class11 = class Factory {
 }) || _class11);
 
 export let NewInstance = (_dec7 = resolver(), _dec7(_class13 = class NewInstance {
-
-  constructor(key) {
+  constructor(key, ...dynamicDependencies) {
     this.key = key;
     this.asKey = key;
+    this.dynamicDependencies = dynamicDependencies;
   }
 
   get(container) {
-    const instance = container.invoke(this.key);
+    let dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency)) : undefined;
+    const instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -133,8 +134,8 @@ export let NewInstance = (_dec7 = resolver(), _dec7(_class13 = class NewInstance
     return this;
   }
 
-  static of(key) {
-    return new NewInstance(key);
+  static of(key, ...dynamicDependencies) {
+    return new NewInstance(key, ...dynamicDependencies);
   }
 }) || _class13);
 
@@ -191,17 +192,17 @@ export function factory(keyValue, asValue) {
   };
 }
 
-export function newInstance(asKeyOrTarget) {
+export function newInstance(asKeyOrTarget, ...dynamicDependencies) {
   let deco = function (asKey) {
     return function (target, key, index) {
       let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index]);
+      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
       if (!!asKey) {
         params[index].as(asKey);
       }
     };
   };
-  if (arguments.length === 1) {
+  if (arguments.length >= 1) {
     return deco(asKeyOrTarget);
   }
   return deco();
@@ -290,7 +291,11 @@ export let SingletonRegistration = class SingletonRegistration {
   }
 };
 
-const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+function validateKey(key) {
+  if (key === null || key === undefined) {
+    throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+  }
+}
 export const _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
@@ -425,9 +430,7 @@ export let Container = class Container {
   }
 
   registerResolver(key, resolver) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     let allResolvers = this._resolvers;
     let result = allResolvers.get(key);
@@ -471,17 +474,13 @@ export let Container = class Container {
   }
 
   hasResolver(key, checkParent = false) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     return this._resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
   }
 
   get(key) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     if (key === Container) {
       return this;
@@ -519,9 +518,7 @@ export let Container = class Container {
   }
 
   getAll(key) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     let resolver = this._resolvers.get(key);
 
@@ -598,9 +595,15 @@ export function autoinject(potentialTarget) {
     if (!previousInject) {
       target.inject = autoInject;
     } else {
-      for (let i = 0; i++; i < autoInject.length) {
-        if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
+      for (let i = 0; i < autoInject.length; i++) {
+        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
+          const prevIndex = previousInject.indexOf(autoInject[i]);
+          if (prevIndex > -1) {
+            previousInject.splice(prevIndex, 1);
+            previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
+          } else if (!previousInject[i]) {
+            previousInject[i] = autoInject[i];
+          }
         }
       }
     }
