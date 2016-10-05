@@ -15,14 +15,13 @@ export function autoinject(potentialTarget?: any): any {
         //check if previously injected.
         if (previousInject[i] && previousInject[i] !== autoInject[i]) {
           const prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1)
+          if (prevIndex > -1) {
             previousInject.splice(prevIndex, 1);
             previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-          }
-          //else add 
-          else if (!previousInject[i]) {
+          } else if (!previousInject[i]) { //else add
             previousInject[i] = autoInject[i];
           }
+        }
       }
     }
   };
