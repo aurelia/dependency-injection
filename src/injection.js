@@ -11,18 +11,19 @@ export function autoinject(potentialTarget?: any): any {
     if (!previousInject) {
       target.inject = autoInject;
     } else {
-      for (let i = 0; i < autoInject.length; i++) {
-        //check if previously injected.
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          const prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
+        for (let i = 0; i < autoInject.length; i++) {
+          //check if previously injected.
+          if (previousInject[i] && previousInject[i] !== autoInject[i]) {
+            const prevIndex = previousInject.indexOf(autoInject[i]);
+            if (prevIndex > -1) {
+              previousInject.splice(prevIndex, 1);
+            }
+            previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
           }
-          previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-        }
-        //else add 
-        else if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
+          //else add 
+          else if (!previousInject[i]) {
+            previousInject[i] = autoInject[i];
+          }
         }
       }
     }
