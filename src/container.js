@@ -10,8 +10,8 @@ export const _emptyParameters = Object.freeze([]);
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
 
-export const congigurations = new Set();
-metadata.define(metadata.registration, congigurations, ConfigurationRegistration);
+export const configurations = new Set();
+metadata.define(metadata.registration, configurations, ConfigurationRegistration);
 
 let resolverDecorates = resolver.decorates;
 

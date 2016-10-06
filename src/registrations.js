@@ -1,5 +1,5 @@
 import {StrategyResolver, Resolver} from './resolvers';
-import {Container, congigurations} from './container';
+import {Container, configurations} from './container';
 import {metadata} from 'aurelia-metadata';
 import {factory} from './invokers';
 
@@ -16,7 +16,7 @@ export function registration(value: Registration): any {
 
     if (value instanceof ConfigurationRegistration) {
       value.target = target;
-      congigurations.add(value);
+      configurations.add(value);
     } else {
       metadata.define(metadata.registration, value, target);
     }
