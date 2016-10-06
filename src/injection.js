@@ -4,30 +4,31 @@ import {_emptyParameters} from './container';
 /**
 * Decorator: Directs the TypeScript transpiler to write-out type metadata for the decorated class.
 */
-export function autoinject(potentialTarget?: any): any {
-  let deco = function(target) {
-    let previousInject = target.inject;
-    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-        for (let i = 0; i < autoInject.length; i++) {
-          //check if previously injected.
-          if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-            const prevIndex = previousInject.indexOf(autoInject[i]);
-            if (prevIndex > -1) {
-              previousInject.splice(prevIndex, 1);
+export function autoinject(potentialTarget?: any): any
+{
+    let deco = function(target) {
+        let previousInject = target.inject;
+        let autoInject:
+        any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+        if (!previousInject) {
+            target.inject = autoInject;
+        } else {
+            for (let i = 0; i < autoInject.length; i++) {
+              //check if previously injected.
+              if (previousInject[i] && previousInject[i] !== autoInject[i]) {
+                const prevIndex = previousInject.indexOf(autoInject[i]);
+                if (prevIndex > -1) {
+                  previousInject.splice(prevIndex, 1);
+                }
+                previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
+              }
+              //else add 
+              else if (!previousInject[i]) {
+                previousInject[i] = autoInject[i];
+              }
             }
-            previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-          }
-          //else add 
-          else if (!previousInject[i]) {
-            previousInject[i] = autoInject[i];
-          }
         }
-      }
-    }
-  };
+    };
 
   return potentialTarget ? deco(potentialTarget) : deco;
 }
