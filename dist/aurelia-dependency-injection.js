@@ -267,9 +267,15 @@ export class NewInstance {
   key;
   asKey;
 
-  constructor(key) {
+  /**
+  * Creates an instance of the NewInstance class.
+  * @param key The key to resolve/instantiate.
+  * @param dynamicDependencies An optional list of dynamic dependencies.
+  */
+  constructor(key, ...dynamicDependencies: any[]) {
     this.key = key;
     this.asKey = key;
+    this.dynamicDependencies = dynamicDependencies;
   }
 
   /**
@@ -279,7 +285,10 @@ export class NewInstance {
   * @return Returns the matching instance from the parent container
   */
   get(container) {
-    const instance = container.invoke(this.key);
+    let dynamicDependencies = this.dynamicDependencies.length > 0 ?
+      this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ?
+        dependency.get(container) : container.get(dependency)) : undefined;
+    const instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -297,10 +306,11 @@ export class NewInstance {
   /**
   * Creates an NewInstance Resolver for the supplied key.
   * @param key The key to resolve/instantiate.
+  * @param dynamicDependencies An optional list of dynamic dependencies.
   * @return Returns an instance of NewInstance for the key.
   */
-  static of(key) {
-    return new NewInstance(key);
+  static of(key, ...dynamicDependencies: any[]) {
+    return new NewInstance(key, ...dynamicDependencies);
   }
 }
 
@@ -375,17 +385,17 @@ export function factory(keyValue: any, asValue?: any) {
 /**
 * Decorator: Specifies the dependency as a new instance
 */
-export function newInstance(asKeyOrTarget?: any) {
+export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
       let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index]);
+      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
       if (!!asKey) {
         params[index].as(asKey);
       }
     };
   };
-  if (arguments.length === 1) {
+  if (arguments.length >= 1) {
     return deco(asKeyOrTarget);
   }
   return deco();
@@ -587,7 +597,11 @@ export class SingletonRegistration {
   }
 }
 
-const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+function validateKey(key: any) {
+  if (key === null || key === undefined) {
+    throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+  }
+}
 export const _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
@@ -843,9 +857,7 @@ export class Container {
   * @return The resolver that was registered.
   */
   registerResolver(key: any, resolver: Resolver): Resolver {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     let allResolvers = this._resolvers;
     let result = allResolvers.get(key);
@@ -908,9 +920,7 @@ export class Container {
   * @return Returns true if the key has been registred; false otherwise.
   */
   hasResolver(key: any, checkParent: boolean = false): boolean {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     return this._resolvers.has(key) || (checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent));
   }
@@ -921,9 +931,7 @@ export class Container {
   * @return Returns the resolved instance.
   */
   get(key: any): any {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     if (key === Container) {
       return this;
@@ -966,9 +974,7 @@ export class Container {
   * @return Returns an array of the resolved instances.
   */
   getAll(key: any): any[] {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     let resolver = this._resolvers.get(key);
 
@@ -1059,9 +1065,16 @@ export function autoinject(potentialTarget?: any): any {
     if (!previousInject) {
       target.inject = autoInject;
     } else {
-      for (let i = 0; i++; i < autoInject.length) {
-        if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
+      for (let i = 0; i < autoInject.length; i++) {
+        //check if previously injected.
+        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
+          const prevIndex = previousInject.indexOf(autoInject[i]);
+          if (prevIndex > -1) {
+            previousInject.splice(prevIndex, 1);
+            previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
+          } else if (!previousInject[i]) { //else add
+            previousInject[i] = autoInject[i];
+          }
         }
       }
     }

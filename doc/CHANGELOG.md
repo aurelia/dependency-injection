@@ -1,3 +1,17 @@
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/aurelia/dependency-injection/compare/1.0.0...v1.1.0) (2016-10-05)
+
+### Bug Fixes
+
+* **injection:** correct internal loop error and enable inheritence with autoinject
+
+### Features
+
+* **resolvers:** let NewInstance have resolved dynamics dependencies ([0fcda8b](https://github.com/aurelia/dependency-injection/commit/0fcda8b))
+* **resolvers:** let NewInstance resolver have dynamics dependencies ([c6275a5](https://github.com/aurelia/dependency-injection/commit/c6275a5))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/aurelia/dependency-injection/compare/1.0.0-rc.1.0.1...v1.0.0) (2016-07-27)
 

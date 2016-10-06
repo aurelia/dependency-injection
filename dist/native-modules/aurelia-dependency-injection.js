@@ -163,10 +163,19 @@ export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
 
     this.key = key;
     this.asKey = key;
+
+    for (var _len2 = arguments.length, dynamicDependencies = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      dynamicDependencies[_key2 - 1] = arguments[_key2];
+    }
+
+    this.dynamicDependencies = dynamicDependencies;
   }
 
   NewInstance.prototype.get = function get(container) {
-    var instance = container.invoke(this.key);
+    var dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(function (dependency) {
+      return dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency);
+    }) : undefined;
+    var instance = container.invoke(this.key, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   };
@@ -177,7 +186,11 @@ export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
   };
 
   NewInstance.of = function of(key) {
-    return new NewInstance(key);
+    for (var _len3 = arguments.length, dynamicDependencies = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+      dynamicDependencies[_key3 - 1] = arguments[_key3];
+    }
+
+    return new (Function.prototype.bind.apply(NewInstance, [null].concat([key], dynamicDependencies)))();
   };
 
   return NewInstance;
@@ -239,16 +252,20 @@ export function factory(keyValue, asValue) {
 }
 
 export function newInstance(asKeyOrTarget) {
+  for (var _len4 = arguments.length, dynamicDependencies = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+    dynamicDependencies[_key4 - 1] = arguments[_key4];
+  }
+
   var deco = function deco(asKey) {
     return function (target, key, index) {
       var params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index]);
+      params[index] = NewInstance.of.apply(NewInstance, [params[index]].concat(dynamicDependencies));
       if (!!asKey) {
         params[index].as(asKey);
       }
     };
   };
-  if (arguments.length === 1) {
+  if (arguments.length >= 1) {
     return deco(asKeyOrTarget);
   }
   return deco();
@@ -355,7 +372,11 @@ export var SingletonRegistration = function () {
   return SingletonRegistration;
 }();
 
-var badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+function validateKey(key) {
+  if (key === null || key === undefined) {
+    throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+  }
+}
 export var _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
@@ -494,9 +515,7 @@ export var Container = function () {
   };
 
   Container.prototype.registerResolver = function registerResolver(key, resolver) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     var allResolvers = this._resolvers;
     var result = allResolvers.get(key);
@@ -542,17 +561,13 @@ export var Container = function () {
   Container.prototype.hasResolver = function hasResolver(key) {
     var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     return this._resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
   };
 
   Container.prototype.get = function get(key) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     if (key === Container) {
       return this;
@@ -590,9 +605,7 @@ export var Container = function () {
   };
 
   Container.prototype.getAll = function getAll(key) {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     var resolver = this._resolvers.get(key);
 
@@ -673,9 +686,15 @@ export function autoinject(potentialTarget) {
     if (!previousInject) {
       target.inject = autoInject;
     } else {
-      for (var i = 0; i++; i < autoInject.length) {
-        if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
+      for (var i = 0; i < autoInject.length; i++) {
+        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
+          var prevIndex = previousInject.indexOf(autoInject[i]);
+          if (prevIndex > -1) {
+            previousInject.splice(prevIndex, 1);
+            previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
+          } else if (!previousInject[i]) {
+            previousInject[i] = autoInject[i];
+          }
         }
       }
     }
@@ -685,8 +704,8 @@ export function autoinject(potentialTarget) {
 }
 
 export function inject() {
-  for (var _len2 = arguments.length, rest = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    rest[_key2] = arguments[_key2];
+  for (var _len5 = arguments.length, rest = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+    rest[_key5] = arguments[_key5];
   }
 
   return function (target, key, descriptor) {

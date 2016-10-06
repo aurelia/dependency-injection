@@ -4,7 +4,11 @@ import {ConfigurationRegistration} from './registrations';
 import {resolver, StrategyResolver, Resolver} from './resolvers';
 import {Invoker} from './invokers';
 
-const badKeyError = 'key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?';
+function validateKey(key: any) {
+  if (key === null || key === undefined) {
+    throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+  }
+}
 export const _emptyParameters = Object.freeze([]);
 
 metadata.registration = 'aurelia:registration';
@@ -264,9 +268,7 @@ export class Container {
   * @return The resolver that was registered.
   */
   registerResolver(key: any, resolver: Resolver): Resolver {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     let allResolvers = this._resolvers;
     let result = allResolvers.get(key);
@@ -329,9 +331,7 @@ export class Container {
   * @return Returns true if the key has been registred; false otherwise.
   */
   hasResolver(key: any, checkParent: boolean = false): boolean {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     return this._resolvers.has(key) || (checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent));
   }
@@ -358,11 +358,9 @@ export class Container {
   * @return Returns the resolved instance.
   */
   get(key: any): any {
-    this._registerAllConfigs();
+    validateKey(key);
 
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    this._registerAllConfigs();
 
     if (key === Container) {
       return this;
@@ -405,9 +403,7 @@ export class Container {
   * @return Returns an array of the resolved instances.
   */
   getAll(key: any): any[] {
-    if (key === null || key === undefined) {
-      throw new Error(badKeyError);
-    }
+    validateKey(key);
 
     let resolver = this._resolvers.get(key);
 
