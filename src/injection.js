@@ -8,8 +8,7 @@ export function autoinject(potentialTarget?: any): any
 {
     let deco = function(target) {
         let previousInject = target.inject;
-        let autoInject:
-        any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+        let autoInject:any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
         if (!previousInject) {
             target.inject = autoInject;
         } else {
