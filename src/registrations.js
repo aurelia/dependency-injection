@@ -18,10 +18,9 @@ export function registration(value: Registration): any {
       value.target = target;
       ConfigurationRegistration.configurations.add(value);
 
-      if(!metadata.get(metadata.registration, ConfigurationRegistration)) {
+      if (!metadata.get(metadata.registration, ConfigurationRegistration)) {
         metadata.define(metadata.registration, ConfigurationRegistration.configurations, ConfigurationRegistration);
       }
-
     } else {
       metadata.define(metadata.registration, value, target);
     }
