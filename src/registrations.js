@@ -1,5 +1,5 @@
 import {StrategyResolver, Resolver} from './resolvers';
-import {Container, configurations} from './container';
+import {Container} from './container';
 import {metadata} from 'aurelia-metadata';
 import {factory} from './invokers';
 
@@ -16,7 +16,12 @@ export function registration(value: Registration): any {
 
     if (value instanceof ConfigurationRegistration) {
       value.target = target;
-      configurations.add(value);
+      ConfigurationRegistration.configurations.add(value);
+
+      if(!metadata.get(metadata.registration, ConfigurationRegistration)) {
+        metadata.define(metadata.registration, ConfigurationRegistration.configurations, ConfigurationRegistration);
+      }
+
     } else {
       metadata.define(metadata.registration, value, target);
     }
@@ -146,6 +151,8 @@ export class SingletonRegistration extends Registration {
  * configuring dependencies
  */
 class ConfigurationRegistration extends Registration {
+  static configurations = new Set();
+
   createChild: boolean;
   target: any;
 

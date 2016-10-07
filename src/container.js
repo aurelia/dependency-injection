@@ -14,9 +14,6 @@ export const _emptyParameters = Object.freeze([]);
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
 
-export const configurations = new Set();
-metadata.define(metadata.registration, configurations, ConfigurationRegistration);
-
 let resolverDecorates = resolver.decorates;
 
 /**
@@ -345,10 +342,12 @@ export class Container {
     if (!this._configInitialized) {
       this._configInitialized = true; // this method is not recursive
       let configs = metadata.get(metadata.registration, ConfigurationRegistration);
-      configs.forEach((config) => {
-        config.registerResolver(this, config.target);
-        this._get(config.target);
-      });
+      if (configs) {
+        configs.forEach((config) => {
+          config.registerResolver(this, config.target);
+          this._get(config.target);
+        });
+      }
     }
   }
 
