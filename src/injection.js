@@ -19,9 +19,7 @@ export function autoinject(potentialTarget?: any): any {
             previousInject.splice(prevIndex, 1);
           }
           previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-        }
-        //else add
-        else if (!previousInject[i]) {
+        } else if (!previousInject[i]) {//else add
           previousInject[i] = autoInject[i];
         }
       }
