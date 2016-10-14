@@ -214,7 +214,7 @@ export function invoker(value) {
   };
 }
 
-export function factory(potentialTarget) {
+export function invokeAsFactory(potentialTarget) {
   let deco = function (target) {
     metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
@@ -600,10 +600,10 @@ export function autoinject(potentialTarget) {
           const prevIndex = previousInject.indexOf(autoInject[i]);
           if (prevIndex > -1) {
             previousInject.splice(prevIndex, 1);
-            previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
-          } else if (!previousInject[i]) {
-            previousInject[i] = autoInject[i];
           }
+          previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
+        } else if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
         }
       }
     }

@@ -198,6 +198,10 @@ export declare function optional(checkParentOrTarget?: boolean): (target: any, k
 */
 export declare function parent(target: any, key: any, index: any): void;
 /**
+* Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
+*/
+export declare function factory(keyValue: any, asValue?: any): (target: any, key: any, index: any) => void;
+/**
 * Decorator: Specifies the dependency as a new instance
 */
 export declare function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]): (target: any, key: any, index: any) => void;
@@ -205,6 +209,10 @@ export declare function newInstance(asKeyOrTarget?: any, ...dynamicDependencies:
 * Decorator: Specifies a custom Invoker for the decorated item.
 */
 export declare function invoker(value: Invoker): any;
+/**
+* Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor.
+*/
+export declare function invokeAsFactory(potentialTarget?: any): any;
 /**
 * A strategy for invoking a function, resulting in an object instance.
 */

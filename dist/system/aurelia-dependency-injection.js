@@ -104,7 +104,7 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
 
   _export('invoker', invoker);
 
-  function factory(potentialTarget) {
+  function invokeAsFactory(potentialTarget) {
     var deco = function deco(target) {
       metadata.define(metadata.invoker, FactoryInvoker.instance, target);
     };
@@ -112,7 +112,7 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
     return potentialTarget ? deco(potentialTarget) : deco;
   }
 
-  _export('factory', factory);
+  _export('invokeAsFactory', invokeAsFactory);
 
   function registration(value) {
     return function (target) {
@@ -182,10 +182,10 @@ System.register(['aurelia-metadata', 'aurelia-pal'], function (_export, _context
             var prevIndex = previousInject.indexOf(autoInject[i]);
             if (prevIndex > -1) {
               previousInject.splice(prevIndex, 1);
-              previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
-            } else if (!previousInject[i]) {
-              previousInject[i] = autoInject[i];
             }
+            previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
+          } else if (!previousInject[i]) {
+            previousInject[i] = autoInject[i];
           }
         }
       }

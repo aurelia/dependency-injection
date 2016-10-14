@@ -413,7 +413,7 @@ export function invoker(value: Invoker): any {
 /**
 * Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor.
 */
-export function factory(potentialTarget?: any): any {
+export function invokeAsFactory(potentialTarget?: any): any {
   let deco = function(target) {
     metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
@@ -1071,10 +1071,10 @@ export function autoinject(potentialTarget?: any): any {
           const prevIndex = previousInject.indexOf(autoInject[i]);
           if (prevIndex > -1) {
             previousInject.splice(prevIndex, 1);
-            previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-          } else if (!previousInject[i]) { //else add
-            previousInject[i] = autoInject[i];
           }
+          previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
+        } else if (!previousInject[i]) {//else add
+          previousInject[i] = autoInject[i];
         }
       }
     }

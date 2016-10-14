@@ -1,3 +1,10 @@
+# 1.2.0
+
+## Bug Fixes
+
+* **autoinject**: merge issue caused incorrect branching logic
+* **invokers:** remove duplicate export name
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/aurelia/dependency-injection/compare/1.0.0...v1.1.0) (2016-10-05)
 
