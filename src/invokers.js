@@ -13,7 +13,7 @@ export function invoker(value: Invoker): any {
 /**
 * Decorator: Specifies that the decorated item should be called as a factory function, rather than a constructor.
 */
-export function factory(potentialTarget?: any): any {
+export function invokeAsFactory(potentialTarget?: any): any {
   let deco = function(target) {
     metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
