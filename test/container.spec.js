@@ -2,7 +2,7 @@ import './setup';
 import {Container} from '../src/container';
 import {Lazy, All, Optional, Parent, Factory, NewInstance, lazy, all, optional, parent, factory, newInstance} from '../src/resolvers';
 import {transient, singleton} from '../src/registrations';
-import {inject} from '../src/injection';
+import {inject, autoinject} from '../src/injection';
 import {decorators} from 'aurelia-metadata';
 
 describe('container', () => {
@@ -110,6 +110,81 @@ describe('container', () => {
       expect(app.service).toEqual(jasmine.any(Service));
       expect(app.logger).toEqual(jasmine.any(Logger));
     });
+  });
+
+
+  describe('autoinject', () => {
+      class Logger {}
+      class Service {}
+      class SubService1 {}
+      class SubService2 {}
+
+      it('loads dependencies in tree classes', function() {
+        
+          let ParentApp = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Logger])).on(
+          class {
+              constructor(logger) {
+                  this.logger = logger;
+              }
+          });
+        
+
+          let ChildApp = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Service, Logger])).on(
+          class extends ParentApp {
+              constructor(service, ...rest) {
+                  super(...rest);
+                  this.service = service;
+              }
+          });
+
+          let SubChildApp1 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [SubService1, Service, Logger])).on(
+          class extends ChildApp {
+              constructor(subService1, ...rest) {
+                  super(...rest);
+                  this.subService1 = subService1;
+              }
+          });
+
+          let SubChildApp2 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [SubService2, Service, Logger])).on(
+          class extends ChildApp {
+              constructor(subService2, ...rest) {
+                  super(...rest);
+                  this.subService2 = subService2;
+              }
+          });
+
+          class SubChildApp3 extends ChildApp {
+          }
+
+          let SubChildApp4 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Logger, SubService1, Service])).on(
+          class extends ChildApp {
+              constructor(logger, subService1, service) {
+                  super(service, logger);
+                  this.subService1 = subService1;
+              }
+          });
+
+          let container = new Container();
+
+          let app1 = container.get(SubChildApp1);
+          expect(app1.subService1).toEqual(jasmine.any(SubService1));
+          expect(app1.service).toEqual(jasmine.any(Service));
+          expect(app1.logger).toEqual(jasmine.any(Logger));
+
+          let app2 = container.get(SubChildApp2);
+          expect(app2.subService2).toEqual(jasmine.any(SubService2));
+          expect(app2.service).toEqual(jasmine.any(Service));
+          expect(app2.logger).toEqual(jasmine.any(Logger));
+
+          let app3 = container.get(SubChildApp3);
+          expect(app3.service).toEqual(jasmine.any(Service));
+          expect(app3.logger).toEqual(jasmine.any(Logger));
+
+          let app4 = container.get(SubChildApp4);
+          expect(app4.subService1).toEqual(jasmine.any(SubService1));
+          expect(app4.service).toEqual(jasmine.any(Service));
+          expect(app4.logger).toEqual(jasmine.any(Logger));
+      });
   });
 
   describe('registration', () => {
