@@ -354,7 +354,13 @@ export class Container {
         return this.autoRegister(key).get(this, key);
       }
 
-      return this.parent._get(key);
+      let registration = metadata.get(metadata.registration, key);
+
+      if (registration === undefined) {
+        return this.parent._get(key);
+      }
+
+      return registration.registerResolver(this, key, key).get(this, key);
     }
 
     return resolver.get(this, key);
