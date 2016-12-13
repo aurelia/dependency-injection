@@ -497,7 +497,13 @@ export let Container = class Container {
         return this.autoRegister(key).get(this, key);
       }
 
-      return this.parent._get(key);
+      let registration = metadata.get(metadata.registration, key);
+
+      if (registration === undefined) {
+        return this.parent._get(key);
+      }
+
+      return registration.registerResolver(this, key, key).get(this, key);
     }
 
     return resolver.get(this, key);
@@ -590,7 +596,7 @@ export let Container = class Container {
 
 export function autoinject(potentialTarget) {
   let deco = function (target) {
-    let previousInject = target.inject;
+    let previousInject = target.inject ? target.inject.slice() : null;
     let autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
     if (!previousInject) {
       target.inject = autoInject;
@@ -606,6 +612,7 @@ export function autoinject(potentialTarget) {
           previousInject[i] = autoInject[i];
         }
       }
+      target.inject = previousInject;
     }
   };
 

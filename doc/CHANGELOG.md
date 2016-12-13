@@ -1,3 +1,14 @@
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/aurelia/dependency-injection/compare/1.2.0...v1.2.1) (2016-12-13)
+
+
+### Bug Fixes
+
+* **autoinject:** prevent changing inject of parent classes ([aa38a34](https://github.com/aurelia/dependency-injection/commit/aa38a34))
+* **container:** check for custom registration before bubbling ([98739f2](https://github.com/aurelia/dependency-injection/commit/98739f2))
+
+
+
 # 1.2.0
 
 ## Bug Fixes

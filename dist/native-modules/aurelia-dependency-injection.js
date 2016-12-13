@@ -584,7 +584,13 @@ export var Container = function () {
         return this.autoRegister(key).get(this, key);
       }
 
-      return this.parent._get(key);
+      var _registration2 = metadata.get(metadata.registration, key);
+
+      if (_registration2 === undefined) {
+        return this.parent._get(key);
+      }
+
+      return _registration2.registerResolver(this, key, key).get(this, key);
     }
 
     return resolver.get(this, key);
@@ -681,7 +687,7 @@ export var Container = function () {
 
 export function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    var previousInject = target.inject;
+    var previousInject = target.inject ? target.inject.slice() : null;
     var autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
     if (!previousInject) {
       target.inject = autoInject;
@@ -697,6 +703,7 @@ export function autoinject(potentialTarget) {
           previousInject[i] = autoInject[i];
         }
       }
+      target.inject = previousInject;
     }
   };
 
