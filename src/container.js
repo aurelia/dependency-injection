@@ -332,6 +332,15 @@ export class Container {
   }
 
   /**
+  * Gets the resolver for the particular key, if it has been registered.
+  * @param key The key that identifies the dependency at resolution time; usually a constructor function.
+  * @return Returns the resolver, if registred, otherwise undefined.
+  */
+  getResolver(key: any) {
+    return this._resolvers.get(key);
+  }
+
+  /**
   * Resolves a single instance based on the provided key.
   * @param key The key that identifies the object to resolve.
   * @return Returns the resolved instance.
