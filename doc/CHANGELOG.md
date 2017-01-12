@@ -1,3 +1,13 @@
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/aurelia/dependency-injection/compare/1.2.1...v1.3.0) (2017-01-12)
+
+
+### Bug Fixes
+
+* **registrations:** incorrect behavior for auto resolution when... ([708b5fd](https://github.com/aurelia/dependency-injection/commit/708b5fd))
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/aurelia/dependency-injection/compare/1.2.0...v1.2.1) (2016-12-13)
 

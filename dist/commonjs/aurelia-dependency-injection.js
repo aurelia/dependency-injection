@@ -361,7 +361,8 @@ var TransientRegistration = exports.TransientRegistration = function () {
   }
 
   TransientRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
-    return container.registerTransient(this._key || key, fn);
+    var existingResolver = container.getResolver(this._key || key);
+    return existingResolver === undefined ? container.registerTransient(this._key || key, fn) : existingResolver;
   };
 
   return TransientRegistration;
@@ -382,7 +383,9 @@ var SingletonRegistration = exports.SingletonRegistration = function () {
   }
 
   SingletonRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
-    return this._registerInChild ? container.registerSingleton(this._key || key, fn) : container.root.registerSingleton(this._key || key, fn);
+    var targetContainer = this._registerInChild ? container : container.root;
+    var existingResolver = targetContainer.getResolver(this._key || key);
+    return existingResolver === undefined ? targetContainer.registerSingleton(this._key || key, fn) : existingResolver;
   };
 
   return SingletonRegistration;
@@ -580,6 +583,10 @@ var Container = exports.Container = function () {
     validateKey(key);
 
     return this._resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
+  };
+
+  Container.prototype.getResolver = function getResolver(key) {
+    return this._resolvers.get(key);
   };
 
   Container.prototype.get = function get(key) {
