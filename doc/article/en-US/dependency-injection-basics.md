@@ -151,7 +151,7 @@ Notice that we use the `inject` decorator and that the constructor signature mat
 > Info
 > To use Decorators in Babel, you need the `babel-plugin-transform-decorators-legacy` plugin. To use them in TypeScript, you need to add the `"experimentalDecorators": true` setting to the `compilerOptions` section of your `tsconfig.json` file. Aurelia projects typically come with these options pre-configured.
 
-If you are using TypeScript, you can take advantage of an experimental feature of the language to have the TypeScript transpiler automatically provide Type information to Aurelia's DI. You can do this by configuring the TypeScript compiler with the `"emitDecoratorMetadata": true` option in the `compilerOptions` section of your `tsconfig.json` file. If you do this, you don't need to duplicate the type information with `inject`, instead, as long as your constructor definition contains its paramaters' types, you can use Aurelia's `autoinject` decorator like this:
+If you are using TypeScript, you can take advantage of an experimental feature of the language to have the TypeScript transpiler automatically provide Type information to Aurelia's DI. You can do this by configuring the TypeScript compiler with the `"emitDecoratorMetadata": true` option in the `compilerOptions` section of your `tsconfig.json` file. If you do this, you don't need to duplicate the type information with `inject`, instead, as long as your constructor definition contains its parameters' types, you can use Aurelia's `autoinject` decorator like this:
 
 <code-listing heading="CustomerEditScreen AutoInjection with TypeScript">
   <source-code lang="TypeScript">
