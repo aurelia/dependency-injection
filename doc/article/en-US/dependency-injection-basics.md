@@ -32,7 +32,7 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
 
     export class CustomerEditScreen {
       static inject() { return [CustomerService]; }
-    
+
       constructor(customerService) {
         this.customerService = customerService;
         this.customer = null;
@@ -90,7 +90,7 @@ Notice that we use the `inject` decorator and that the constructor signature mat
 
     export class CustomerEditScreen {
       static inject() { return [CustomerService, CommonDialogs, EventAggregator]; }
-      
+
       constructor(customerService, dialogs, ea) {
         this.customerService = customerService;
         this.dialogs = dialogs;
@@ -339,10 +339,10 @@ If using TypeScript, keep in mind that `@autoinject` won't allow you to use `Res
 
 * `lazy(key)`
 * `all(key)`
-* `optional(key)`
-* `parent(key)`
+* `optional(checkParent?)`
+* `parent`
 * `factory(key, asValue?)`
-* `newInstance(key)`
+* `newInstance(key?)`
 
 Here's an example of how we might express a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
 
