@@ -513,7 +513,7 @@ export function transient(key?: any): any {
 }
 
 /**
-* Decorator: Specifies to register the decorated item with a "singleton" lieftime.
+* Decorator: Specifies to register the decorated item with a "singleton" lifetime.
 */
 export function singleton(keyOrRegisterInChild?: any, registerInChild: boolean = false): any {
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));

@@ -1,3 +1,8 @@
+<a name="1.3.1"></a>
+## [1.3.1](https://github.com/aurelia/dependency-injection/compare/1.3.0...v1.3.1) (2017-04-05)
+
+* Documentation update.
+
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/aurelia/dependency-injection/compare/1.2.1...v1.3.0) (2017-01-12)
 
