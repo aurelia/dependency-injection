@@ -76,7 +76,10 @@ function invokeWithDynamicDependencies(container, fn, staticDependencies, dynami
   let args = new Array(i);
 
   while (i--) {
-    args[i] = container.get(staticDependencies[i]);
+    if (staticDependencies[i] === null || staticDependencies[i] === undefined) {
+      throw new Error('Constructor Parameter with index ' + i + ' cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+    } else
+      args[i] = container.get(staticDependencies[i]);
   }
 
   if (dynamicDependencies !== undefined) {
