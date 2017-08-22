@@ -1,3 +1,13 @@
+<a name="1.3.2"></a>
+## [1.3.2](https://github.com/aurelia/dependency-injection/compare/1.3.1...v1.3.2) (2017-08-22)
+
+
+### Performance Improvements
+
+* **container:** improve dynamic construction of static depencies ([01b2988](https://github.com/aurelia/dependency-injection/commit/01b2988))
+
+
+
 <a name="1.3.1"></a>
 ## [1.3.1](https://github.com/aurelia/dependency-injection/compare/1.3.0...v1.3.1) (2017-04-05)
 
