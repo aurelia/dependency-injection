@@ -3,13 +3,13 @@ name: "Dependency Injection: Basics"
 description: Learn about how to leverage Aurelia's dependency injection container, the power behind all object creation in Aurelia applications.
 author: Rob Eisenberg (http://robeisenberg.com)
 ---
-## [Introduction](aurelia-doc://section/1/version/1.0.0)
+## Introduction
 
 When building applications, it's often necessary to take a "divide and conquer" approach by breaking down complex problems into a series of simpler problems. In an object-oriented world, this translates to breaking down complex objects into a series of smaller objects, each focusing on a single concern, and collaborating with the others to form a complex system and model its behavior.
 
 A dependency injection container is a tool that can simplify the process of decomposing such a system. Often times, when developers go through the work of destructuring a system, they introduce a new complexity of "re-assembling" the smaller parts again at runtime. This is what a dependency injection container can do for you, using simple declarative hints.
 
-## [Injection](aurelia-doc://section/2/version/1.0.0)
+## Injection
 
 Let's say we have a `CustomerEditScreen` that needs to load a `Customer` entity by ID from a web service. We wouldn't want to place all the details of our AJAX implementation inside our `CustomerEditScreen` class. Instead, we would want to factor that into a `CustomerService` class that our `CustomerEditScreen`, or any other class, can use when it needs to load a `Customer`. Aurelia's dependency injection container lets you accomplish this by declaring that the `CustomerEditScreen` needs to have a `CustomerService` injected at creation time.
 
@@ -221,7 +221,7 @@ In addition to a static `inject` method, a static `inject` property is also supp
 
 The nice thing about dependency injection is that it works in a recursive fashion. For example, if class A depends on class B, and class B depends on classes C and D, and class D depends on E, F and G, then creating class A will result in the resolution of all the classes in the hierarchy that are needed.
 
-## [Object Lifetime, Child Containers and Default Behavior](aurelia-doc://section/3/version/1.0.0)
+## Object Lifetime, Child Containers and Default Behavior
 
 Each object created by the dependency injection container has a "lifetime". There are three lifetime behaviors that are typical:
 
@@ -245,7 +245,7 @@ Let's start with an instance of `Container` named `root`. We will then call `roo
 
 As you can see from these examples, the `Container` basically walks its hierarchy until it either finds a `Resolver` or reaches the root. If no `Resolver` is found in the root, it auto-registers the class as a singleton in the root. This means that all auto-registered classes are application-wide singletons, unless they are overriden by a child container.
 
-## [How Aurelia Uses Containers](aurelia-doc://section/4/version/1.0.0)
+## How Aurelia Uses Containers
 
 Aurelia makes extensive use of DI throughout the framework. All view-models, components, services, etc. are created with DI. Aurelia also makes heavy use of child containers. The key to understanding the lifetime of your objects is in knowing how Aurelia uses child containers.
 
@@ -273,7 +273,7 @@ Dynamic composition, whether through the `<compose>` element or through the `Com
 
 Everything is an application-level singleton except for those things which are classified as "components", essentially  custom elements, custom attributes and view-models created through the router or composition engine. You can change the lifetime of router and composition created components through explicit configuration.
 
-## [Explicit Configuration](aurelia-doc://section/5/version/1.0.0)
+## Explicit Configuration)
 
 For the most part, Aurelia's DI will do what you want with object lifetime. However, you may desire to change the behavior of individual classes for the specific needs of your application. This is easy to do by either directly using the `Container` API or by decorating your class with a `Registration`.
 
@@ -308,7 +308,7 @@ As an alternative to explicitly registering types with the container, you can re
 > Warning: Registration Decorator Usage
 > At present, the Decorators spec allows for decorators to use parens or not depending on whether or not the decorator requires arguments. This means that decorator invocation is dependent on how the decorator was implemented internally, which can be confusing from time to time. As a result of the way that the registration decorators are implemented, you *must* use them with parens.
 
-## [Resolvers](aurelia-doc://section/6/version/1.0.0)
+## Resolvers
 
 As mentioned above, the DI container uses `Resolvers` internally to provide all instances. When explicitly configuring the container, you are actually specifying what `Resolver` should be associated with a particular lookup key. However, there's a second way that resolvers are useful. Instead of supplying a key as part of the `inject` decorator, you can provide a `Resolver` instead. This resolver then communicates with the container to provide special resolution behavior, specific to the injection. Here's a list of the resolvers you can use in this capacity:
 
