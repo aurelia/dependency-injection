@@ -1,17 +1,7 @@
 ---
-{
-  "name": "Dependency Injection: Basics",
-  "culture": "en-US",
-  "description": "Learn about how to leverage Aurelia's dependency injection container, the power behind all object creation in Aurelia applications.",
-  "engines" : { "aurelia-doc" : "^1.0.0" },
-  "author": {
-    "name": "Rob Eisenberg",
-    "url": "http://robeisenberg.com"
-  },
-  "contributors": [],
-  "translators": [],
-  "keywords": ["DI", "IoC"]
-}
+name: "Dependency Injection: Basics"
+description: Learn about how to leverage Aurelia's dependency injection container, the power behind all object creation in Aurelia applications.
+author: Rob Eisenberg (http://robeisenberg.com)
 ---
 ## [Introduction](aurelia-doc://section/1/version/1.0.0)
 
