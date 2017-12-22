@@ -273,7 +273,7 @@ Dynamic composition, whether through the `<compose>` element or through the `Com
 
 Everything is an application-level singleton except for those things which are classified as "components", essentially  custom elements, custom attributes and view-models created through the router or composition engine. You can change the lifetime of router and composition created components through explicit configuration.
 
-## Explicit Configuration)
+## Explicit Configuration
 
 For the most part, Aurelia's DI will do what you want with object lifetime. However, you may desire to change the behavior of individual classes for the specific needs of your application. This is easy to do by either directly using the `Container` API or by decorating your class with a `Registration`.
 
