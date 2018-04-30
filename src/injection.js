@@ -8,6 +8,15 @@ export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
     let previousInject = target.inject ? target.inject.slice() : null; //make a copy of target.inject to avoid changing parent inject
     let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
+
+    let resolvers = metadata.get('aurelia:resolver', target);
+    if (resolvers) {
+      for (let i in resolvers) {
+        autoInject[i] = resolvers[i];
+      }
+      metadata.define('aurelia:resolver', undefined, target);
+    }
+
     if (!previousInject) {
       target.inject = autoInject;
     } else {
