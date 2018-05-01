@@ -793,6 +793,29 @@ describe('container', () => {
           expect(app.logger).toBe(null);
         });
 
+        it('doesn\'t check the parent container hierarchy when checkParent is false using decorator', () => {
+          class Logger {}
+
+          class App {
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+          decorators( Reflect.metadata('design:paramtypes', [Logger]) ).on(App);
+          optional(false)(App, null, 0);
+          decorators( autoinject() ).on(App);
+
+          let parentContainer = new Container();
+          parentContainer.registerSingleton(Logger, Logger);
+
+          let childContainer = parentContainer.createChild();
+          childContainer.registerSingleton(App, App);
+
+          let app = childContainer.get(App);
+
+          expect(app.logger).toBe(null);
+        });
+
         it('checks the parent container hierarchy when checkParent is true or default', () => {
           class Logger {}
 
@@ -802,6 +825,29 @@ describe('container', () => {
               this.logger = logger;
             }
           }
+
+          let parentContainer = new Container();
+          parentContainer.registerSingleton(Logger, Logger);
+
+          let childContainer = parentContainer.createChild();
+          childContainer.registerSingleton(App, App);
+
+          let app = childContainer.get(App);
+
+          expect(app.logger).toEqual(jasmine.any(Logger));
+        });
+
+        it('checks the parent container hierarchy when checkParent is true or default using decorator', () => {
+          class Logger {}
+
+          class App {
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+          decorators( Reflect.metadata('design:paramtypes', [Logger]) ).on(App);
+          optional()(App, null, 0);
+          decorators( autoinject() ).on(App);
 
           let parentContainer = new Container();
           parentContainer.registerSingleton(Logger, Logger);
