@@ -949,6 +949,52 @@ describe('container', () => {
         });
       });
 
+      describe('Factory using registered handler', () => {
+        let container;
+        let app;
+        let logger;
+        let service;
+        let data = 'test';
+
+        class Logger {}
+
+        class Service {
+          static inject() { return [Factory.of('aLogger')]; }
+          constructor(getLogger, data) {
+            this.getLogger = getLogger;
+            this.data = data;
+          }
+        }
+
+        class App {
+          static inject() { return [Factory.of('aService')]; }
+          constructor(GetService) {
+            this.GetService = GetService;
+            this.service = new GetService(data);
+          }
+        }
+
+        beforeEach(() => {
+          container = new Container();
+        });
+
+        it('provides a function which, when called, will return the instance', () => {
+          container.registerHandler('aLogger', Logger);
+          container.registerHandler('aService', Service);
+          app = container.get(App);
+          service = app.GetService;
+          expect(service()).toEqual(jasmine.any(Service));
+          expect(app.service.getLogger()).toEqual(jasmine.any(Logger));
+        });
+
+        it('passes data in to the constructor as the second argument', () => {
+          container.registerHandler('aLogger', Logger);
+          container.registerHandler('aService', Service);
+          app = container.get(App);
+          expect(app.service.data).toEqual(data);
+        });
+      });
+
       describe('Factory decorator', () => {
         let container;
         let app;
@@ -1107,6 +1153,26 @@ describe('container', () => {
           expect(app1.logger).toEqual(jasmine.any(Logger));
           expect(app1.logger).not.toBe(logger);
           expect(app1.logger.dep()).toEqual(jasmine.any(Dependency));
+        });
+
+        it('inject a new instance of a dependency with registered handler', () => {
+          class Mock {}
+
+          class App1 {
+            static inject() { return [NewInstance.of(Logger)]; }
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          let container = new Container();
+          container.registerHandler(Logger, () => new Mock());
+          let logger = container.get(Logger);
+          let app1 = container.get(App1);
+
+          expect(logger).toEqual(jasmine.any(Mock));
+          expect(app1.logger).toEqual(jasmine.any(Mock));
+          expect(app1.logger).not.toBe(logger);
         });
       });
     });
