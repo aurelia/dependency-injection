@@ -1,4 +1,4 @@
-import {protocol} from 'aurelia-metadata';
+import {protocol, metadata} from 'aurelia-metadata';
 import {Container} from './container';
 
 /**
@@ -340,13 +340,23 @@ export function getDecoratorDependencies(target, name) {
   return dependencies;
 }
 
+export function getResolvers(target, name) {
+  let resolvers = metadata.getOrCreateOwn('aurelia:resolver', Object, target);
+  if (typeof target.inject === 'function') {
+    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+  }
+
+  return resolvers;
+}
+
 /**
 * Decorator: Specifies the dependency should be lazy loaded
 */
 export function lazy(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
+    let resolvers = getResolvers(target, 'lazy');
+
+    resolvers[index] = Lazy.of(keyValue);
   };
 }
 
@@ -355,8 +365,9 @@ export function lazy(keyValue: any) {
 */
 export function all(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
+    let resolvers = getResolvers(target, 'all');
+
+    resolvers[index] = All.of(keyValue);
   };
 }
 
@@ -366,8 +377,10 @@ export function all(keyValue: any) {
 export function optional(checkParentOrTarget: boolean = true) {
   let deco = function(checkParent: boolean) {
     return function(target, key, index) {
-      let params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
+      let resolvers = getResolvers(target, 'optional');
+      let params = metadata.getOwn(metadata.paramTypes, target).slice();
+
+      resolvers[index] = Optional.of(params[index], checkParent);
     };
   };
   if (typeof checkParentOrTarget === 'boolean') {
@@ -380,8 +393,10 @@ export function optional(checkParentOrTarget: boolean = true) {
 * Decorator: Specifies the dependency to look at the parent container for resolution
 */
 export function parent(target, key, index) {
-  let params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
+  let resolvers = getResolvers(target, 'parent');
+  let params = metadata.getOwn(metadata.paramTypes, target).slice();
+
+  resolvers[index] = Parent.of(params[index]);
 }
 
 /**
@@ -389,9 +404,10 @@ export function parent(target, key, index) {
 */
 export function factory(keyValue: any, asValue?: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'factory');
+    let resolvers = getResolvers(target, 'factory');
     let factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
+
+    resolvers[index] = asValue ? factory.as(asValue) : factory;
   };
 }
 
@@ -401,10 +417,12 @@ export function factory(keyValue: any, asValue?: any) {
 export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
-      let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
+      let resolvers = getResolvers(target, 'newInstance');
+      let params = metadata.getOwn(metadata.paramTypes, target).slice();
+
+      resolvers[index] = NewInstance.of(params[index], ...dynamicDependencies);
       if (!!asKey) {
-        params[index].as(asKey);
+        resolvers[index].as(asKey);
       }
     };
   };
