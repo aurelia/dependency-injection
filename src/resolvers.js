@@ -244,7 +244,13 @@ export class Factory {
   * @return Returns a function that can be invoked to resolve dependencies later, and the rest of the parameters.
   */
   get(container: Container): any {
-    return (...rest) => container.invoke(this._key, rest);
+    let fn = this._key;
+    let resolver =  container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    return (...rest) => container.invoke(fn, rest);
   }
 
   /**
@@ -288,7 +294,14 @@ export class NewInstance {
     let dynamicDependencies = this.dynamicDependencies.length > 0 ?
       this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ?
         dependency.get(container) : container.get(dependency)) : undefined;
-    const instance = container.invoke(this.key, dynamicDependencies);
+
+    let fn = this.key;
+    let resolver =  container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    const instance = container.invoke(fn, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
