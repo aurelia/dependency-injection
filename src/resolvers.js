@@ -400,7 +400,8 @@ export function factory(keyValue: any) {
 }
 
 /**
-* Decorator: Specifies the dependency as a new instance
+* Decorator: Specifies the dependency as a new instance. Instances can optionally be registered in the container
+* under a different key and/or use dynamic dependencies
 */
 export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
