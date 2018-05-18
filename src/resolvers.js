@@ -1,4 +1,4 @@
-import {protocol} from 'aurelia-metadata';
+import {protocol, metadata} from 'aurelia-metadata';
 import {Container} from './container';
 
 /**
@@ -315,6 +315,9 @@ export class NewInstance {
 }
 
 export function getDecoratorDependencies(target, name) {
+  if (!target.hasOwnProperty('inject')) {
+    Object.defineProperty(target, 'inject', {value: undefined, writable: true});
+  }
   let dependencies = target.inject;
   if (typeof dependencies === 'function') {
     throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');

@@ -6,24 +6,16 @@ import {_emptyParameters} from './container';
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    let previousInject = target.inject ? target.inject.slice() : null; //make a copy of target.inject to avoid changing parent inject
+    let previousInject = target.hasOwnProperty('inject') ? target.inject : null;
     let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
     if (!previousInject) {
       target.inject = autoInject;
     } else {
-      for (let i = 0; i < autoInject.length; i++) {
-        //check if previously injected.
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          const prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {//else add
+      for (let i = 0; i++; i < autoInject.length) {
+        if (!previousInject[i]) {
           previousInject[i] = autoInject[i];
         }
       }
-      target.inject = previousInject;
     }
   };
 
