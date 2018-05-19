@@ -184,6 +184,209 @@ describe('container', () => {
       expect(app4.service).toEqual(jasmine.any(Service));
       expect(app4.logger).toEqual(jasmine.any(Logger));
     });
+
+    it('not fail with inherited inject() method', function() {
+      class ParentApp {
+        static inject() { return [Logger]; }
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+      Reflect.metadata(ParentApp, 'design:paramtypes', [Logger]);
+
+      class App {
+        static inject() { return [Logger]; }
+        constructor(logger) {
+          this.logger = logger;
+        }
+      }
+
+      let ChildApp = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Service, Logger])).on(
+        class extends ParentApp {
+          constructor(service, ...rest) {
+            super(...rest);
+            this.service = service;
+          }
+        });
+
+      let container = new Container();
+
+      let app1 = container.get(ParentApp);
+      expect(app1.logger).toEqual(jasmine.any(Logger));
+
+      let app2 = container.get(ChildApp);
+      expect(app2.logger).toEqual(jasmine.any(Logger));
+      expect(app2.service).toEqual(jasmine.any(Service));
+    });
+
+    describe('with custom resolvers', () => {
+      class Dependency {}
+      class LoggerBase {
+        constructor(dep?) {
+          this.dep = dep;
+        }
+      }
+      class VerboseLogger extends LoggerBase {}
+      class Logger extends LoggerBase {}
+      class Service {}
+      class SubService1 {}
+      class SubService2 {}
+  
+      it('loads dependencies in tree classes', function() {
+        class ParentApp {
+          constructor(logger) {
+            this.logger = logger;
+          }
+        }
+        decorators(Reflect.metadata('design:paramtypes', [()=>Logger])).on(ParentApp);
+        lazy(Logger)(ParentApp, null, 0);
+        decorators( autoinject() ).on(ParentApp);   
+  
+        class ChildApp extends ParentApp {
+          constructor(service, ...rest) {
+            super(...rest);
+            this.service = service;
+          }
+        }
+        decorators(Reflect.metadata('design:paramtypes', [Service, ()=>Logger])).on(ChildApp);
+        lazy(Logger)(ChildApp, null, 1);
+        decorators( autoinject() ).on(ChildApp);
+  
+        class SubChildApp1 extends ChildApp {
+          constructor(subService1, ...rest) {
+            super(...rest);
+            this.subService1 = subService1;
+          }
+        }
+        decorators(Reflect.metadata('design:paramtypes', [()=>SubService1, Service, ()=>Logger])).on(SubChildApp1);
+        lazy(SubService1)(SubChildApp1, null, 0);
+        lazy(Logger)(SubChildApp1, null, 2);
+        decorators( autoinject() ).on(SubChildApp1);
+  
+        class SubChildApp2 extends ChildApp {
+          constructor(subService2, ...rest) {
+            super(...rest);
+            this.subService2 = subService2;
+          }
+        }
+        decorators(Reflect.metadata('design:paramtypes', [()=>SubService2, Service, ()=>Logger])).on(SubChildApp2);
+        lazy(SubService2)(SubChildApp2, null, 0);
+        newInstance(Service)(SubChildApp2, null, 2);
+        lazy(Logger)(SubChildApp2, null, 2);
+        decorators( autoinject() ).on(SubChildApp2);
+  
+        class SubChildApp3 extends ChildApp {
+        }
+  
+        class SubChildApp4 extends ChildApp {
+          constructor(logger, subService1, service) {
+            super(service, logger);
+            this.subService1 = subService1;
+          }
+        }
+        decorators(Reflect.metadata('design:paramtypes', [()=>Logger, ()=>SubService1, Service])).on(SubChildApp4);
+        lazy(SubService1)(SubChildApp4, null, 1);
+        lazy(Logger)(SubChildApp4, null, 0);
+        decorators( autoinject() ).on(SubChildApp4);
+  
+        let container = new Container();
+  
+        let p_app = container.get(ParentApp);
+        expect(p_app.logger()).toEqual(jasmine.any(Logger));
+  
+        let c_app = container.get(ChildApp);
+        expect(c_app.service).toEqual(jasmine.any(Service));
+        expect(c_app.logger()).toEqual(jasmine.any(Logger));
+  
+        let app1 = container.get(SubChildApp1);
+        expect(app1.subService1()).toEqual(jasmine.any(SubService1));
+        expect(app1.service).toEqual(jasmine.any(Service));
+        expect(app1.logger()).toEqual(jasmine.any(Logger));
+  
+        let app2 = container.get(SubChildApp2);
+        expect(app2.subService2()).toEqual(jasmine.any(SubService2));
+        expect(app2.service).toEqual(jasmine.any(Service));
+        expect(app2.logger()).toEqual(jasmine.any(Logger));
+  
+        let app3 = container.get(SubChildApp3);
+        expect(app3.service).toEqual(jasmine.any(Service));
+        expect(app3.logger()).toEqual(jasmine.any(Logger));
+  
+        let app4 = container.get(SubChildApp4);
+        expect(app4.subService1()).toEqual(jasmine.any(SubService1));
+        expect(app4.service).toEqual(jasmine.any(Service));
+        expect(app4.logger()).toEqual(jasmine.any(Logger));
+      });
+  
+      it('allows multiple parameter decorators', () => {    
+        let data = 'test';
+  
+        class MyService {
+          constructor(getLogger, data) {
+            this.getLogger = getLogger;
+            this.data = data;
+          }
+        }
+        decorators( Reflect.metadata('design:paramtypes', [() => Logger]) ).on(MyService);
+        factory(Logger)(MyService, null, 0);
+        decorators( autoinject() ).on(MyService);
+  
+        class App {
+          constructor(getLogger: () => Logger, loggers, optionalLogger, parentLogger, newLogger, GetService) {
+            this.getLogger = getLogger;
+            this.loggers = loggers;
+            this.optionalLogger = optionalLogger;
+            this.parentLogger = parentLogger;
+            this.newLogger = newLogger;
+            this.GetService = GetService;
+            this.service = new GetService(data);
+          }
+        }
+  
+        decorators( Reflect.metadata('design:paramtypes', [()=>Logger, LoggerBase, Logger, Logger, Logger, MyService]) ).on(App);
+        lazy(Logger)(App, null, 0);
+        all(LoggerBase)(App, null, 1);
+        optional()(App, null, 2);
+        parent(App, null, 3);
+        newInstance(Logger, Dependency)(App, null, 4);
+        factory(MyService)(App, null, 5);
+        decorators( autoinject() ).on(App);
+  
+        let parentContainer = new Container();
+        let parentInstance = new Logger();
+        parentContainer.registerInstance(Logger, parentInstance);
+  
+        let container = parentContainer.createChild();
+        let childInstance = new Logger();
+        container.registerSingleton(LoggerBase, VerboseLogger);
+        container.registerTransient(LoggerBase, Logger);
+        container.registerSingleton(Logger, Logger);
+        container.registerInstance(Logger, childInstance);
+        container.registerSingleton(App, App);
+  
+        let app = container.get(App);
+  
+        let logger = app.getLogger;
+        expect(logger()).toEqual(jasmine.any(Logger));
+  
+        expect(app.loggers).toEqual(jasmine.any(Array));
+        expect(app.loggers.length).toBe(2);
+        expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
+        expect(app.loggers[1]).toEqual(jasmine.any(Logger));
+  
+        expect(app.optionalLogger).toEqual(jasmine.any(Logger));
+  
+        expect(app.parentLogger).toBe(parentInstance);
+  
+        expect(app.newLogger).toEqual(jasmine.any(Logger));
+        expect(app.newLogger).not.toBe(logger);
+        expect(app.newLogger.dep).toEqual(jasmine.any(Dependency));
+  
+        let service = app.GetService;
+        expect(service()).toEqual(jasmine.any(MyService));
+        expect(app.service.data).toEqual(data);
+      });
+    });
   });
 
   describe('registration', () => {
@@ -1156,175 +1359,6 @@ describe('container', () => {
           expect(app1.logger.dep()).toEqual(jasmine.any(Dependency));
         });
       });
-    });
-  });
-
-  describe('autoinject with custom resolvers', () => {
-    class Dependency {}
-    class LoggerBase {
-      constructor(dep?) {
-        this.dep = dep;
-      }
-    }
-    class VerboseLogger extends LoggerBase {}
-    class Logger extends LoggerBase {}
-    class Service {}
-    class SubService1 {}
-    class SubService2 {}
-
-    it('loads dependencies in tree classes', function() {
-      class ParentApp {
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [()=>Logger])).on(ParentApp);
-      lazy(Logger)(ParentApp, null, 0);
-      decorators( autoinject() ).on(ParentApp);   
-
-      class ChildApp extends ParentApp {
-        constructor(service, ...rest) {
-          super(...rest);
-          this.service = service;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [Service, ()=>Logger])).on(ChildApp);
-      lazy(Logger)(ChildApp, null, 1);
-      decorators( autoinject() ).on(ChildApp);
-
-      class SubChildApp1 extends ChildApp {
-        constructor(subService1, ...rest) {
-          super(...rest);
-          this.subService1 = subService1;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [()=>SubService1, Service, ()=>Logger])).on(SubChildApp1);
-      lazy(SubService1)(SubChildApp1, null, 0);
-      lazy(Logger)(SubChildApp1, null, 2);
-      decorators( autoinject() ).on(SubChildApp1);
-
-      class SubChildApp2 extends ChildApp {
-        constructor(subService2, ...rest) {
-          super(...rest);
-          this.subService2 = subService2;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [()=>SubService2, Service, ()=>Logger])).on(SubChildApp2);
-      lazy(SubService2)(SubChildApp2, null, 0);
-      newInstance(Service)(SubChildApp2, null, 2);
-      lazy(Logger)(SubChildApp2, null, 2);
-      decorators( autoinject() ).on(SubChildApp2);
-
-      class SubChildApp3 extends ChildApp {
-      }
-
-      class SubChildApp4 extends ChildApp {
-        constructor(logger, subService1, service) {
-          super(service, logger);
-          this.subService1 = subService1;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [()=>Logger, ()=>SubService1, Service])).on(SubChildApp4);
-      lazy(SubService1)(SubChildApp4, null, 1);
-      lazy(Logger)(SubChildApp4, null, 0);
-      decorators( autoinject() ).on(SubChildApp4);
-
-      let container = new Container();
-
-      let p_app = container.get(ParentApp);
-      expect(p_app.logger()).toEqual(jasmine.any(Logger));
-
-      let c_app = container.get(ChildApp);
-      expect(c_app.service).toEqual(jasmine.any(Service));
-      expect(c_app.logger()).toEqual(jasmine.any(Logger));
-
-      let app1 = container.get(SubChildApp1);
-      expect(app1.subService1()).toEqual(jasmine.any(SubService1));
-      expect(app1.service).toEqual(jasmine.any(Service));
-      expect(app1.logger()).toEqual(jasmine.any(Logger));
-
-      let app2 = container.get(SubChildApp2);
-      expect(app2.subService2()).toEqual(jasmine.any(SubService2));
-      expect(app2.service).toEqual(jasmine.any(Service));
-      expect(app2.logger()).toEqual(jasmine.any(Logger));
-
-      let app3 = container.get(SubChildApp3);
-      expect(app3.service).toEqual(jasmine.any(Service));
-      expect(app3.logger()).toEqual(jasmine.any(Logger));
-
-      let app4 = container.get(SubChildApp4);
-      expect(app4.subService1()).toEqual(jasmine.any(SubService1));
-      expect(app4.service).toEqual(jasmine.any(Service));
-      expect(app4.logger()).toEqual(jasmine.any(Logger));
-    });
-
-    it('allows multiple parameter decorators', () => {    
-      let data = 'test';
-
-      class MyService {
-        constructor(getLogger, data) {
-          this.getLogger = getLogger;
-          this.data = data;
-        }
-      }
-      decorators( Reflect.metadata('design:paramtypes', [() => Logger]) ).on(MyService);
-      factory(Logger)(MyService, null, 0);
-      decorators( autoinject() ).on(MyService);
-
-      class App {
-        constructor(getLogger: () => Logger, loggers, optionalLogger, parentLogger, newLogger, GetService) {
-          this.getLogger = getLogger;
-          this.loggers = loggers;
-          this.optionalLogger = optionalLogger;
-          this.parentLogger = parentLogger;
-          this.newLogger = newLogger;
-          this.GetService = GetService;
-          this.service = new GetService(data);
-        }
-      }
-
-      decorators( Reflect.metadata('design:paramtypes', [()=>Logger, LoggerBase, Logger, Logger, Logger, MyService]) ).on(App);
-      lazy(Logger)(App, null, 0);
-      all(LoggerBase)(App, null, 1);
-      optional()(App, null, 2);
-      parent(App, null, 3);
-      newInstance(Logger, Dependency)(App, null, 4);
-      factory(MyService)(App, null, 5);
-      decorators( autoinject() ).on(App);
-
-      let parentContainer = new Container();
-      let parentInstance = new Logger();
-      parentContainer.registerInstance(Logger, parentInstance);
-
-      let container = parentContainer.createChild();
-      let childInstance = new Logger();
-      container.registerSingleton(LoggerBase, VerboseLogger);
-      container.registerTransient(LoggerBase, Logger);
-      container.registerSingleton(Logger, Logger);
-      container.registerInstance(Logger, childInstance);
-      container.registerSingleton(App, App);
-
-      let app = container.get(App);
-
-      let logger = app.getLogger;
-      expect(logger()).toEqual(jasmine.any(Logger));
-
-      expect(app.loggers).toEqual(jasmine.any(Array));
-      expect(app.loggers.length).toBe(2);
-      expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
-      expect(app.loggers[1]).toEqual(jasmine.any(Logger));
-
-      expect(app.optionalLogger).toEqual(jasmine.any(Logger));
-
-      expect(app.parentLogger).toBe(parentInstance);
-
-      expect(app.newLogger).toEqual(jasmine.any(Logger));
-      expect(app.newLogger).not.toBe(logger);
-      expect(app.newLogger.dep).toEqual(jasmine.any(Dependency));
-
-      let service = app.GetService;
-      expect(service()).toEqual(jasmine.any(MyService));
-      expect(app.service.data).toEqual(data);
     });
   });
 });
