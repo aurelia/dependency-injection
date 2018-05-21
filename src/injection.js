@@ -7,7 +7,14 @@ import {_emptyParameters} from './container';
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
     if (!target.hasOwnProperty('inject')) {
-      target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
+      target.inject = (metadata.getOwn(metadata.paramTypes, target) || Object.freeze(new Array(metadata.paramTypes.length))).slice();
+      metadata.define('aurelia:inject', true, target);
+
+      return;
+    }
+
+    if (!metadata.get('aurelia:inject', target)) {
+      throw new Error('Decorator autoinject cannot be used with "static inject"');
     }
   };
 
