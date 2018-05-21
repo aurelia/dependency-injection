@@ -6,16 +6,8 @@ import {_emptyParameters} from './container';
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    let previousInject = target.hasOwnProperty('inject') ? target.inject : null;
-    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (let i = 0; i++; i < autoInject.length) {
-        if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
-        }
-      }
+    if (!target.hasOwnProperty('inject')) {
+      target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
     }
   };
 

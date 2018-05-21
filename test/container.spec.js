@@ -271,7 +271,7 @@ describe('container', () => {
         }
         decorators(Reflect.metadata('design:paramtypes', [()=>SubService2, Service, ()=>Logger])).on(SubChildApp2);
         lazy(SubService2)(SubChildApp2, null, 0);
-        newInstance(Service)(SubChildApp2, null, 2);
+        newInstance(Service)(SubChildApp2, null, 1);
         lazy(Logger)(SubChildApp2, null, 2);
         decorators( autoinject() ).on(SubChildApp2);
   
@@ -304,8 +304,10 @@ describe('container', () => {
         expect(app1.logger()).toEqual(jasmine.any(Logger));
   
         let app2 = container.get(SubChildApp2);
+        let service = container.get(Service);
         expect(app2.subService2()).toEqual(jasmine.any(SubService2));
         expect(app2.service).toEqual(jasmine.any(Service));
+        expect(app2.service).not.toBe(service);
         expect(app2.logger()).toEqual(jasmine.any(Logger));
   
         let app3 = container.get(SubChildApp3);

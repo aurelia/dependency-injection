@@ -1,5 +1,5 @@
 import {protocol, metadata} from 'aurelia-metadata';
-import {Container} from './container';
+import {Container, _emptyParameters} from './container';
 
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
@@ -316,18 +316,9 @@ export class NewInstance {
 
 export function getDecoratorDependencies(target, name) {
   if (!target.hasOwnProperty('inject')) {
-    Object.defineProperty(target, 'inject', {value: undefined, writable: true});
+    target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
   }
-  let dependencies = target.inject;
-  if (typeof dependencies === 'function') {
-    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
-  }
-  if (!dependencies) {
-    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
-    target.inject = dependencies;
-  }
-
-  return dependencies;
+  return target.inject;
 }
 
 /**
@@ -335,8 +326,8 @@ export function getDecoratorDependencies(target, name) {
 */
 export function lazy(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
+    let inject = getDecoratorDependencies(target, 'lazy');
+    inject[index] = Lazy.of(keyValue);
   };
 }
 
@@ -345,8 +336,8 @@ export function lazy(keyValue: any) {
 */
 export function all(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
+    let inject = getDecoratorDependencies(target, 'all');
+    inject[index] = All.of(keyValue);
   };
 }
 
@@ -356,8 +347,8 @@ export function all(keyValue: any) {
 export function optional(checkParentOrTarget: boolean = true) {
   let deco = function(checkParent: boolean) {
     return function(target, key, index) {
-      let params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
+      let inject = getDecoratorDependencies(target, 'optional');
+      inject[index] = Optional.of(inject[index], checkParent);
     };
   };
   if (typeof checkParentOrTarget === 'boolean') {
@@ -370,8 +361,8 @@ export function optional(checkParentOrTarget: boolean = true) {
 * Decorator: Specifies the dependency to look at the parent container for resolution
 */
 export function parent(target, key, index) {
-  let params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
+  let inject = getDecoratorDependencies(target, 'parent');
+  inject[index] = Parent.of(inject[index]);
 }
 
 /**
@@ -379,9 +370,9 @@ export function parent(target, key, index) {
 */
 export function factory(keyValue: any, asValue?: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'factory');
+    let inject = getDecoratorDependencies(target, 'factory');
     let factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
+    inject[index] = asValue ? factory.as(asValue) : factory;
   };
 }
 
@@ -391,10 +382,10 @@ export function factory(keyValue: any, asValue?: any) {
 export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
-      let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
+      let inject = getDecoratorDependencies(target, 'newInstance');
+      inject[index] = NewInstance.of(inject[index], ...dynamicDependencies);
       if (!!asKey) {
-        params[index].as(asKey);
+        inject[index].as(asKey);
       }
     };
   };
