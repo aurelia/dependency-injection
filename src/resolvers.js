@@ -1,5 +1,6 @@
-import {protocol, metadata} from 'aurelia-metadata';
-import {Container, _emptyParameters} from './container';
+import {protocol} from 'aurelia-metadata';
+import {Container} from './container';
+import {autoinject} from './injection';
 
 /**
 * Decorator: Indicates that the decorated class/object is a custom resolver.
@@ -315,9 +316,8 @@ export class NewInstance {
 }
 
 export function getDecoratorDependencies(target, name) {
-  if (!target.hasOwnProperty('inject')) {
-    target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
-  }
+  autoinject(target);
+
   return target.inject;
 }
 
