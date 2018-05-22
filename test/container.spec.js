@@ -219,54 +219,6 @@ describe('container', () => {
       expect(app2.service).toEqual(jasmine.any(Service));
     });
 
-    it('fail with own static inject', function() {
-      class App {
-        static inject() { return [Container]; }
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [Logger])).on(App);
-
-      let error = () => decorators( autoinject() ).on(App);
-
-      expect(error).toThrow(jasmine.any(Error));
-
-      /* without the error, autoinject unexpectedly would not do anything
-      /* and following would fail
-
-      decorators( autoinject() ).on(App)
-      let container = new Container();
-
-      let app = container.get(App);
-      expect(app.logger).toEqual(jasmine.any(Logger));
-      expect(app.logger).not.toEqual(jasmine.any(Container));
-      */
-    });
-
-    it('fail with own static inject (and inherited autoinjected inject)', function() {
-      class App {
-        constructor(logger) {
-          this.logger = logger;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [Logger])).on(App);
-      decorators( autoinject() ).on(App);
-
-      class ChildApp {
-        static inject() { return [App, Logger]; }
-        constructor(app, logger) {
-          this.app = app;
-          this.logger = logger;
-        }
-      }
-      decorators(Reflect.metadata('design:paramtypes', [App, Logger])).on(App);
-
-      let error = () => decorators( autoinject() ).on(ChildApp);
-
-      expect(error).toThrow(jasmine.any(Error));
-    });
-
     describe('with custom resolvers', () => {
       class Dependency {}
       class LoggerBase {
@@ -854,22 +806,6 @@ describe('container', () => {
 
           let logger = app.getLogger;
           expect(logger()).toEqual(jasmine.any(Logger));
-        });
-    
-        it('provides a function which will fail with own static inject', function() {
-          class Logger {}
-
-          class App {
-            static inject() { return [Logger]; }
-            constructor(logger) {
-              this.logger = logger;
-            }
-          }
-          decorators(Reflect.metadata('design:paramtypes', [Logger])).on(App);
-
-          let error = () => lazy(Logger)(App, null, 0);
-
-          expect(error).toThrow(jasmine.any(Error));
         });
       });
 

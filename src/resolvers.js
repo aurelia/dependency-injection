@@ -317,13 +317,7 @@ export class NewInstance {
 export function getDecoratorDependencies(target, name) {
   if (!target.hasOwnProperty('inject')) {
     target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
-    metadata.define('aurelia:inject', true, target);
   }
-
-  if (!metadata.get('aurelia:inject', target)) {
-    throw new Error(`Decorator ${name} cannot be used with "static inject"`);
-  }
-
   return target.inject;
 }
 
