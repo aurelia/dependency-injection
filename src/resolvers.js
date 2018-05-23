@@ -265,8 +265,12 @@ export class Factory {
 */
 @resolver()
 export class NewInstance {
-  key;
-  asKey;
+  /** @internal */
+  key: any;
+  /** @internal */
+  asKey: any;
+  /** @internal */
+  dynamicDependencies: any[];
 
   /**
   * Creates an instance of the NewInstance class.
@@ -315,7 +319,12 @@ export class NewInstance {
   }
 }
 
-export function getDecoratorDependencies(target, name) {
+/**
+* Used by parameter decorators to call autoinject for the target and retrieve the target's inject property.
+* @param target The target class.
+* @return Returns the target's own inject property.
+*/
+export function getDecoratorDependencies(target) {
   autoinject(target);
 
   return target.inject;
@@ -326,7 +335,7 @@ export function getDecoratorDependencies(target, name) {
 */
 export function lazy(keyValue: any) {
   return function(target, key, index) {
-    let inject = getDecoratorDependencies(target, 'lazy');
+    let inject = getDecoratorDependencies(target);
     inject[index] = Lazy.of(keyValue);
   };
 }
@@ -336,7 +345,7 @@ export function lazy(keyValue: any) {
 */
 export function all(keyValue: any) {
   return function(target, key, index) {
-    let inject = getDecoratorDependencies(target, 'all');
+    let inject = getDecoratorDependencies(target);
     inject[index] = All.of(keyValue);
   };
 }
@@ -347,7 +356,7 @@ export function all(keyValue: any) {
 export function optional(checkParentOrTarget: boolean = true) {
   let deco = function(checkParent: boolean) {
     return function(target, key, index) {
-      let inject = getDecoratorDependencies(target, 'optional');
+      let inject = getDecoratorDependencies(target);
       inject[index] = Optional.of(inject[index], checkParent);
     };
   };
@@ -361,7 +370,7 @@ export function optional(checkParentOrTarget: boolean = true) {
 * Decorator: Specifies the dependency to look at the parent container for resolution
 */
 export function parent(target, key, index) {
-  let inject = getDecoratorDependencies(target, 'parent');
+  let inject = getDecoratorDependencies(target);
   inject[index] = Parent.of(inject[index]);
 }
 
@@ -370,7 +379,7 @@ export function parent(target, key, index) {
 */
 export function factory(keyValue: any, asValue?: any) {
   return function(target, key, index) {
-    let inject = getDecoratorDependencies(target, 'factory');
+    let inject = getDecoratorDependencies(target);
     let factory = Factory.of(keyValue);
     inject[index] = asValue ? factory.as(asValue) : factory;
   };
@@ -382,7 +391,7 @@ export function factory(keyValue: any, asValue?: any) {
 export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
-      let inject = getDecoratorDependencies(target, 'newInstance');
+      let inject = getDecoratorDependencies(target);
       inject[index] = NewInstance.of(inject[index], ...dynamicDependencies);
       if (!!asKey) {
         inject[index].as(asKey);
