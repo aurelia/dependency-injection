@@ -334,7 +334,7 @@ describe('container', () => {
         decorators( autoinject() ).on(MyService);
   
         class App {
-          constructor(getLogger: () => Logger, loggers, optionalLogger, parentLogger, newLogger, GetService) {
+          constructor(getLogger: () => Logger, loggers, optionalLogger, parentLogger, newLogger, GetService, otherNewLogger) {
             this.getLogger = getLogger;
             this.loggers = loggers;
             this.optionalLogger = optionalLogger;
@@ -342,6 +342,7 @@ describe('container', () => {
             this.newLogger = newLogger;
             this.GetService = GetService;
             this.service = new GetService(data);
+            this.otherNewLogger = otherNewLogger;
           }
         }
   
@@ -352,6 +353,7 @@ describe('container', () => {
         parent(App, null, 3);
         newInstance(Logger, Dependency)(App, null, 4);
         factory(MyService)(App, null, 5);
+        inject(NewInstance.of(Logger))(App, null, 6);
         decorators( autoinject() ).on(App);
   
         let parentContainer = new Container();
@@ -387,6 +389,10 @@ describe('container', () => {
         let service = app.GetService;
         expect(service()).toEqual(jasmine.any(MyService));
         expect(app.service.data).toEqual(data);
+
+        expect(app.otherNewLogger).toEqual(jasmine.any(Logger));
+        expect(app.otherNewLogger).not.toBe(logger);
+        expect(app.otherNewLogger).not.toBe(app.newLogger);
       });
     });
   });
@@ -864,11 +870,32 @@ describe('container', () => {
       });
 
       describe('inject as param decorator', ()=> {
-        it('resolves a matching dependency using the inject decorator', () => {
+        it('a simple dependency (Typescript)', () => {
           class Logger {}
 
           class App1 {
-            static inject = [Logger];
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          decorators( Reflect.metadata('design:paramtypes', [Logger]) ).on(App1);
+          inject()(App1, null, 0);
+          decorators( autoinject() ).on(App1);
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          let logger = app1.logger;
+
+          expect(logger).toEqual(jasmine.any(Logger));
+        });
+
+        // not very useful maybe, but allowed in the current implementation
+        it('a simple dependency (ES6)', () => {
+          class Logger {}
+
+          class App1 {
             constructor(logger) {
               this.logger = logger;
             }
@@ -880,6 +907,57 @@ describe('container', () => {
           let app1 = container.get(App1);
 
           let logger = app1.logger;
+
+          expect(logger).toEqual(jasmine.any(Logger));
+        });
+
+        it('fixes the dependency derived from metadata (Typescript)', () => {
+          class LoggerBase {}
+          class Logger extends LoggerBase {}
+
+          class App1 {
+            constructor(logger) {
+              this.logger = logger;
+            }
+          }
+
+          decorators( Reflect.metadata('design:paramtypes', [Logger]) ).on(App1);
+          inject(LoggerBase)(App1, null, 0);
+          decorators( autoinject() ).on(App1);
+
+          let container = new Container();
+          let app1 = container.get(App1);
+
+          let logger = app1.logger;
+
+          expect(logger).not.toEqual(jasmine.any(Logger));
+          expect(logger).toEqual(jasmine.any(LoggerBase));
+        });
+
+        // not sure if that's useful, but current implementation allows it
+        it('on a member function', () => {
+          class Logger {}
+
+          /*
+          class App1 {
+            @inject(Logger)
+            member(logger){
+              this.logger=logger;
+            }
+          }
+          */
+          class App1 {
+            member(logger) {
+              this.logger = logger;
+            }
+          }
+          decorators(inject(Logger)).on(App1.prototype.member);
+
+          let container = new Container();
+          let app1 = container.get(App1);
+          let member = container.get(app1.member);
+
+          let logger = member.logger;
 
           expect(logger).toEqual(jasmine.any(Logger));
         });

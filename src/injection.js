@@ -15,21 +15,16 @@ export function autoinject(potentialTarget?: any): any {
 }
 
 /**
-* Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function.
+* Decorator: Specifies the dependencies that should be injected by the DI Container into the decorated class/function.
 */
 export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
-    // handle when used as a parameter
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      let params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+    // handle when used as a parameter decorator
+    if (typeof descriptor === 'number') {
+      autoinject(target);
+      if (rest.length === 1) {
+        target.inject[descriptor] = rest[0];
       }
-      if (!params) {
-        params = metadata.getOwn(metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
       return;
     }
     // if it's true then we injecting rest into function and not Class constructor
