@@ -19,7 +19,7 @@ export function autoinject(potentialTarget?: any): any {
 */
 export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
-    // handle when used as a parameter decorator
+    // handle when used as a constructor parameter decorator
     if (typeof descriptor === 'number') {
       autoinject(target);
       if (rest.length === 1) {
