@@ -6,24 +6,8 @@ import {_emptyParameters} from './container';
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    let previousInject = target.inject ? target.inject.slice() : null; //make a copy of target.inject to avoid changing parent inject
-    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (let i = 0; i < autoInject.length; i++) {
-        //check if previously injected.
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          const prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {//else add
-          previousInject[i] = autoInject[i];
-        }
-      }
-      target.inject = previousInject;
+    if (!target.hasOwnProperty('inject')) {
+      target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
     }
   };
 
@@ -31,21 +15,16 @@ export function autoinject(potentialTarget?: any): any {
 }
 
 /**
-* Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function.
+* Decorator: Specifies the dependencies that should be injected by the DI Container into the decorated class/function.
 */
 export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
-    // handle when used as a parameter
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      let params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+    // handle when used as a constructor parameter decorator
+    if (typeof descriptor === 'number') {
+      autoinject(target);
+      if (rest.length === 1) {
+        target.inject[descriptor] = rest[0];
       }
-      if (!params) {
-        params = metadata.getOwn(metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
       return;
     }
     // if it's true then we injecting rest into function and not Class constructor

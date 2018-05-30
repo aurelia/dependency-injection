@@ -325,14 +325,14 @@ As mentioned above, the DI container uses `Resolvers` internally to provide all 
 * `NewInstance` - Used to inject a new instance of a dependency, without regard for existing instances in the container.
   * ex. `NewInstance.of(CustomClass).as(Another)`
 
-If using TypeScript, keep in mind that `@autoinject` won't allow you to use `Resolvers`. Instead, you may use argument decorators, without duplicating argument order, which you otherwise have to maintain when using the class decorator or the static `inject` property. Available function parameter decorators are:
+If using TypeScript, keep in mind that `@autoinject` won't allow you to use `Resolvers`. Instead, you may use argument decorators, without duplicating argument order, which you otherwise have to maintain when using the class decorator or the static `inject` property. You also can use `inject` as argument decorator for your own custom resolvers, eg `constructor(@inject(NewInstance.of(HttpClient)) public client: HttpClient){...}`. Available build-in function parameter decorators are:
 
 * `lazy(key)`
 * `all(key)`
 * `optional(checkParent?)`
 * `parent`
 * `factory(key, asValue?)`
-* `newInstance(key?)`
+* `newInstance(asKey?, dynamicDependencies: [any])`
 
 Here's an example of how we might express a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
 
