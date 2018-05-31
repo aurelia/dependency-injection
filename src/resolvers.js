@@ -392,16 +392,16 @@ export function parent(target, key, index) {
 /**
 * Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
 */
-export function factory(keyValue: any, asValue?: any) {
+export function factory(keyValue: any) {
   return function(target, key, index) {
     let inject = getDecoratorDependencies(target);
-    let factory = Factory.of(keyValue);
-    inject[index] = asValue ? factory.as(asValue) : factory;
+    inject[index] = Factory.of(keyValue);
   };
 }
 
 /**
-* Decorator: Specifies the dependency as a new instance
+* Decorator: Specifies the dependency as a new instance. Instances can optionally be registered in the container
+* under a different key and/or use dynamic dependencies
 */
 export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {

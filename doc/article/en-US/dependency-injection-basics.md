@@ -331,7 +331,7 @@ If using TypeScript, keep in mind that `@autoinject` won't allow you to use `Res
 * `all(key)`
 * `optional(checkParent?)`
 * `parent`
-* `factory(key, asValue?)`
+* `factory(key)`
 * `newInstance(asKey?, dynamicDependencies: [any])`
 
 Here's an example of how we might express a dependency on `HttpClient` that we may or may not actually need to use, depending on runtime scenarios:
