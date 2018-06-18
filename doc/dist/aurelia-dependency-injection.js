@@ -26,6 +26,53 @@ export interface Resolver {
 }
 
 /**
+* Used to resolve instances, singletons, transients, aliases
+*/
+@resolver()
+export class StrategyResolver {
+  strategy: StrategyResolver | number;
+  state: any;
+
+  /**
+  * Creates an instance of the StrategyResolver class.
+  * @param strategy The type of resolution strategy.
+  * @param state The state associated with the resolution strategy.
+  */
+  constructor(strategy, state) {
+    this.strategy = strategy;
+    this.state = state;
+  }
+
+  /**
+  * Called by the container to allow custom resolution of dependencies for a function/class.
+  * @param container The container to resolve from.
+  * @param key The key that the resolver was registered as.
+  * @return Returns the resolved object.
+  */
+  get(container: Container, key: any): any {
+    switch (this.strategy) {
+    case 0: //instance
+      return this.state;
+    case 1: //singleton
+      let singleton = container.invoke(this.state);
+      this.state = singleton;
+      this.strategy = 0;
+      return singleton;
+    case 2: //transient
+      return container.invoke(this.state);
+    case 3: //function
+      return this.state(container, key, this);
+    case 4: //array
+      return this.state[0].get(container, key);
+    case 5: //alias
+      return container.get(this.state);
+    default:
+      throw new Error('Invalid strategy: ' + this.strategy);
+    }
+  }
+}
+
+/**
 * Used to allow functions/classes to specify lazy resolution logic.
 */
 @resolver()
@@ -140,7 +187,6 @@ export class Optional {
   }
 }
 
-
 /**
 * Used to inject the dependency from the parent container instead of the current one.
 */
@@ -178,50 +224,6 @@ export class Parent {
   }
 }
 
-@resolver()
-export class StrategyResolver {
-  strategy: StrategyResolver | number;
-  state: any;
-
-  /**
-  * Creates an instance of the StrategyResolver class.
-  * @param strategy The type of resolution strategy.
-  * @param state The state associated with the resolution strategy.
-  */
-  constructor(strategy, state) {
-    this.strategy = strategy;
-    this.state = state;
-  }
-
-  /**
-  * Called by the container to allow custom resolution of dependencies for a function/class.
-  * @param container The container to resolve from.
-  * @param key The key that the resolver was registered as.
-  * @return Returns the resolved object.
-  */
-  get(container: Container, key: any): any {
-    switch (this.strategy) {
-    case 0: //instance
-      return this.state;
-    case 1: //singleton
-      let singleton = container.invoke(this.state);
-      this.state = singleton;
-      this.strategy = 0;
-      return singleton;
-    case 2: //transient
-      return container.invoke(this.state);
-    case 3: //function
-      return this.state(container, key, this);
-    case 4: //array
-      return this.state[0].get(container, key);
-    case 5: //alias
-      return container.get(this.state);
-    default:
-      throw new Error('Invalid strategy: ' + this.strategy);
-    }
-  }
-}
-
 /**
 * Used to allow injecting dependencies but also passing data to the constructor.
 */
@@ -244,7 +246,13 @@ export class Factory {
   * @return Returns a function that can be invoked to resolve dependencies later, and the rest of the parameters.
   */
   get(container: Container): any {
-    return (...rest) => container.invoke(this._key, rest);
+    let fn = this._key;
+    let resolver =  container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    return (...rest) => container.invoke(fn, rest);
   }
 
   /**
@@ -264,8 +272,12 @@ export class Factory {
 */
 @resolver()
 export class NewInstance {
-  key;
-  asKey;
+  /** @internal */
+  key: any;
+  /** @internal */
+  asKey: any;
+  /** @internal */
+  dynamicDependencies: any[];
 
   /**
   * Creates an instance of the NewInstance class.
@@ -288,7 +300,14 @@ export class NewInstance {
     let dynamicDependencies = this.dynamicDependencies.length > 0 ?
       this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ?
         dependency.get(container) : container.get(dependency)) : undefined;
-    const instance = container.invoke(this.key, dynamicDependencies);
+
+    let fn = this.key;
+    let resolver =  container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    const instance = container.invoke(fn, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -314,17 +333,15 @@ export class NewInstance {
   }
 }
 
-export function getDecoratorDependencies(target, name) {
-  let dependencies = target.inject;
-  if (typeof dependencies === 'function') {
-    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
-  }
-  if (!dependencies) {
-    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
-    target.inject = dependencies;
-  }
+/**
+* Used by parameter decorators to call autoinject for the target and retrieve the target's inject property.
+* @param target The target class.
+* @return Returns the target's own inject property.
+*/
+export function getDecoratorDependencies(target) {
+  autoinject(target);
 
-  return dependencies;
+  return target.inject;
 }
 
 /**
@@ -332,8 +349,8 @@ export function getDecoratorDependencies(target, name) {
 */
 export function lazy(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
+    let inject = getDecoratorDependencies(target);
+    inject[index] = Lazy.of(keyValue);
   };
 }
 
@@ -342,8 +359,8 @@ export function lazy(keyValue: any) {
 */
 export function all(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
+    let inject = getDecoratorDependencies(target);
+    inject[index] = All.of(keyValue);
   };
 }
 
@@ -353,8 +370,8 @@ export function all(keyValue: any) {
 export function optional(checkParentOrTarget: boolean = true) {
   let deco = function(checkParent: boolean) {
     return function(target, key, index) {
-      let params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
+      let inject = getDecoratorDependencies(target);
+      inject[index] = Optional.of(inject[index], checkParent);
     };
   };
   if (typeof checkParentOrTarget === 'boolean') {
@@ -367,31 +384,31 @@ export function optional(checkParentOrTarget: boolean = true) {
 * Decorator: Specifies the dependency to look at the parent container for resolution
 */
 export function parent(target, key, index) {
-  let params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
+  let inject = getDecoratorDependencies(target);
+  inject[index] = Parent.of(inject[index]);
 }
 
 /**
 * Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
 */
-export function factory(keyValue: any, asValue?: any) {
+export function factory(keyValue: any) {
   return function(target, key, index) {
-    let params = getDecoratorDependencies(target, 'factory');
-    let factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
+    let inject = getDecoratorDependencies(target);
+    inject[index] = Factory.of(keyValue);
   };
 }
 
 /**
-* Decorator: Specifies the dependency as a new instance
+* Decorator: Specifies the dependency as a new instance. Instances can optionally be registered in the container
+* under a different key and/or use dynamic dependencies
 */
 export function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]) {
   let deco = function(asKey?: any) {
     return function(target, key, index) {
-      let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
+      let inject = getDecoratorDependencies(target);
+      inject[index] = NewInstance.of(inject[index], ...dynamicDependencies);
       if (!!asKey) {
-        params[index].as(asKey);
+        inject[index].as(asKey);
       }
     };
   };
@@ -1083,24 +1100,8 @@ export class Container {
 */
 export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
-    let previousInject = target.inject ? target.inject.slice() : null; //make a copy of target.inject to avoid changing parent inject
-    let autoInject: any = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (let i = 0; i < autoInject.length; i++) {
-        //check if previously injected.
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          const prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice((prevIndex > -1 && prevIndex < i) ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {//else add
-          previousInject[i] = autoInject[i];
-        }
-      }
-      target.inject = previousInject;
+    if (!target.hasOwnProperty('inject')) {
+      target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
     }
   };
 
@@ -1108,21 +1109,16 @@ export function autoinject(potentialTarget?: any): any {
 }
 
 /**
-* Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function.
+* Decorator: Specifies the dependencies that should be injected by the DI Container into the decorated class/function.
 */
 export function inject(...rest: any[]): any {
   return function(target, key, descriptor) {
-    // handle when used as a parameter
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      let params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+    // handle when used as a constructor parameter decorator
+    if (typeof descriptor === 'number') {
+      autoinject(target);
+      if (rest.length === 1) {
+        target.inject[descriptor] = rest[0];
       }
-      if (!params) {
-        params = metadata.getOwn(metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
       return;
     }
     // if it's true then we injecting rest into function and not Class constructor

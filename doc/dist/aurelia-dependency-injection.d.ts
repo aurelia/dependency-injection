@@ -17,6 +17,26 @@ export interface Resolver {
     get(container: Container, key: any): any;
 }
 /**
+* Used to resolve instances, singletons, transients, aliases
+*/
+export declare class StrategyResolver {
+    strategy: StrategyResolver | number;
+    state: any;
+    /**
+    * Creates an instance of the StrategyResolver class.
+    * @param strategy The type of resolution strategy.
+    * @param state The state associated with the resolution strategy.
+    */
+    constructor(strategy: any, state: any);
+    /**
+    * Called by the container to allow custom resolution of dependencies for a function/class.
+    * @param container The container to resolve from.
+    * @param key The key that the resolver was registered as.
+    * @return Returns the resolved object.
+    */
+    get(container: Container, key: any): any;
+}
+/**
 * Used to allow functions/classes to specify lazy resolution logic.
 */
 export declare class Lazy {
@@ -106,23 +126,6 @@ export declare class Parent {
     */
     static of(key: any): Parent;
 }
-export declare class StrategyResolver {
-    strategy: StrategyResolver | number;
-    state: any;
-    /**
-    * Creates an instance of the StrategyResolver class.
-    * @param strategy The type of resolution strategy.
-    * @param state The state associated with the resolution strategy.
-    */
-    constructor(strategy: any, state: any);
-    /**
-    * Called by the container to allow custom resolution of dependencies for a function/class.
-    * @param container The container to resolve from.
-    * @param key The key that the resolver was registered as.
-    * @return Returns the resolved object.
-    */
-    get(container: Container, key: any): any;
-}
 /**
 * Used to allow injecting dependencies but also passing data to the constructor.
 */
@@ -151,8 +154,6 @@ export declare class Factory {
 * under a different key by supplying a key using the `as` method.
 */
 export declare class NewInstance {
-    key: any;
-    asKey: any;
     /**
     * Creates an instance of the NewInstance class.
     * @param key The key to resolve/instantiate.
@@ -180,7 +181,12 @@ export declare class NewInstance {
     */
     static of(key: any, ...dynamicDependencies: any[]): NewInstance;
 }
-export declare function getDecoratorDependencies(target: any, name: any): any;
+/**
+* Used by parameter decorators to call autoinject for the target and retrieve the target's inject property.
+* @param target The target class.
+* @return Returns the target's own inject property.
+*/
+export declare function getDecoratorDependencies(target: any): any;
 /**
 * Decorator: Specifies the dependency should be lazy loaded
 */
@@ -200,9 +206,10 @@ export declare function parent(target: any, key: any, index: any): void;
 /**
 * Decorator: Specifies the dependency to create a factory method, that can accept optional arguments
 */
-export declare function factory(keyValue: any, asValue?: any): (target: any, key: any, index: any) => void;
+export declare function factory(keyValue: any): (target: any, key: any, index: any) => void;
 /**
-* Decorator: Specifies the dependency as a new instance
+* Decorator: Specifies the dependency as a new instance. Instances can optionally be registered in the container
+* under a different key and/or use dynamic dependencies
 */
 export declare function newInstance(asKeyOrTarget?: any, ...dynamicDependencies: any[]): (target: any, key: any, index: any) => void;
 /**
@@ -499,6 +506,6 @@ export declare class Container {
 */
 export declare function autoinject(potentialTarget?: any): any;
 /**
-* Decorator: Specifies the dependencies that should be injected by the DI Container into the decoratored class/function.
+* Decorator: Specifies the dependencies that should be injected by the DI Container into the decorated class/function.
 */
 export declare function inject(...rest: any[]): any;

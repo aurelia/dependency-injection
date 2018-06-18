@@ -1,3 +1,20 @@
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/aurelia/dependency-injection/compare/1.3.2...1.4.0) (2018-06-18)
+
+
+### Bug Fixes
+
+* **injection:** fail with autoinject and own static inject ([e230bda](https://github.com/aurelia/dependency-injection/commit/e230bda))
+* **resolver:** use own property 'inject' in autoinject and parameter decorators ([724ff08](https://github.com/aurelia/dependency-injection/commit/724ff08))
+* **resolvers:** remove unusable asValue option of the factory decorator ([5739152](https://github.com/aurelia/dependency-injection/commit/5739152))
+
+
+### Features
+
+* **resolvers:** allow using Factory.of and NewInstance.of with registered handlers ([991cbb5](https://github.com/aurelia/dependency-injection/commit/991cbb5))
+
+
+
 <a name="1.3.2"></a>
 ## [1.3.2](https://github.com/aurelia/dependency-injection/compare/1.3.1...v1.3.2) (2017-08-22)
 

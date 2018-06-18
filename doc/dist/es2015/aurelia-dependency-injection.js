@@ -1,4 +1,4 @@
-var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13;
+var _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6, _dec7, _class7;
 
 import { protocol, metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
@@ -11,68 +11,7 @@ export const resolver = protocol.create('aurelia:resolver', function (target) {
   return true;
 });
 
-export let Lazy = (_dec = resolver(), _dec(_class = class Lazy {
-  constructor(key) {
-    this._key = key;
-  }
-
-  get(container) {
-    return () => container.get(this._key);
-  }
-
-  static of(key) {
-    return new Lazy(key);
-  }
-}) || _class);
-
-export let All = (_dec2 = resolver(), _dec2(_class3 = class All {
-  constructor(key) {
-    this._key = key;
-  }
-
-  get(container) {
-    return container.getAll(this._key);
-  }
-
-  static of(key) {
-    return new All(key);
-  }
-}) || _class3);
-
-export let Optional = (_dec3 = resolver(), _dec3(_class5 = class Optional {
-  constructor(key, checkParent = true) {
-    this._key = key;
-    this._checkParent = checkParent;
-  }
-
-  get(container) {
-    if (container.hasResolver(this._key, this._checkParent)) {
-      return container.get(this._key);
-    }
-
-    return null;
-  }
-
-  static of(key, checkParent = true) {
-    return new Optional(key, checkParent);
-  }
-}) || _class5);
-
-export let Parent = (_dec4 = resolver(), _dec4(_class7 = class Parent {
-  constructor(key) {
-    this._key = key;
-  }
-
-  get(container) {
-    return container.parent ? container.parent.get(this._key) : null;
-  }
-
-  static of(key) {
-    return new Parent(key);
-  }
-}) || _class7);
-
-export let StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = class StrategyResolver {
+export let StrategyResolver = (_dec = resolver(), _dec(_class = class StrategyResolver {
   constructor(strategy, state) {
     this.strategy = strategy;
     this.state = state;
@@ -99,23 +38,90 @@ export let StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = class Strateg
         throw new Error('Invalid strategy: ' + this.strategy);
     }
   }
-}) || _class9);
+}) || _class);
 
-export let Factory = (_dec6 = resolver(), _dec6(_class11 = class Factory {
+export let Lazy = (_dec2 = resolver(), _dec2(_class2 = class Lazy {
   constructor(key) {
     this._key = key;
   }
 
   get(container) {
-    return (...rest) => container.invoke(this._key, rest);
+    return () => container.get(this._key);
+  }
+
+  static of(key) {
+    return new Lazy(key);
+  }
+}) || _class2);
+
+export let All = (_dec3 = resolver(), _dec3(_class3 = class All {
+  constructor(key) {
+    this._key = key;
+  }
+
+  get(container) {
+    return container.getAll(this._key);
+  }
+
+  static of(key) {
+    return new All(key);
+  }
+}) || _class3);
+
+export let Optional = (_dec4 = resolver(), _dec4(_class4 = class Optional {
+  constructor(key, checkParent = true) {
+    this._key = key;
+    this._checkParent = checkParent;
+  }
+
+  get(container) {
+    if (container.hasResolver(this._key, this._checkParent)) {
+      return container.get(this._key);
+    }
+
+    return null;
+  }
+
+  static of(key, checkParent = true) {
+    return new Optional(key, checkParent);
+  }
+}) || _class4);
+
+export let Parent = (_dec5 = resolver(), _dec5(_class5 = class Parent {
+  constructor(key) {
+    this._key = key;
+  }
+
+  get(container) {
+    return container.parent ? container.parent.get(this._key) : null;
+  }
+
+  static of(key) {
+    return new Parent(key);
+  }
+}) || _class5);
+
+export let Factory = (_dec6 = resolver(), _dec6(_class6 = class Factory {
+  constructor(key) {
+    this._key = key;
+  }
+
+  get(container) {
+    let fn = this._key;
+    let resolver = container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    return (...rest) => container.invoke(fn, rest);
   }
 
   static of(key) {
     return new Factory(key);
   }
-}) || _class11);
+}) || _class6);
 
-export let NewInstance = (_dec7 = resolver(), _dec7(_class13 = class NewInstance {
+export let NewInstance = (_dec7 = resolver(), _dec7(_class7 = class NewInstance {
   constructor(key, ...dynamicDependencies) {
     this.key = key;
     this.asKey = key;
@@ -124,7 +130,14 @@ export let NewInstance = (_dec7 = resolver(), _dec7(_class13 = class NewInstance
 
   get(container) {
     let dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(dependency => dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency)) : undefined;
-    const instance = container.invoke(this.key, dynamicDependencies);
+
+    let fn = this.key;
+    let resolver = container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    const instance = container.invoke(fn, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -137,40 +150,33 @@ export let NewInstance = (_dec7 = resolver(), _dec7(_class13 = class NewInstance
   static of(key, ...dynamicDependencies) {
     return new NewInstance(key, ...dynamicDependencies);
   }
-}) || _class13);
+}) || _class7);
 
-export function getDecoratorDependencies(target, name) {
-  let dependencies = target.inject;
-  if (typeof dependencies === 'function') {
-    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
-  }
-  if (!dependencies) {
-    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
-    target.inject = dependencies;
-  }
+export function getDecoratorDependencies(target) {
+  autoinject(target);
 
-  return dependencies;
+  return target.inject;
 }
 
 export function lazy(keyValue) {
   return function (target, key, index) {
-    let params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
+    let inject = getDecoratorDependencies(target);
+    inject[index] = Lazy.of(keyValue);
   };
 }
 
 export function all(keyValue) {
   return function (target, key, index) {
-    let params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
+    let inject = getDecoratorDependencies(target);
+    inject[index] = All.of(keyValue);
   };
 }
 
 export function optional(checkParentOrTarget = true) {
   let deco = function (checkParent) {
     return function (target, key, index) {
-      let params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
+      let inject = getDecoratorDependencies(target);
+      inject[index] = Optional.of(inject[index], checkParent);
     };
   };
   if (typeof checkParentOrTarget === 'boolean') {
@@ -180,25 +186,24 @@ export function optional(checkParentOrTarget = true) {
 }
 
 export function parent(target, key, index) {
-  let params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
+  let inject = getDecoratorDependencies(target);
+  inject[index] = Parent.of(inject[index]);
 }
 
-export function factory(keyValue, asValue) {
+export function factory(keyValue) {
   return function (target, key, index) {
-    let params = getDecoratorDependencies(target, 'factory');
-    let factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
+    let inject = getDecoratorDependencies(target);
+    inject[index] = Factory.of(keyValue);
   };
 }
 
 export function newInstance(asKeyOrTarget, ...dynamicDependencies) {
   let deco = function (asKey) {
     return function (target, key, index) {
-      let params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of(params[index], ...dynamicDependencies);
+      let inject = getDecoratorDependencies(target);
+      inject[index] = NewInstance.of(inject[index], ...dynamicDependencies);
       if (!!asKey) {
-        params[index].as(asKey);
+        inject[index].as(asKey);
       }
     };
   };
@@ -583,7 +588,7 @@ export let Container = class Container {
 
       return handler.invoke(this, dynamicDependencies);
     } catch (e) {
-      throw new AggregateError(`Error invoking ${ fn.name }. Check the inner error for details.`, e, true);
+      throw new AggregateError(`Error invoking ${fn.name}. Check the inner error for details.`, e, true);
     }
   }
 
@@ -610,23 +615,8 @@ export let Container = class Container {
 
 export function autoinject(potentialTarget) {
   let deco = function (target) {
-    let previousInject = target.inject ? target.inject.slice() : null;
-    let autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (let i = 0; i < autoInject.length; i++) {
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          const prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
-        }
-      }
-      target.inject = previousInject;
+    if (!target.hasOwnProperty('inject')) {
+      target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
     }
   };
 
@@ -635,16 +625,11 @@ export function autoinject(potentialTarget) {
 
 export function inject(...rest) {
   return function (target, key, descriptor) {
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      let params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+    if (typeof descriptor === 'number') {
+      autoinject(target);
+      if (rest.length === 1) {
+        target.inject[descriptor] = rest[0];
       }
-      if (!params) {
-        params = metadata.getOwn(metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
       return;
     }
 

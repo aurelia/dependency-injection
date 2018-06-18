@@ -1,11 +1,34 @@
-var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.NewInstance = exports.Factory = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.StrategyResolver = exports.resolver = undefined;
+
+var _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6, _dec7, _class7, _classInvokers;
+
+exports.getDecoratorDependencies = getDecoratorDependencies;
+exports.lazy = lazy;
+exports.all = all;
+exports.optional = optional;
+exports.parent = parent;
+exports.factory = factory;
+exports.newInstance = newInstance;
+exports.invoker = invoker;
+exports.invokeAsFactory = invokeAsFactory;
+exports.registration = registration;
+exports.transient = transient;
+exports.singleton = singleton;
+exports.autoinject = autoinject;
+exports.inject = inject;
+
+var _aureliaMetadata = require('aurelia-metadata');
+
+var _aureliaPal = require('aurelia-pal');
 
 
 
-import { protocol, metadata } from 'aurelia-metadata';
-import { AggregateError } from 'aurelia-pal';
-
-export var resolver = protocol.create('aurelia:resolver', function (target) {
+var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
   if (!(typeof target.get === 'function')) {
     return 'Resolvers must implement: get(container: Container, key: any): any';
   }
@@ -13,7 +36,39 @@ export var resolver = protocol.create('aurelia:resolver', function (target) {
   return true;
 });
 
-export var Lazy = (_dec = resolver(), _dec(_class = function () {
+var StrategyResolver = exports.StrategyResolver = (_dec = resolver(), _dec(_class = function () {
+  function StrategyResolver(strategy, state) {
+    
+
+    this.strategy = strategy;
+    this.state = state;
+  }
+
+  StrategyResolver.prototype.get = function get(container, key) {
+    switch (this.strategy) {
+      case 0:
+        return this.state;
+      case 1:
+        var _singleton = container.invoke(this.state);
+        this.state = _singleton;
+        this.strategy = 0;
+        return _singleton;
+      case 2:
+        return container.invoke(this.state);
+      case 3:
+        return this.state(container, key, this);
+      case 4:
+        return this.state[0].get(container, key);
+      case 5:
+        return container.get(this.state);
+      default:
+        throw new Error('Invalid strategy: ' + this.strategy);
+    }
+  };
+
+  return StrategyResolver;
+}()) || _class);
+var Lazy = exports.Lazy = (_dec2 = resolver(), _dec2(_class2 = function () {
   function Lazy(key) {
     
 
@@ -33,9 +88,8 @@ export var Lazy = (_dec = resolver(), _dec(_class = function () {
   };
 
   return Lazy;
-}()) || _class);
-
-export var All = (_dec2 = resolver(), _dec2(_class3 = function () {
+}()) || _class2);
+var All = exports.All = (_dec3 = resolver(), _dec3(_class3 = function () {
   function All(key) {
     
 
@@ -52,10 +106,9 @@ export var All = (_dec2 = resolver(), _dec2(_class3 = function () {
 
   return All;
 }()) || _class3);
-
-export var Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
+var Optional = exports.Optional = (_dec4 = resolver(), _dec4(_class4 = function () {
   function Optional(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+    var checkParent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
     
 
@@ -72,15 +125,14 @@ export var Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
   };
 
   Optional.of = function of(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+    var checkParent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
     return new Optional(key, checkParent);
   };
 
   return Optional;
-}()) || _class5);
-
-export var Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
+}()) || _class4);
+var Parent = exports.Parent = (_dec5 = resolver(), _dec5(_class5 = function () {
   function Parent(key) {
     
 
@@ -96,42 +148,8 @@ export var Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
   };
 
   return Parent;
-}()) || _class7);
-
-export var StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
-  function StrategyResolver(strategy, state) {
-    
-
-    this.strategy = strategy;
-    this.state = state;
-  }
-
-  StrategyResolver.prototype.get = function get(container, key) {
-    switch (this.strategy) {
-      case 0:
-        return this.state;
-      case 1:
-        var singleton = container.invoke(this.state);
-        this.state = singleton;
-        this.strategy = 0;
-        return singleton;
-      case 2:
-        return container.invoke(this.state);
-      case 3:
-        return this.state(container, key, this);
-      case 4:
-        return this.state[0].get(container, key);
-      case 5:
-        return container.get(this.state);
-      default:
-        throw new Error('Invalid strategy: ' + this.strategy);
-    }
-  };
-
-  return StrategyResolver;
-}()) || _class9);
-
-export var Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
+}()) || _class5);
+var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class6 = function () {
   function Factory(key) {
     
 
@@ -139,14 +157,18 @@ export var Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
   }
 
   Factory.prototype.get = function get(container) {
-    var _this2 = this;
+    var fn = this._key;
+    var resolver = container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
 
     return function () {
       for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
         rest[_key] = arguments[_key];
       }
 
-      return container.invoke(_this2._key, rest);
+      return container.invoke(fn, rest);
     };
   };
 
@@ -155,9 +177,8 @@ export var Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
   };
 
   return Factory;
-}()) || _class11);
-
-export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
+}()) || _class6);
+var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class7 = function () {
   function NewInstance(key) {
     
 
@@ -175,7 +196,14 @@ export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
     var dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(function (dependency) {
       return dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency);
     }) : undefined;
-    var instance = container.invoke(this.key, dynamicDependencies);
+
+    var fn = this.key;
+    var resolver = container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    var instance = container.invoke(fn, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   };
@@ -194,42 +222,34 @@ export var NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
   };
 
   return NewInstance;
-}()) || _class13);
+}()) || _class7);
+function getDecoratorDependencies(target) {
+  autoinject(target);
 
-export function getDecoratorDependencies(target, name) {
-  var dependencies = target.inject;
-  if (typeof dependencies === 'function') {
-    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
-  }
-  if (!dependencies) {
-    dependencies = metadata.getOwn(metadata.paramTypes, target).slice();
-    target.inject = dependencies;
-  }
-
-  return dependencies;
+  return target.inject;
 }
 
-export function lazy(keyValue) {
+function lazy(keyValue) {
   return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
+    var inject = getDecoratorDependencies(target);
+    inject[index] = Lazy.of(keyValue);
   };
 }
 
-export function all(keyValue) {
+function all(keyValue) {
   return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
+    var inject = getDecoratorDependencies(target);
+    inject[index] = All.of(keyValue);
   };
 }
 
-export function optional() {
-  var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+function optional() {
+  var checkParentOrTarget = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
   var deco = function deco(checkParent) {
     return function (target, key, index) {
-      var params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
+      var inject = getDecoratorDependencies(target);
+      inject[index] = Optional.of(inject[index], checkParent);
     };
   };
   if (typeof checkParentOrTarget === 'boolean') {
@@ -238,30 +258,29 @@ export function optional() {
   return deco(true);
 }
 
-export function parent(target, key, index) {
-  var params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
+function parent(target, key, index) {
+  var inject = getDecoratorDependencies(target);
+  inject[index] = Parent.of(inject[index]);
 }
 
-export function factory(keyValue, asValue) {
+function factory(keyValue) {
   return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'factory');
-    var factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
+    var inject = getDecoratorDependencies(target);
+    inject[index] = Factory.of(keyValue);
   };
 }
 
-export function newInstance(asKeyOrTarget) {
+function newInstance(asKeyOrTarget) {
   for (var _len4 = arguments.length, dynamicDependencies = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
     dynamicDependencies[_key4 - 1] = arguments[_key4];
   }
 
   var deco = function deco(asKey) {
     return function (target, key, index) {
-      var params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of.apply(NewInstance, [params[index]].concat(dynamicDependencies));
+      var inject = getDecoratorDependencies(target);
+      inject[index] = NewInstance.of.apply(NewInstance, [inject[index]].concat(dynamicDependencies));
       if (!!asKey) {
-        params[index].as(asKey);
+        inject[index].as(asKey);
       }
     };
   };
@@ -271,21 +290,21 @@ export function newInstance(asKeyOrTarget) {
   return deco();
 }
 
-export function invoker(value) {
+function invoker(value) {
   return function (target) {
-    metadata.define(metadata.invoker, value, target);
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
   };
 }
 
-export function invokeAsFactory(potentialTarget) {
+function invokeAsFactory(potentialTarget) {
   var deco = function deco(target) {
-    metadata.define(metadata.invoker, FactoryInvoker.instance, target);
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, FactoryInvoker.instance, target);
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
 }
 
-export var FactoryInvoker = function () {
+var FactoryInvoker = exports.FactoryInvoker = function () {
   function FactoryInvoker() {
     
   }
@@ -321,23 +340,23 @@ export var FactoryInvoker = function () {
 
 FactoryInvoker.instance = new FactoryInvoker();
 
-export function registration(value) {
+function registration(value) {
   return function (target) {
-    metadata.define(metadata.registration, value, target);
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
   };
 }
 
-export function transient(key) {
+function transient(key) {
   return registration(new TransientRegistration(key));
 }
 
-export function singleton(keyOrRegisterInChild) {
-  var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+function singleton(keyOrRegisterInChild) {
+  var registerInChild = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
 
-export var TransientRegistration = function () {
+var TransientRegistration = exports.TransientRegistration = function () {
   function TransientRegistration(key) {
     
 
@@ -352,9 +371,9 @@ export var TransientRegistration = function () {
   return TransientRegistration;
 }();
 
-export var SingletonRegistration = function () {
+var SingletonRegistration = exports.SingletonRegistration = function () {
   function SingletonRegistration(keyOrRegisterInChild) {
-    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var registerInChild = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     
 
@@ -380,14 +399,14 @@ function validateKey(key) {
     throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
   }
 }
-export var _emptyParameters = Object.freeze([]);
+var _emptyParameters = exports._emptyParameters = Object.freeze([]);
 
-metadata.registration = 'aurelia:registration';
-metadata.invoker = 'aurelia:invoker';
+_aureliaMetadata.metadata.registration = 'aurelia:registration';
+_aureliaMetadata.metadata.invoker = 'aurelia:invoker';
 
 var resolverDecorates = resolver.decorates;
 
-export var InvocationHandler = function () {
+var InvocationHandler = exports.InvocationHandler = function () {
   function InvocationHandler(fn, invoker, dependencies) {
     
 
@@ -478,7 +497,7 @@ function getDependencies(f) {
   return f.inject;
 }
 
-export var Container = function () {
+var Container = exports.Container = function () {
   function Container(configuration) {
     
 
@@ -545,7 +564,7 @@ export var Container = function () {
     fn = fn === undefined ? key : fn;
 
     if (typeof fn === 'function') {
-      var _registration = metadata.get(metadata.registration, fn);
+      var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
 
       if (_registration === undefined) {
         return this.registerResolver(key, new StrategyResolver(1, fn));
@@ -569,7 +588,7 @@ export var Container = function () {
   };
 
   Container.prototype.hasResolver = function hasResolver(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var checkParent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     validateKey(key);
 
@@ -598,7 +617,7 @@ export var Container = function () {
         return this.autoRegister(key).get(this, key);
       }
 
-      var _registration2 = metadata.get(metadata.registration, key);
+      var _registration2 = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, key);
 
       if (_registration2 === undefined) {
         return this.parent._get(key);
@@ -670,7 +689,7 @@ export var Container = function () {
 
       return _handler.invoke(this, dynamicDependencies);
     } catch (e) {
-      throw new AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
+      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
     }
   };
 
@@ -678,7 +697,7 @@ export var Container = function () {
     var dependencies = void 0;
 
     if (fn.inject === undefined) {
-      dependencies = metadata.getOwn(metadata.paramTypes, fn) || _emptyParameters;
+      dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
     } else {
       dependencies = [];
       var ctor = fn;
@@ -690,7 +709,7 @@ export var Container = function () {
       }
     }
 
-    var invoker = metadata.getOwn(metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
+    var invoker = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
 
     var handler = new InvocationHandler(fn, invoker, dependencies);
     return this._onHandlerCreated !== undefined ? this._onHandlerCreated(handler) : handler;
@@ -699,47 +718,27 @@ export var Container = function () {
   return Container;
 }();
 
-export function autoinject(potentialTarget) {
+function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    var previousInject = target.inject ? target.inject.slice() : null;
-    var autoInject = metadata.getOwn(metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (var i = 0; i < autoInject.length; i++) {
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          var prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
-        }
-      }
-      target.inject = previousInject;
+    if (!target.hasOwnProperty('inject')) {
+      target.inject = (_aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters).slice();
     }
   };
 
   return potentialTarget ? deco(potentialTarget) : deco;
 }
 
-export function inject() {
+function inject() {
   for (var _len5 = arguments.length, rest = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
     rest[_key5] = arguments[_key5];
   }
 
   return function (target, key, descriptor) {
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      var params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+    if (typeof descriptor === 'number') {
+      autoinject(target);
+      if (rest.length === 1) {
+        target.inject[descriptor] = rest[0];
       }
-      if (!params) {
-        params = metadata.getOwn(metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
       return;
     }
 
