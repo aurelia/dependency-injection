@@ -18,6 +18,7 @@ Typically, you would use Decorators, an ES Next feature supported by both Babel 
 
 <code-listing heading="CustomerEditScreen Injection">
   <source-code lang="ES 2015">
+    
     import {CustomerService} from 'backend/customer-service';
 
     export class CustomerEditScreen {
