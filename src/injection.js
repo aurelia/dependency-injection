@@ -8,6 +8,14 @@ export function autoinject(potentialTarget?: any): any {
   let deco = function(target) {
     if (!target.hasOwnProperty('inject')) {
       target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
+      if (target.inject &&
+        target.inject.length > 0) {
+        // TypeScript 3.0 metadata for "...rest" gives type "Object"
+        // if last parameter is "Object", assume it's a ...rest and remove that metadata.
+        if (target.inject[target.inject.length - 1] === Object) {
+          target.inject.splice(-1,1);
+        }
+      }
     }
   };
 

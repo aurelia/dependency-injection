@@ -276,6 +276,47 @@ describe('injection', () => {
         expect(app2.logger).toEqual(jasmine.any(Logger));
         expect(app2.service).toEqual(jasmine.any(Service));
       });
+
+      it('test variadic arguments (TypeScript metadata)', function() {
+        class VariadicParentApp {
+          static inject() { return [Logger]; }
+          constructor(logger) {
+            this.logger = logger;
+          }
+        }
+        Reflect.metadata(ParentApp, 'design:paramtypes', [Logger]);
+
+        // TypeScript 3.0 gives "Object" in metadata for "...rest" arguments.
+        let VariadicChildApp = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Service, Object])).on(
+          class VariadicChildApp extends VariadicParentApp {
+            constructor(service, ...rest) {
+              super(...rest);
+              this.service = service;
+            }
+          });
+
+        let VariadicGrandchildApp = decorators(autoinject(), Reflect.metadata('design:paramtypes', [SubService1, Object])).on(
+          class VariadicGrandchildApp extends VariadicChildApp {
+            constructor(subService, ...rest) {
+              super(...rest);
+              this.subService = subService;
+            }
+          });
+
+        let container = new Container();
+
+        let app1 = container.get(VariadicParentApp);
+        expect(app1.logger).toEqual(jasmine.any(Logger));
+
+        let app2 = container.get(VariadicChildApp);
+        expect(app2.logger).toEqual(jasmine.any(Logger));
+        expect(app2.service).toEqual(jasmine.any(Service));
+
+        let app3 = container.get(VariadicGrandchildApp);
+        expect(app3.logger).toEqual(jasmine.any(Logger));
+        expect(app3.service).toEqual(jasmine.any(Service));
+        expect(app3.subService).toEqual(jasmine.any(SubService1));
+      });
     });
   });
 
