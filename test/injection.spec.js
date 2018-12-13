@@ -276,6 +276,223 @@ describe('injection', () => {
         expect(app2.logger).toEqual(jasmine.any(Logger));
         expect(app2.service).toEqual(jasmine.any(Service));
       });
+
+      it('test variadic arguments (TypeScript metadata)', function() {
+        const container = new Container();
+        const VariadicArg = Object; // TypeScript emits "Object" type for "...rest" param
+
+        class Dep$1 {}
+        class Dep$2 {}
+        class Dep$3 {}
+        class Dep$4 {}
+        class Dep$5 {}
+
+        const ParentOneDep = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$1])).on(
+          class ParentOneDep {
+            constructor(dep1: Dep$1) {
+              this.dep1 = dep1;
+            }
+          }
+        )
+
+        const ParentTwoDeps = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$1, Dep$2])).on(
+          class ParentTwoDeps {
+            constructor(dep1: Dep$1, dep2: Dep$2) {
+              this.dep1 = dep1;
+              this.dep2 = dep2;
+            }
+          }
+        )
+
+        class ChildZeroDeps$1 extends ParentOneDep {}
+        class ChildZeroDeps$2 extends ParentTwoDeps {}
+        
+        const ChildOneDep$1 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$3, VariadicArg])).on(
+          class ChildOneDep$1 extends ParentOneDep {
+            constructor(dep3: Dep$3, ...rest) {
+              super(...rest);
+              this.dep3 = dep3;
+            }
+          }
+        )
+        {
+          const a = container.get(ChildOneDep$1);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+        }
+
+        const ChildOneDep$2 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$3, VariadicArg])).on(
+          class ChildOneDep$2 extends ParentTwoDeps {
+            constructor(dep3: Dep$3, ...rest) {
+              super(...rest);
+              this.dep3 = dep3;
+            }
+          }
+        )
+        {
+          const a = container.get(ChildOneDep$2);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+        }
+
+        const ChildTwoDeps$1 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$3, Dep$4, VariadicArg])).on(
+          class ChildTwoDeps$1 extends ParentOneDep {
+            constructor(dep3: Dep$3, dep4: Dep$4, ...rest) {
+              super(...rest);
+              this.dep3 = dep3;
+              this.dep4 = dep4;
+            }
+          }
+        )
+        const ChildTwoDeps$2 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$3, Dep$4, VariadicArg])).on(
+          class ChildTwoDeps$2 extends ParentTwoDeps {
+            constructor(dep3: Dep$3, dep4: Dep$4, ...rest) {
+              super(...rest);
+              this.dep3 = dep3;
+              this.dep4 = dep4;
+            }
+          }
+        )
+
+        class GrandChildZeroDeps$01 extends ChildZeroDeps$1 {}
+        {
+          const a = container.get(GrandChildZeroDeps$01);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+        }
+
+        class GrandChildZeroDeps$02 extends ChildZeroDeps$2 {}
+        {
+          const a = container.get(GrandChildZeroDeps$02);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+        }
+
+        class GrandChildZeroDeps$11 extends ChildOneDep$1 {}
+        {
+          const a = container.get(GrandChildZeroDeps$11);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+        }
+
+        class GrandChildZeroDeps$12 extends ChildOneDep$2 {}
+        {
+          const a = container.get(GrandChildZeroDeps$12);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+        }
+
+        class GrandChildZeroDeps$21 extends ChildTwoDeps$1 {}
+        {
+          const a = container.get(GrandChildZeroDeps$21);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep4).toEqual(jasmine.any(Dep$4));
+        }
+
+        class GrandChildZeroDeps$22 extends ChildTwoDeps$2 {}
+        {
+          const a = container.get(GrandChildZeroDeps$22);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep4).toEqual(jasmine.any(Dep$4));
+        }
+
+        const GrandChildOneDep$01 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$5, VariadicArg])).on(
+          class GrandChildOneDep$01 extends ChildZeroDeps$1 {
+            constructor(dep5: Dep$5, ...rest) {
+              super(...rest);
+              this.dep5 = dep5;
+            }
+          }
+        )
+        {
+          const a = container.get(GrandChildOneDep$01);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+        }
+
+        const GrandChildOneDep$02 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$5, VariadicArg])).on(
+          class GrandChildOneDep$02 extends ChildZeroDeps$2 {
+            constructor(dep5: Dep$5, ...rest) {
+              super(...rest);
+              this.dep5 = dep5;
+            }
+          }
+        )
+        {
+          const a = container.get(GrandChildOneDep$02);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+        }
+
+        const GrandChildOneDep$11 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$5, VariadicArg])).on(
+          class GrandChildOneDep$11 extends ChildOneDep$1 {
+            constructor(dep5: Dep$5, ...rest) {
+              super(...rest);
+              this.dep5 = dep5;
+            }
+          }
+        )
+        {
+          const a = container.get(GrandChildOneDep$11);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+        }
+
+        const GrandChildOneDep$12 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$5, VariadicArg])).on(
+          class GrandChildOneDep$12 extends ChildOneDep$2 {
+            constructor(dep5: Dep$5, ...rest) {
+              super(...rest);
+              this.dep5 = dep5;
+            }
+          }
+        )
+        {
+          const a = container.get(GrandChildOneDep$12);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+        }
+
+        const GrandChildOneDep$21 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$5, VariadicArg])).on(
+          class GrandChildOneDep$21 extends ChildTwoDeps$1 {
+            constructor(dep5: Dep$5, ...rest) {
+              super(...rest);
+              this.dep5 = dep5;
+            }
+          }
+        )
+        {
+          const a = container.get(GrandChildOneDep$21);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep4).toEqual(jasmine.any(Dep$4));
+          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+        }
+
+        const GrandChildOneDep$22 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$5, VariadicArg])).on(
+          class GrandChildOneDep$22 extends ChildTwoDeps$2 {
+            constructor(dep5: Dep$5, ...rest) {
+              super(...rest);
+              this.dep5 = dep5;
+            }
+          }
+        )
+        {
+          const a = container.get(GrandChildOneDep$22);
+          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep4).toEqual(jasmine.any(Dep$4));
+          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+        }
+      });
     });
   });
 
