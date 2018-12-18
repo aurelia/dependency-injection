@@ -706,6 +706,10 @@ export function autoinject(potentialTarget) {
   var deco = function deco(target) {
     if (!target.hasOwnProperty('inject')) {
       target.inject = (metadata.getOwn(metadata.paramTypes, target) || _emptyParameters).slice();
+
+      if (target.inject.length > 0 && target.inject[target.inject.length - 1] === Object) {
+        target.inject.pop();
+      }
     }
   };
 

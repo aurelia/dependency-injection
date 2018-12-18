@@ -1,3 +1,15 @@
+<a name="1.4.2"></a>
+## [1.4.2](https://github.com/aurelia/dependency-injection/compare/1.4.1...1.4.2) (2018-12-18)
+
+
+### Bug Fixes
+
+* **dependency-injection:** add more tests using cases suggested by [@fkleuver](https://github.com/fkleuver) ([ac4e6f9](https://github.com/aurelia/dependency-injection/commit/ac4e6f9)), closes [#171](https://github.com/aurelia/dependency-injection/issues/171)
+* **dependency-injection:** adjust based on review ([dc756f4](https://github.com/aurelia/dependency-injection/commit/dc756f4)), closes [#171](https://github.com/aurelia/dependency-injection/issues/171)
+* **dependency-injection:** ignore ...rest TypeScript metadata ([c093756](https://github.com/aurelia/dependency-injection/commit/c093756)), closes [#171](https://github.com/aurelia/dependency-injection/issues/171)
+
+
+
 <a name="1.4.0"></a>
 # [1.4.0](https://github.com/aurelia/dependency-injection/compare/1.3.2...1.4.0) (2018-06-18)
 
