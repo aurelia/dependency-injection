@@ -11,7 +11,7 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 
 ## Documentation
 
-You can read documentation on dependency injection [here](http://aurelia.io/hub.html#/doc/article/aurelia/dependency-injection/latest/dependency-injection-basics). If you would like to help improve this documentation, the source for the above can be found in the doc folder within this repository.
+You can read documentation on dependency injection [here](https://aurelia.io/docs/fundamentals/dependency-injection/). If you would like to help improve this documentation, the source for the above can be found in the doc folder within this repository.
 
 ## Platform Support
 
