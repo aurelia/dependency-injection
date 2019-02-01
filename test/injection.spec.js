@@ -293,7 +293,7 @@ describe('injection', () => {
               this.dep1 = dep1;
             }
           }
-        )
+        );
 
         const ParentTwoDeps = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$1, Dep$2])).on(
           class ParentTwoDeps {
@@ -302,11 +302,11 @@ describe('injection', () => {
               this.dep2 = dep2;
             }
           }
-        )
+        );
 
         class ChildZeroDeps$1 extends ParentOneDep {}
         class ChildZeroDeps$2 extends ParentTwoDeps {}
-        
+
         const ChildOneDep$1 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$3, VariadicArg])).on(
           class ChildOneDep$1 extends ParentOneDep {
             constructor(dep3: Dep$3, ...rest) {
@@ -314,7 +314,7 @@ describe('injection', () => {
               this.dep3 = dep3;
             }
           }
-        )
+        );
         {
           const a = container.get(ChildOneDep$1);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -328,7 +328,7 @@ describe('injection', () => {
               this.dep3 = dep3;
             }
           }
-        )
+        );
         {
           const a = container.get(ChildOneDep$2);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -344,7 +344,7 @@ describe('injection', () => {
               this.dep4 = dep4;
             }
           }
-        )
+        );
         const ChildTwoDeps$2 = decorators(autoinject(), Reflect.metadata('design:paramtypes', [Dep$3, Dep$4, VariadicArg])).on(
           class ChildTwoDeps$2 extends ParentTwoDeps {
             constructor(dep3: Dep$3, dep4: Dep$4, ...rest) {
@@ -353,7 +353,7 @@ describe('injection', () => {
               this.dep4 = dep4;
             }
           }
-        )
+        );
 
         class GrandChildZeroDeps$01 extends ChildZeroDeps$1 {}
         {
@@ -407,7 +407,7 @@ describe('injection', () => {
               this.dep5 = dep5;
             }
           }
-        )
+        );
         {
           const a = container.get(GrandChildOneDep$01);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -421,7 +421,7 @@ describe('injection', () => {
               this.dep5 = dep5;
             }
           }
-        )
+        );
         {
           const a = container.get(GrandChildOneDep$02);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -436,7 +436,7 @@ describe('injection', () => {
               this.dep5 = dep5;
             }
           }
-        )
+        );
         {
           const a = container.get(GrandChildOneDep$11);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -451,7 +451,7 @@ describe('injection', () => {
               this.dep5 = dep5;
             }
           }
-        )
+        );
         {
           const a = container.get(GrandChildOneDep$12);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -467,7 +467,7 @@ describe('injection', () => {
               this.dep5 = dep5;
             }
           }
-        )
+        );
         {
           const a = container.get(GrandChildOneDep$21);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
@@ -483,7 +483,7 @@ describe('injection', () => {
               this.dep5 = dep5;
             }
           }
-        )
+        );
         {
           const a = container.get(GrandChildOneDep$22);
           expect(a.dep1).toEqual(jasmine.any(Dep$1));
