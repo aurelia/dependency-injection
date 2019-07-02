@@ -7,7 +7,7 @@
       "es2017",
       "dom"
     ],
-    "outDir": "dist/test",
+    "outDir": "dist/amd",
     "declaration": false,
     "noImplicitAny": false,
     "removeComments": true,

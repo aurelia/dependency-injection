@@ -1,3 +1,21 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [1.4.4](https://github.com/aurelia/dependency-injection/compare/1.4.3...1.4.4) (2019-07-06)
+
+
+
+## [1.4.3](https://github.com/aurelia/dependency-injection/compare/1.4.2...1.4.3) (2019-07-06)
+
+
+### Bug Fixes
+
+* **ci:** add dev dep jspm ([ad4be00](https://github.com/aurelia/dependency-injection/commit/ad4be00))
+* **ci:** take our circle ci ([9899197](https://github.com/aurelia/dependency-injection/commit/9899197))
+
+
+
 <a name="1.4.2"></a>
 ## [1.4.2](https://github.com/aurelia/dependency-injection/compare/1.4.1...1.4.2) (2018-12-18)
 

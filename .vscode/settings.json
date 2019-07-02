@@ -1,0 +1,7 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "tslint.nodePath": "./node_modules/tslint/bin/tslint",
+  "editor.formatOnSave": false,
+  "json.format.enable": false,
+  "typescript.format.enable": true
+}

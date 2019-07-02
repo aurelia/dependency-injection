@@ -17,52 +17,42 @@ You can read documentation on dependency injection [here](https://aurelia.io/doc
 
 This library can be used in the **browser** as well as on the **server**.
 
-## Building The Code
+## Reporting Issues
 
-To build the code, follow these steps.
+Please refer to the [issue template](ISSUE_TEMPLATE.md). Accompany any bug report with a demo of the issue using a [runnable Gist](https://gist.run/?id=381fdb1a4b0865a4c25026187db865ce).
 
-1. Ensure that [NodeJS](http://nodejs.org/) is installed. This provides the platform on which the build tooling runs.
-2. From the project folder, execute the following command:
+## Building
 
-	```shell
-	npm install
-	```
-3. Ensure that [Gulp](http://gulpjs.com/) is installed. If you need to install it, use the following command:
+```shell
+npm run build
+```
 
-	```shell
-	npm install -g gulp
-	```
-4. To build the code, you can now run:
+## Tests
 
-	```shell
-	gulp build
-	```
-5. You will find the compiled code in the `dist` folder, available in three module formats: AMD, CommonJS and ES6.
+```shell
+npm run test
+```
 
-6. See `gulpfile.js` for other tasks related to generating the docs and linting.
+## Developing
 
-## Running The Tests
+Run the tests in watch mode:
 
-To run the unit tests, first ensure that you have followed the steps above in order to install all dependencies and successfully build the library. Once you have done that, proceed with these additional steps:
+```shell
+npm run develop
+```
 
-1. Ensure that the [Karma](http://karma-runner.github.io/) CLI is installed. If you need to install it, use the following command:
+## Publishing
 
-	```shell
-	npm install -g karma-cli
-	```
-2. Ensure that [jspm](http://jspm.io/) is installed. If you need to install it, use the following commnand:
+1. Bump the version
+  
+  ```shell
+  npm run bump-version [<newversion> | major | minor | patch]
+  ```
 
-	```shell
-	npm install -g jspm
-	```
-3. Install the client-side dependencies with jspm:
+2. Prepare the release (run tests, run build, docs, release notes)
+  
+  ```shell
+  npm run prepare-release
+  ```
 
-	```shell
-	jspm install
-	```
-
-4. You can now run the tests with this command:
-
-	```shell
-	karma start
-	```
+3. Commit, tag, npm publish (not automated)
