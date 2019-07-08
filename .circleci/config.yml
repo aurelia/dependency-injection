@@ -1,0 +1,45 @@
+version: 2.1
+
+map-1: &filter_only_develop
+  filters:
+    branches:
+      only: develop
+
+map-2: &filter_only_tag
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^v?[0-9]+(\.[0-9]+)*$/
+
+orbs:
+  v1: aurelia/v1@volatile
+
+workflows:
+  main:
+    jobs:
+      - v1/build_test
+      - v1/build_merge:
+          <<: *filter_only_develop
+          requires:
+            - v1/build_test
+      - v1/npm_publish:
+          <<: *filter_only_tag
+          name: npm_publish_dry
+          args: "--dry-run"
+      - request_publish_latest:
+          <<: *filter_only_tag
+          type: approval
+          requires:
+            - npm_publish_dry
+      - v1/npm_publish:
+          <<: *filter_only_tag
+          name: npm_publish
+          context: Aurelia
+          requires:
+            - request_publish_latest
+      - v1/merge_back:
+          <<: *filter_only_tag
+          requires:
+            - npm_publish
+
