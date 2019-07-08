@@ -1,14 +1,14 @@
 // tslint:disable-next-line:no-reference
-/// <reference path="./internal" />
+/// <reference path="./internal.d.ts" />
 import { metadata } from 'aurelia-metadata';
 import { Container } from './container';
-import { DependencyCtorOrFunctor, PrimitiveOrBase, ImplOrAny } from './types';
+import { DependencyCtorOrFunctor, ImplOrAny, Impl, Args } from './types';
 
 /**
  * Decorator: Specifies a custom Invoker for the decorated item.
  */
-export function invoker<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-  value: Invoker<TBase, TArgs, TImpl>
+export function invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
+  value: Invoker<TBase, TImpl, TArgs>
 ): any {
   return target => {
     metadata.define(metadata.invoker, value, target);
@@ -30,7 +30,7 @@ export function invokeAsFactory(potentialTarget?: any): any {
 /**
  * A strategy for invoking a function, resulting in an object instance.
  */
-export interface Invoker<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>> {
+export interface Invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> {
   /**
    * Invokes the function with the provided dependencies.
    * @param fn The constructor or factory function.
@@ -39,7 +39,7 @@ export interface Invoker<TBase, TArgs extends Array<any>, TImpl extends Primitiv
    */
   invoke(
     container: Container,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
     dependencies: TArgs
   ): ImplOrAny<TImpl>;
 
@@ -53,7 +53,7 @@ export interface Invoker<TBase, TArgs extends Array<any>, TImpl extends Primitiv
    */
   invokeWithDynamicDependencies(
     container: Container,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
     staticDependencies: TArgs[number][],
     dynamicDependencies: TArgs[number][]
   ): ImplOrAny<TImpl>;
@@ -64,8 +64,8 @@ export interface Invoker<TBase, TArgs extends Array<any>, TImpl extends Primitiv
  */
 export class FactoryInvoker<
   TBase = any,
-  TArgs extends Array<any> = Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
+  TArgs extends Args<TBase> = Args<TBase>,
+  TImpl extends Impl<TBase> = Impl<TBase>
   > {
   /**
    * The singleton instance of the FactoryInvoker.
@@ -81,7 +81,7 @@ export class FactoryInvoker<
    */
   public invoke(
     container: Container,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
     dependencies: TArgs
   ): ImplOrAny<TImpl> {
     let i = dependencies.length;
@@ -104,7 +104,7 @@ export class FactoryInvoker<
    */
   public invokeWithDynamicDependencies(
     container: Container,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
     staticDependencies: TArgs[number][],
     dynamicDependencies: TArgs[number][]
   ): ImplOrAny<TImpl> {

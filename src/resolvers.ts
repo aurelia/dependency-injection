@@ -2,13 +2,14 @@ import { protocol } from 'aurelia-metadata';
 import { Container } from './container';
 import { autoinject } from './injection';
 import {
-  PrimitiveOrBase,
   PrimitiveOrDependencyCtor,
   DependencyCtorOrFunctor,
   PrimitiveOrDependencyCtorOrFunctor,
   DependencyCtor,
   DependencyFunctor,
-  ImplOrAny
+  ImplOrAny,
+  Impl,
+  Args
 } from './types';
 
 /**
@@ -53,23 +54,23 @@ export type IStrategy = 1 | 2 | 3 | 4 | 5;
 
 export type StrategyFunctor<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
   > = (
     container?: Container,
-    ctor?: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+    ctor?: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>,
     strategyResolver?: any
   ) => TImpl;
 
 export interface StrategyState<
   TBase,
-  TImpl extends PrimitiveOrBase<TBase>,
-  TArgs extends Array<any>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
   > {
   [Strategy.instance]: TImpl;
-  [Strategy.singleton]: DependencyCtorOrFunctor<TBase, TArgs, TImpl>;
-  [Strategy.transient]: DependencyCtorOrFunctor<TBase, TArgs, TImpl>;
-  [Strategy.function]: StrategyFunctor<TBase, TArgs, TImpl>;
+  [Strategy.singleton]: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
+  [Strategy.transient]: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
+  [Strategy.function]: StrategyFunctor<TBase, TImpl, TArgs>;
   [Strategy.array]: [{
     get: (
       container: Container,
@@ -81,12 +82,13 @@ export interface StrategyState<
 
 function isStrategy<
   TBase,
-  TImpl extends PrimitiveOrBase<TBase>,
-  TArgs extends Array<any>,
-  TKey extends keyof StrategyState<TBase, TImpl, TArgs> = keyof StrategyState<TBase, TImpl, TArgs>>(
-    actual: Strategy,
-    expected: TKey,
-    state):
+  TImpl extends Impl<TBase>,
+  TArgs extends Args<TBase>,
+  TKey extends keyof StrategyState<TBase, TImpl, TArgs>
+>(
+  actual: Strategy,
+  expected: TKey,
+  state):
   state is StrategyState<TBase, TImpl, TArgs>[TKey] {
   return actual === expected;
 }
@@ -96,8 +98,8 @@ function isStrategy<
 @resolver()
 export class StrategyResolver<
   TBase,
-  TImpl extends PrimitiveOrBase<TBase>,
-  TArgs extends Array<any>,
+  TImpl extends Impl<TBase>,
+  TArgs extends Args<TBase>,
   TStrategyKey extends keyof StrategyState<TBase, TImpl, TArgs>> {
 
   public strategy: keyof StrategyState<TBase, TImpl, TArgs>;
@@ -125,13 +127,13 @@ export class StrategyResolver<
       return this.state;
     }
     if (isStrategy<TBase, TImpl, TArgs, Strategy.singleton>(this.strategy, Strategy.singleton, this.state)) {
-      const singleton = container.invoke<TBase, TArgs, TImpl>(this.state);
+      const singleton = container.invoke<TBase, TImpl, TArgs>(this.state);
       this.state = singleton;
       this.strategy = 0;
       return singleton;
     }
     if (isStrategy<TBase, TImpl, TArgs, Strategy.transient>(this.strategy, Strategy.transient, this.state)) {
-      return container.invoke<TBase, TArgs, TImpl>(this.state);
+      return container.invoke<TBase, TImpl, TArgs>(this.state);
     }
     if (isStrategy<TBase, TImpl, TArgs, Strategy.function>(this.strategy, Strategy.function, this.state)) {
       return this.state(container, key, this);
@@ -150,7 +152,9 @@ export class StrategyResolver<
  * Used to allow functions/classes to specify lazy resolution logic.
  */
 @resolver()
-export class Lazy<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>> {
+export class Lazy<TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
@@ -180,10 +184,11 @@ export class Lazy<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase
    */
   public static of<
     TBase,
-    TArgs extends Array<any>,
-    TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
-  >(key: any) {
-    return new Lazy<TBase, TArgs, TImpl>(key);
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>
+    ) {
+    return new Lazy<TBase, TImpl, TArgs>(key);
   }
 }
 
@@ -191,7 +196,9 @@ export class Lazy<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase
  * Used to allow functions/classes to specify resolution of all matches to a key.
  */
 @resolver()
-export class All<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>> {
+export class All<TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
@@ -218,8 +225,11 @@ export class All<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<
    * @param key The key to resolve all instances for.
    * @return Returns an instance of All for the key.
    */
-  public static of<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
-    key: any): All<TBase, TArgs, TImpl> {
+  public static of<TBase,
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>
+    ): All<TBase, TImpl, TArgs> {
     return new All(key);
   }
 }
@@ -229,7 +239,9 @@ export class All<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<
  * be resolved only if already registred with the container.
  */
 @resolver()
-export class Optional<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>> {
+export class Optional<TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
@@ -268,9 +280,10 @@ export class Optional<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOr
    * @return Returns an instance of Optional for the key.
    */
   public static of<TBase,
-    TArgs extends Array<any>,
-    TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
-  >(key: any, checkParent: boolean = true): Optional<TBase, TArgs, TImpl> {
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
+      checkParent: boolean = true): Optional<TBase, TImpl, TArgs> {
     return new Optional(key, checkParent);
   }
 }
@@ -280,7 +293,9 @@ export class Optional<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOr
  * one.
  */
 @resolver()
-export class Parent<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>> {
+export class Parent<TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
@@ -307,8 +322,10 @@ export class Parent<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBa
    * @return Returns an instance of Parent for the key.
    */
   public static of<TBase,
-    TArgs extends Array<any>,
-    TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(key: any): Parent<TBase, TArgs, TImpl> {
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>
+    ): Parent<TBase, TImpl, TArgs> {
     return new Parent(key);
   }
 }
@@ -317,15 +334,17 @@ export class Parent<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBa
  * Used to allow injecting dependencies but also passing data to the constructor.
  */
 @resolver()
-export class Factory<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>> {
+export class Factory<TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
-  public _key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>;
+  public _key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
 
   /**
    * Creates an instance of the Factory class.
    * @param key The key to resolve from the parent container.
    */
-  constructor(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>) {
+  constructor(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>) {
     this._key = key;
   }
 
@@ -336,14 +355,14 @@ export class Factory<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrB
    * @return Returns a function that can be invoked to resolve dependencies
    * later, and the rest of the parameters.
    */
-  public get(container: Container): DependencyFunctor<TBase, TArgs, TImpl> {
+  public get(container: Container): DependencyFunctor<TBase, TImpl, TArgs> {
     let fn = this._key;
     const resolver = container.getResolver(fn);
     if (resolver && resolver.strategy === Strategy.function) {
       fn = resolver.state;
     }
 
-    return (...rest) => container.invoke(fn as DependencyCtorOrFunctor<TBase, TArgs, TImpl>, rest);
+    return (...rest) => container.invoke(fn as DependencyCtorOrFunctor<TBase, TImpl, TArgs>, rest);
   }
 
   /**
@@ -351,9 +370,11 @@ export class Factory<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrB
    * @param key The key to resolve.
    * @return Returns an instance of Factory for the key.
    */
-  public static of<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
-    key: DependencyCtor<TBase, TImpl, TArgs>
-  ): Factory<TBase, TArgs, TImpl> {
+  public static of<TBase,
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      key: DependencyCtor<TBase, TImpl, TArgs>
+    ): Factory<TBase, TImpl, TArgs> {
     return new Factory(key);
   }
 }
@@ -367,13 +388,12 @@ export class Factory<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrB
 @resolver()
 export class NewInstance<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
-  > {
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
-  public key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>;
+  public key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
   /** @internal */
-  public asKey: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>;
+  public asKey: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
   /** @internal */
   public dynamicDependencies: TArgs[number][];
 
@@ -382,7 +402,7 @@ export class NewInstance<
    * @param key The key to resolve/instantiate.
    * @param dynamicDependencies An optional list of dynamic dependencies.
    */
-  constructor(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>, ...dynamicDependencies: TArgs[number][]) {
+  constructor(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>, ...dynamicDependencies: TArgs[number][]) {
     this.key = key;
     this.asKey = key;
     this.dynamicDependencies = dynamicDependencies;
@@ -411,7 +431,7 @@ export class NewInstance<
       fn = resolver.state;
     }
 
-    const instance = container.invoke(fn as DependencyCtorOrFunctor<TBase, TArgs, TImpl>, dynamicDependencies);
+    const instance = container.invoke(fn as DependencyCtorOrFunctor<TBase, TImpl, TArgs>, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   }
@@ -422,7 +442,7 @@ export class NewInstance<
    * @param key The key to register the instance with.
    * @return Returns the NewInstance resolver.
    */
-  public as(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>) {
+  public as(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>) {
     this.asKey = key;
     return this;
   }
@@ -433,9 +453,11 @@ export class NewInstance<
    * @param dynamicDependencies An optional list of dynamic dependencies.
    * @return Returns an instance of NewInstance for the key.
    */
-  public static of<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
-    key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>,
-    ...dynamicDependencies: TArgs[number][]): NewInstance<TBase, TArgs, TImpl> {
+  public static of<TBase,
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>,
+      ...dynamicDependencies: TArgs[number][]): NewInstance<TBase, TImpl, TArgs> {
     return new NewInstance(key, ...dynamicDependencies);
   }
 }
@@ -447,7 +469,9 @@ export class NewInstance<
  * @return Returns the target's own inject property.
  */
 export function getDecoratorDependencies<
-  TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>>(
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] }
   ) {
   autoinject(target);
@@ -459,12 +483,14 @@ export function getDecoratorDependencies<
  * Decorator: Specifies the dependency should be lazy loaded
  */
 export function lazy<
-  TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>>(
     keyValue: any
   ) {
   return (
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
-    key,
+    _key,
     index: number
   ) => {
     const inject = getDecoratorDependencies(target);
@@ -477,12 +503,14 @@ export function lazy<
  * key.
  */
 export function all<
-  TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>>(
     keyValue: any
   ) {
   return (
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
-    key,
+    _key,
     index: number
   ) => {
     const inject = getDecoratorDependencies(target);
@@ -494,12 +522,14 @@ export function all<
  * Decorator: Specifies the dependency as optional
  */
 export function optional<
-  TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>>(
     checkParentOrTarget: boolean = true) {
   const deco = (checkParent: boolean) => {
     return (
       target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
-      key,
+      _key,
       index: number) => {
       const inject = getDecoratorDependencies(target);
       inject[index] = Optional.of(inject[index], checkParent);
@@ -516,9 +546,11 @@ export function optional<
  * resolution
  */
 export function parent<
-  TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>>(
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
-    key,
+    _key,
     index: number) {
   const inject = getDecoratorDependencies(target);
   inject[index] = Parent.of(inject[index]);
@@ -529,12 +561,14 @@ export function parent<
  * accept optional arguments
  */
 export function factory<
-  TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>>(
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>>(
     keyValue: any
   ) {
   return (
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
-    key,
+    _key,
     index: number
   ) => {
     const inject = getDecoratorDependencies(target);
@@ -548,8 +582,8 @@ export function factory<
  */
 export function newInstance<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
 >(
   asKeyOrTarget?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
   ...dynamicDependencies: TArgs[number][]
@@ -557,7 +591,7 @@ export function newInstance<
   const deco = (asKey?: typeof asKeyOrTarget) => {
     return (
       target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
-      key,
+      _key,
       index: number
     ) => {
       const inject = getDecoratorDependencies(target);

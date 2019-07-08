@@ -53,8 +53,15 @@ describe('container', () => {
     container.registerInstance(key6, instance);
     expect(container.get(key6).instanceProp).toBe(instance.instanceProp);
 
-    class Key7 { public keyProps: string; }
-    container.registerInstance(Key7, instance as any);
+    class Key7 {
+      constructor(dep?: string) { this.keyProps = dep; }
+      public keyProps: string;
+    }
+    container.registerInstance(Key7, instance);
+    expect(container.get(Key7).keyProps).toBe(undefined);
+
+    function Key7Functor() { return new Key7(...['']); }
+    container.registerInstance(Key7Functor, instance);
     expect(container.get(Key7).keyProps).toBe(undefined);
   });
 

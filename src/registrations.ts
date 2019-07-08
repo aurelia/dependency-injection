@@ -1,20 +1,21 @@
 // tslint:disable-next-line:no-reference
-/// <reference path="./internal" />
+/// <reference path="./internal.d.ts" />
 import { Resolver } from './resolvers';
 import { Container } from './container';
 import { metadata } from 'aurelia-metadata';
 import {
   DependencyCtorOrFunctor,
   PrimitiveOrDependencyCtor,
-  PrimitiveOrBase
+  Impl,
+  Args
 } from './types';
 
 /**
  * Decorator: Specifies a custom registration strategy for the decorated
  * class/function.
  */
-export function registration<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-  value: Registration<TBase, TArgs, TImpl>): any {
+export function registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
+  value: Registration<TBase, TImpl, TArgs>): any {
   return (target: (...rest: any[]) => any) => {
     metadata.define(metadata.registration, value, target);
   };
@@ -24,9 +25,9 @@ export function registration<TBase, TArgs extends Array<any>, TImpl extends Prim
  * Decorator: Specifies to register the decorated item with a "transient"
  * lifetime.
  */
-export function transient<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
+export function transient<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
   key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): any {
-  return registration(new TransientRegistration<TBase, TArgs, TImpl>(key));
+  return registration(new TransientRegistration<TBase, TImpl, TArgs>(key));
 }
 
 /**
@@ -34,19 +35,22 @@ export function transient<TBase, TArgs extends Array<any>, TImpl extends Primiti
  * lifetime.
  */
 export function singleton(registerInChild?: boolean): any;
-export function singleton<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
+export function singleton<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
   key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, registerInChild?: boolean): any;
-export function singleton<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
+export function singleton<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
   keyOrRegisterInChild?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs> | boolean, registerInChild: boolean = false) {
-  return registration<TBase, TArgs, TImpl>(
-    new SingletonRegistration<TBase, TArgs, TImpl>(keyOrRegisterInChild, registerInChild)
+  return registration<TBase, TImpl, TArgs>(
+    new SingletonRegistration<TBase, TImpl, TArgs>(keyOrRegisterInChild, registerInChild)
   );
 }
 
 /**
  * Customizes how a particular function is resolved by the Container.
  */
-export interface Registration<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>> {
+export interface Registration<
+  TBase,
+  TImpl extends Impl<TBase>,
+  TArgs extends Args<TBase>> {
   /**
    * Called by the container to register the resolver.
    * @param container The container the resolver is being registered with.
@@ -57,7 +61,7 @@ export interface Registration<TBase, TArgs extends Array<any>, TImpl extends Pri
   registerResolver(
     container: Container,
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>
   ): Resolver;
 }
 
@@ -65,8 +69,8 @@ export interface Registration<TBase, TArgs extends Array<any>, TImpl extends Pri
  * Used to allow functions/classes to indicate that they should be registered as
  * transients with the container.
  */
-export class TransientRegistration<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>
-  implements Registration<TBase, TArgs, TImpl> {
+export class TransientRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>
+  implements Registration<TBase, TImpl, TArgs> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
@@ -88,13 +92,13 @@ export class TransientRegistration<TBase, TArgs extends Array<any>, TImpl extend
   public registerResolver(
     container: Container,
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>
   ): Resolver {
     const existingResolver = container.getResolver(this._key || key);
     return existingResolver === undefined
-      ? container.registerTransient<TBase, TArgs, TImpl>(
+      ? container.registerTransient<TBase, TImpl, TArgs>(
         (this._key || key) as string,
-        fn as DependencyCtorOrFunctor<TBase, TArgs, TImpl>)
+        fn as DependencyCtorOrFunctor<TBase, TImpl, TArgs>)
       : existingResolver;
   }
 }
@@ -103,8 +107,8 @@ export class TransientRegistration<TBase, TArgs extends Array<any>, TImpl extend
  * Used to allow functions/classes to indicate that they should be registered as
  * singletons with the container.
  */
-export class SingletonRegistration<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>
-  implements Registration<TBase, TArgs, TImpl> {
+export class SingletonRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>
+  implements Registration<TBase, TImpl, TArgs> {
   /** @internal */
   public _registerInChild: boolean;
 
@@ -136,7 +140,7 @@ export class SingletonRegistration<TBase, TArgs extends Array<any>, TImpl extend
   public registerResolver(
     container: Container,
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>
   ): Resolver {
     const targetContainer = this._registerInChild ? container : container.root;
     const existingResolver = targetContainer.getResolver(this._key || key);

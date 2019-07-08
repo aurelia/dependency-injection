@@ -6,39 +6,44 @@ export type Primitive = boolean
   | ((...args: any[]) => any)
   | Array<any>;
 
+export type CtorArgs<TBase> = TBase extends new (...args: infer TArgs) => infer Impl ? TArgs : any[];
+export type CtorImpl<TBase> = TBase extends new (...args: infer TArgs) => infer Impl ? Impl : any;
+export type FuncArgs<TBase> = TBase extends (...args: infer TArgs) => infer Impl ? TArgs : any[];
+export type FuncReturns<TBase> = TBase extends (...args: infer TArgs) => infer Impl ? Impl : any;
+
+export type Args<TBase> = CtorArgs<TBase>|FuncArgs<TBase>;
+export type Impl<TBase> = CtorImpl<TBase>|FuncReturns<TBase>;
+
 export type DependencyCtor<
   TBase,
-  TImpl extends PrimitiveOrBase<TBase>,
-  TArgs extends Array<any>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
   > = new (...args: TArgs) => TImpl | TBase;
 
 export type DependencyFunctor<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
   > = (...args: TArgs) => TImpl | TBase;
+
+export type ImplOrAny<TImpl> = unknown extends TImpl ? any : TImpl;
 
 export type DependencyCtorOrFunctor<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
-  > = DependencyCtor<TBase, TImpl, TArgs>
-  | DependencyFunctor<TBase, TArgs, TImpl>;
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
+  > = DependencyCtor<TBase, TImpl, TArgs> | DependencyFunctor<TBase, TImpl, TArgs>;
 
 export type PrimitiveOrDependencyCtor<
   TBase,
-  TImpl extends PrimitiveOrBase<TBase>,
-  TArgs extends Array<any>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
   > = DependencyCtor<TBase, TImpl, TArgs> | Primitive;
 
 export type PrimitiveOrDependencyCtorOrFunctor<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase> = PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
   > = DependencyCtor<TBase, TImpl, TArgs>
-  | DependencyFunctor<TBase, TArgs, TImpl>
+  | DependencyFunctor<TBase, TImpl, TArgs>
   | Primitive;
-
-export type PrimitiveOrBase<TBase> = Primitive extends TBase ? TBase : any;
-
-export type ImplOrAny<TImpl> = unknown extends TImpl ? any : TImpl;
