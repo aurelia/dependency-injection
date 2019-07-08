@@ -1,5 +1,5 @@
 // tslint:disable-next-line:no-reference
-/// <reference path="./internal" />
+/// <reference path="./internal.d.ts" />
 import { metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
 import { resolver, StrategyResolver, Resolver, Strategy } from './resolvers';
@@ -8,9 +8,10 @@ import {
   DependencyCtorOrFunctor,
   DependencyCtor,
   PrimitiveOrDependencyCtor,
-  PrimitiveOrBase,
   PrimitiveOrDependencyCtorOrFunctor,
-  ImplOrAny
+  ImplOrAny,
+  Impl,
+  Args
 } from './types';
 
 function validateKey(key: any) {
@@ -32,18 +33,18 @@ const resolverDecorates = resolver.decorates;
  */
 export class InvocationHandler<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase>,
+  TArgs extends Args<TBase>
   > {
   /**
    * The function to be invoked by this handler.
    */
-  public fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>;
+  public fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
 
   /**
    * The invoker implementation that will be used to actually invoke the function.
    */
-  public invoker: Invoker<TBase, TArgs, TImpl>;
+  public invoker: Invoker<TBase, TImpl, TArgs>;
 
   /**
    * The statically known dependencies of this function invocation.
@@ -57,8 +58,8 @@ export class InvocationHandler<
    * @param dependencies The static dependencies of the function call.
    */
   constructor(
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
-    invoker: Invoker<TBase, TArgs, TImpl>,
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
+    invoker: Invoker<TBase, TImpl, TArgs>,
     dependencies: TArgs
   ) {
     this.fn = fn;
@@ -101,11 +102,11 @@ export interface ContainerConfiguration {
 
 function invokeWithDynamicDependencies<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
 >(
   container: Container,
-  fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+  fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
   staticDependencies: TArgs[number][],
   dynamicDependencies: TArgs[number][]
 ) {
@@ -222,11 +223,14 @@ export class Container {
    * @param onHandlerCreated The callback to be called when an
    * InvocationsHandler is created.
    */
-  public setHandlerCreatedCallback<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    onHandlerCreated: (
-      handler: InvocationHandler<TBase, TArgs, TImpl>
-    ) => InvocationHandler<TBase, TArgs, TImpl>
-  ) {
+  public setHandlerCreatedCallback<
+    TBase,
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      onHandlerCreated: (
+        handler: InvocationHandler<TBase, TImpl, TArgs>
+      ) => InvocationHandler<TBase, TImpl, TArgs>
+    ) {
     this._onHandlerCreated = onHandlerCreated;
     this._configuration.onHandlerCreated = onHandlerCreated;
   }
@@ -239,7 +243,7 @@ export class Container {
    * This defaults to the key value when instance is not supplied.
    * @return The resolver that was registered.
    */
-  public registerInstance<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any> = Array<any>>(
+  public registerInstance<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
     instance?: TImpl): Resolver {
     return this.registerResolver(
@@ -257,8 +261,8 @@ export class Container {
    * instantiated. This defaults to the key value when fn is not supplied.
    * @return The resolver that was registered.
    */
-  public registerSingleton<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: any, fn?: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver {
+  public registerSingleton<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: any, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver {
     return this.registerResolver(
       key,
       new StrategyResolver(1, fn === undefined ? key : fn)
@@ -274,12 +278,12 @@ export class Container {
    * instantiated. This defaults to the key value when fn is not supplied.
    * @return The resolver that was registered.
    */
-  public registerTransient<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: string, fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver;
-  public registerTransient<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver;
-  public registerTransient<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver {
+  public registerTransient<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: string, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+  public registerTransient<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+  public registerTransient<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver {
     return this.registerResolver(
       key,
       new StrategyResolver(2, fn === undefined ? key as DependencyCtor<TBase, TImpl, TArgs> : fn)
@@ -295,7 +299,7 @@ export class Container {
    * needed.
    * @return The resolver that was registered.
    */
-  public registerHandler<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any>>(
+  public registerHandler<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
     handler: (container?: Container, key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, resolver?: Resolver) => any
   ): Resolver {
@@ -311,7 +315,7 @@ export class Container {
    * @param aliasKey An alternate key which can also be used to resolve the same dependency  as the original.
    * @return The resolver that was registered.
    */
-  public registerAlias<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any>>(
+  public registerAlias<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     originalKey: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
     aliasKey: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): Resolver {
     return this.registerResolver(
@@ -328,7 +332,7 @@ export class Container {
    * @param resolver The resolver to use when the dependency is needed.
    * @return The resolver that was registered.
    */
-  public registerResolver<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any>>(
+  public registerResolver<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>,
     resolver: Resolver
   ): Resolver {
@@ -357,12 +361,12 @@ export class Container {
    * @param fn The constructor function to use when the dependency needs to be
    * instantiated. This defaults to the key value when fn is not supplied.
    */
-  public autoRegister<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: string, fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver;
-  public autoRegister<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver;
-  public autoRegister<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TArgs, TImpl>): Resolver {
+  public autoRegister<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: string, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+  public autoRegister<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+  public autoRegister<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver {
     fn = fn === undefined ? key as DependencyCtor<TBase, TImpl, TArgs> : fn;
 
     if (typeof fn === 'function') {
@@ -405,7 +409,7 @@ export class Container {
    * @param checkParent Indicates whether or not to check the parent container hierarchy.
    * @return Returns true if the key has been registred; false otherwise.
    */
-  public hasResolver<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any>>(
+  public hasResolver<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, checkParent: boolean = false): boolean {
     validateKey(key);
 
@@ -422,8 +426,8 @@ export class Container {
    * @param key The key that identifies the dependency at resolution time; usually a constructor function.
    * @return Returns the resolver, if registred, otherwise undefined.
    */
-  public getResolver<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any>>(
-    key: PrimitiveOrDependencyCtorOrFunctor<TBase, TArgs, TImpl>) {
+  public getResolver<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>) {
     return this._resolvers.get(key);
   }
 
@@ -432,11 +436,11 @@ export class Container {
    * @param key The key that identifies the object to resolve.
    * @return Returns the resolved instance.
    */
-  public get<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any> = Array<any>>(
+  public get<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): ImplOrAny<TImpl>;
-  public get<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any> = Array<any>>(
+  public get<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: typeof Container): Container;
-  public get<TBase, TImpl extends PrimitiveOrBase<TBase>, TArgs extends Array<any> = Array<any>>(
+  public get<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs> | typeof Container): ImplOrAny<TImpl> | Container {
     validateKey(key);
 
@@ -462,7 +466,7 @@ export class Container {
       }
 
       return registration.registerResolver(
-        this, key, key as DependencyCtorOrFunctor<TBase, TArgs, TImpl>).get(this, key);
+        this, key, key as DependencyCtorOrFunctor<TBase, TImpl, TArgs>).get(this, key);
     }
 
     return resolver.get(this, key);
@@ -487,7 +491,7 @@ export class Container {
    * @param key The key that identifies the objects to resolve.
    * @return Returns an array of the resolved instances.
    */
-  public getAll<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
+  public getAll<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): ImplOrAny<TImpl>[] {
     validateKey(key);
 
@@ -533,8 +537,8 @@ export class Container {
    * @param dynamicDependencies Additional function dependencies to use during invocation.
    * @return Returns the instance resulting from calling the function.
    */
-  public invoke<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl>,
+  public invoke<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>,
     dynamicDependencies?: TArgs[number][]
   ): ImplOrAny<TImpl> {
     try {
@@ -556,11 +560,14 @@ export class Container {
     }
   }
 
-  public _createInvocationHandler<TBase, TArgs extends Array<any>, TImpl extends PrimitiveOrBase<TBase>>(
-    fn: DependencyCtorOrFunctor<TBase, TArgs, TImpl> & {
-      inject?: any;
-    }
-  ): InvocationHandler<TBase, TArgs, TImpl> {
+  public _createInvocationHandler<
+    TBase,
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>>(
+      fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs> & {
+        inject?: any;
+      }
+    ): InvocationHandler<TBase, TImpl, TArgs> {
     let dependencies;
 
     if (fn.inject === undefined) {

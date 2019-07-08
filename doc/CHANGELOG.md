@@ -2,11 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.4.4](https://github.com/aurelia/dependency-injection/compare/1.4.3...1.4.4) (2019-07-06)
-
-
-
 ## [1.4.3](https://github.com/aurelia/dependency-injection/compare/1.4.2...1.4.3) (2019-07-06)
+
+#### Breaking Changes
+
+* Added typings to a majority of the framework. Previously all instances
+  retrieved from a container or functor were cast to any. Now they're typed by
+  inference to the key. If the key is a class the instance will be typed to an
+  instance of that class. If the key is a functor, it will be resolved to the
+  return type of the functor. All other keys will be typed to any.
+
+ ([e5e277df](http://github.com/aurelia/dependency-injection/commit/e5e277dfa74d99ee9952f0b731eae4ec30e628ea))
 
 
 ### Bug Fixes

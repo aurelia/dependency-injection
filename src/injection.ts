@@ -1,6 +1,6 @@
 import { metadata } from 'aurelia-metadata';
 import { _emptyParameters } from './container';
-import { DependencyCtor, PrimitiveOrBase } from './types';
+import { DependencyCtor, Args, Impl } from './types';
 
 /**
  * Decorator: Directs the TypeScript transpiler to write-out type metadata for
@@ -34,8 +34,8 @@ export function autoinject(
  */
 export function inject<
   TBase,
-  TArgs extends Array<any>,
-  TImpl extends PrimitiveOrBase<TBase>
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
 >(...rest: TArgs[number][]): any {
   return (
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject: any },
