@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "./src",
     "module": "amd",
     "moduleResolution": "node",
     "target": "es5",
@@ -10,13 +11,13 @@
     "outDir": "dist/amd",
     "declaration": false,
     "noImplicitAny": false,
-    "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowJs": true,
     "checkJs": true,
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
+    "stripInternal": true
   },
   "exclude": [
     ".vscode",
