@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
     "module": "amd",
     "moduleResolution": "node",
     "target": "es5",
@@ -17,7 +16,8 @@
     "checkJs": true,
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
-    "stripInternal": true
+    "stripInternal": true,
+    "removeComments": false
   },
   "exclude": [
     ".vscode",

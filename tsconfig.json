@@ -7,7 +7,6 @@
       "es2017",
       "dom"
     ],
-    "outDir": "dist/test",
     "declaration": false,
     "noImplicitAny": false,
     "removeComments": true,

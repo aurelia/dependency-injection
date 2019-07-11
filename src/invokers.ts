@@ -1,5 +1,5 @@
 // tslint:disable-next-line:no-reference
-/// <reference path="./internal.d.ts" />
+/// <reference path="./internal.ts" />
 import { metadata } from 'aurelia-metadata';
 import { Container } from './container';
 import { DependencyCtorOrFunctor, ImplOrAny, Impl, Args } from './types';

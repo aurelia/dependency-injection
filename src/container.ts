@@ -1,5 +1,5 @@
 // tslint:disable-next-line:no-reference
-/// <reference path="./internal.d.ts" />
+/// <reference path="./internal.ts" />
 import { metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
 import { resolver, StrategyResolver, Resolver, Strategy } from './resolvers';
@@ -138,9 +138,7 @@ function invokeWithDynamicDependencies<
 const classInvoker: Invoker<any, any, any> = {
   invoke(container, Type: DependencyCtor<any, any, any>, deps) {
     const instances = deps.map((dep) => container.get(dep));
-    const inst = Object.create(Type.prototype);
-    Type.apply(inst, instances);
-    return inst;
+    return Reflect.construct(Type, instances);
   },
   invokeWithDynamicDependencies
 };
