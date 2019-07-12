@@ -7,16 +7,17 @@
       "es2017",
       "dom"
     ],
-    "outDir": "dist/amd",
+    "outFile": "dist/doc-temp/aurelia-dependency-injection.js",
     "declaration": false,
     "noImplicitAny": false,
-    "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowJs": true,
     "checkJs": true,
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
+    "stripInternal": true,
+    "removeComments": false
   },
   "exclude": [
     ".vscode",

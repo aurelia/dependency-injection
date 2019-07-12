@@ -1,6 +1,1 @@
-{
-	"id": 0,
-	"name": "aurelia-dependency-injection-docs",
-	"kind": 0,
-	"flags": {}
-}
+{"name":"aurelia-dependency-injection","children":[{"id":13,"name":"alias","kind":16,"kindString":"Enumeration member","flags":{"isExported":true},"sources":[{"fileName":"aurelia-dependency-injection.d.ts","line":56,"character":6}],"defaultValue":"5"},{"id":12,"name":"array","kind":16,"kindString":"Enumeration member","flags":{"isExported":true},"sources":[{"fileName":"aurelia-dependency-injection.d.ts","line":55,"character":6}],"defaultValue":"4"},{"id":11,"name":"function","kind":16,"kindString":"Enumeration member","flags":{"isExported":true},"sources":[{"fileName":"aurelia-dependency-injection.d.ts","line":54,"character":9}],"defaultValue":"3"},{"id":8,"name":"instance","kind":16,"kindString":"Enumeration member","flags":{"isExported":true},"sources":[{"fileName":"aurelia-dependency-injection.d.ts","line":51,"character":9}],"defaultValue":"0"},{"id":9,"name":"singleton","kind":16,"kindString":"Enumeration member","flags":{"isExported":true},"sources":[{"fileName":"aurelia-dependency-injection.d.ts","line":52,"character":10}],"defaultValue":"1"},{"id":10,"name":"transient","kind":16,"kindString":"Enumeration member","flags":{"isExported":true},"sources":[{"fileName":"aurelia-dependency-injection.d.ts","line":53,"character":10}],"defaultValue":"2"}],"groups":[{"title":"Enumeration members","kind":16,"children":[13,12,11,8,9,10]}]}

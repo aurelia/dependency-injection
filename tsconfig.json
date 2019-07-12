@@ -17,6 +17,7 @@
     "checkJs": true,
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
+    "stripInternal": true
   },
   "exclude": [
     ".vscode",

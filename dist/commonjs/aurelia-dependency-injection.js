@@ -370,9 +370,7 @@ function invokeWithDynamicDependencies(container, fn, staticDependencies, dynami
 var classInvoker = {
     invoke: function (container, Type, deps) {
         var instances = deps.map(function (dep) { return container.get(dep); });
-        var inst = Object.create(Type.prototype);
-        Type.apply(inst, instances);
-        return inst;
+        return Reflect.construct(Type, instances);
     },
     invokeWithDynamicDependencies: invokeWithDynamicDependencies
 };

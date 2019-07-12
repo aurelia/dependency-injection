@@ -39,17 +39,6 @@ export type PrimitiveOrDependencyCtorOrFunctor<
   > = DependencyCtor<TBase, TImpl, TArgs>
   | DependencyFunctor<TBase, TImpl, TArgs>
   | Primitive;
-export declare function invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(value: Invoker<TBase, TImpl, TArgs>): any;
-export declare function invokeAsFactory(potentialTarget?: any): any;
-export interface Invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> {
-	invoke(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, dependencies: TArgs): ImplOrAny<TImpl>;
-	invokeWithDynamicDependencies(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, staticDependencies: TArgs[number][], dynamicDependencies: TArgs[number][]): ImplOrAny<TImpl>;
-}
-export declare class FactoryInvoker<TBase = any, TArgs extends Args<TBase> = Args<TBase>, TImpl extends Impl<TBase> = Impl<TBase>> {
-	static instance: FactoryInvoker;
-	invoke(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, dependencies: TArgs): ImplOrAny<TImpl>;
-	invokeWithDynamicDependencies(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, staticDependencies: TArgs[number][], dynamicDependencies: TArgs[number][]): ImplOrAny<TImpl>;
-}
 export declare const resolver: {
 	decorates?: (key: any) => key is {
 		get(container: Container, key: any): any;
@@ -85,40 +74,31 @@ export declare class StrategyResolver<TBase, TImpl extends Impl<TBase>, TArgs ex
 	get(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): TImpl;
 }
 export declare class Lazy<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>> {
-	_key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 	constructor(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>);
 	get(container: Container): () => ImplOrAny<TImpl>;
 	static of<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): Lazy<TBase, TImpl, TArgs>;
 }
 export declare class All<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>> {
-	_key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 	constructor(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>);
 	get(container: Container): any[];
 	static of<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): All<TBase, TImpl, TArgs>;
 }
 export declare class Optional<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>> {
-	_key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
-	_checkParent: boolean;
 	constructor(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, checkParent?: boolean);
 	get(container: Container): any;
 	static of<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, checkParent?: boolean): Optional<TBase, TImpl, TArgs>;
 }
 export declare class Parent<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>> {
-	_key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 	constructor(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>);
 	get(container: Container): any;
 	static of<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): Parent<TBase, TImpl, TArgs>;
 }
 export declare class Factory<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>> {
-	_key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
 	constructor(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>);
 	get(container: Container): DependencyFunctor<TBase, TImpl, TArgs>;
 	static of<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(key: DependencyCtor<TBase, TImpl, TArgs>): Factory<TBase, TImpl, TArgs>;
 }
 export declare class NewInstance<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>> {
-	key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
-	asKey: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
-	dynamicDependencies: TArgs[number][];
 	constructor(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>, ...dynamicDependencies: TArgs[number][]);
 	get(container: Container): ImplOrAny<TImpl>;
 	as(key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>): this;
@@ -147,38 +127,16 @@ export declare function newInstance<TBase, TImpl extends Impl<TBase> = Impl<TBas
 }, ...dynamicDependencies: TArgs[number][]): (target: DependencyCtor<TBase, TImpl, TArgs> & {
 	inject?: TArgs[number][];
 }, _key: any, index: number) => void;
-export declare function registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(value: Registration<TBase, TImpl, TArgs>): any;
-export declare function transient<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): any;
-export declare function singleton(registerInChild?: boolean): any;
-export declare function singleton<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, registerInChild?: boolean): any;
-export interface Registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> {
-	registerResolver(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+export declare function invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(value: Invoker<TBase, TImpl, TArgs>): any;
+export declare function invokeAsFactory(potentialTarget?: any): any;
+export interface Invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> {
+	invoke(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, dependencies: TArgs): ImplOrAny<TImpl>;
+	invokeWithDynamicDependencies(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, staticDependencies: TArgs[number][], dynamicDependencies: TArgs[number][]): ImplOrAny<TImpl>;
 }
-export declare class TransientRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> implements Registration<TBase, TImpl, TArgs> {
-	_key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
-	constructor(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>);
-	registerResolver(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
-}
-export declare class SingletonRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> implements Registration<TBase, TImpl, TArgs> {
-	_registerInChild: boolean;
-	_key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
-	constructor(keyOrRegisterInChild?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs> | boolean, registerInChild?: boolean);
-	registerResolver(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
-}
-/** @internal */
-export declare module 'aurelia-metadata' {
-  interface MetadataType {
-	invoker: 'aurelia:invoker';
-	getOwn(
-	  metadataKey: 'aurelia:invoker',
-	  target: DependencyCtorOrFunctor<any, any, any>
-	): Invoker<any, any, any>;
-	registration: 'aurelia:registration';
-	get(
-	  metadataKey: 'aurelia:registration',
-	  target: any
-	): SingletonRegistration<any, any, any> | TransientRegistration<any, any, any>;
-  }
+export declare class FactoryInvoker<TBase = any, TArgs extends Args<TBase> = Args<TBase>, TImpl extends Impl<TBase> = Impl<TBase>> {
+	static instance: FactoryInvoker;
+	invoke(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, dependencies: TArgs): ImplOrAny<TImpl>;
+	invokeWithDynamicDependencies(container: Container, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>, staticDependencies: TArgs[number][], dynamicDependencies: TArgs[number][]): ImplOrAny<TImpl>;
 }
 export declare const _emptyParameters: [];
 export declare class InvocationHandler<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> {
@@ -196,10 +154,6 @@ export declare class Container {
 	static instance: Container;
 	parent: Container;
 	root: Container;
-	_configuration: ContainerConfiguration;
-	_onHandlerCreated: (handler: InvocationHandler<any, any, any>) => InvocationHandler<any, any, any>;
-	_handlers: Map<any, any>;
-	_resolvers: Map<any, any>;
 	constructor(configuration?: ContainerConfiguration);
 	makeGlobal(): Container;
 	setHandlerCreatedCallback<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(onHandlerCreated: (handler: InvocationHandler<TBase, TImpl, TArgs>) => InvocationHandler<TBase, TImpl, TArgs>): void;
@@ -228,3 +182,18 @@ export declare class Container {
 }
 export declare function autoinject(potentialTarget?: DependencyCtor<any, any, any>): any;
 export declare function inject<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(...rest: TArgs[number][]): any;
+export declare function registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(value: Registration<TBase, TImpl, TArgs>): any;
+export declare function transient<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): any;
+export declare function singleton(registerInChild?: boolean): any;
+export declare function singleton<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, registerInChild?: boolean): any;
+export interface Registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> {
+	registerResolver(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+}
+export declare class TransientRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> implements Registration<TBase, TImpl, TArgs> {
+	constructor(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>);
+	registerResolver(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+}
+export declare class SingletonRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>> implements Registration<TBase, TImpl, TArgs> {
+	constructor(keyOrRegisterInChild?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs> | boolean, registerInChild?: boolean);
+	registerResolver(container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+}

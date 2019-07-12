@@ -1,4 +1,5 @@
 // Exports
+import './internal';
 export * from './container';
 export * from './injection';
 export * from './invokers';

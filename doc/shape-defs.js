@@ -6,7 +6,7 @@ const packageJsonPath = path.resolve(__dirname, '../package.json');
 
 try {
   const packageName = require(packageJsonPath).name;
-  const dtsPath = path.resolve(__dirname, `../dist/doc-temp/${packageName}.d.ts`);
+  const dtsPath = path.resolve(__dirname, `../dist/${packageName}.d.ts`);
   let defs = fs.readFileSync(dtsPath).toString();
 
   // aggregate external imports
