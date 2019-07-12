@@ -7,7 +7,7 @@
       "es2017",
       "dom"
     ],
-    "outDir": "dist/amd",
+    "outFile": "dist/doc-temp/aurelia-dependency-injection.js",
     "declaration": false,
     "noImplicitAny": false,
     "emitDecoratorMetadata": true,
