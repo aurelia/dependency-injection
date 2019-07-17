@@ -7,7 +7,8 @@ import {
   DependencyCtorOrFunctor,
   PrimitiveOrDependencyCtor,
   Impl,
-  Args
+  Args,
+  DependencyCtor
 } from './types';
 
 /**
@@ -15,8 +16,8 @@ import {
  * class/function.
  */
 export function registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
-  value: Registration<TBase, TImpl, TArgs>): any {
-  return (target: (...rest: any[]) => any) => {
+  value: Registration<TBase, TImpl, TArgs>) {
+  return (target: DependencyCtor<TBase, TImpl, TArgs>) => {
     metadata.define(metadata.registration, value, target);
   };
 }
@@ -26,7 +27,7 @@ export function registration<TBase, TImpl extends Impl<TBase>, TArgs extends Arg
  * lifetime.
  */
 export function transient<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
-  key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): any {
+  key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>) {
   return registration(new TransientRegistration<TBase, TImpl, TArgs>(key));
 }
 
@@ -34,9 +35,9 @@ export function transient<TBase, TImpl extends Impl<TBase>, TArgs extends Args<T
  * Decorator: Specifies to register the decorated item with a "singleton"
  * lifetime.
  */
-export function singleton(registerInChild?: boolean): any;
+export function singleton(registerInChild?: boolean);
 export function singleton<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
-  key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, registerInChild?: boolean): any;
+  key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, registerInChild?: boolean);
 export function singleton<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
   keyOrRegisterInChild?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs> | boolean, registerInChild: boolean = false) {
   return registration<TBase, TImpl, TArgs>(

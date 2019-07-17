@@ -514,7 +514,7 @@
       };
   }
   function invokeAsFactory(potentialTarget) {
-      const deco = target => {
+      const deco = (target) => {
           aureliaMetadata.metadata.define(aureliaMetadata.metadata.invoker, FactoryInvoker.instance, target);
       };
       return potentialTarget ? deco(potentialTarget) : deco;
