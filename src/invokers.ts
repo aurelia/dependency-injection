@@ -2,14 +2,14 @@
 /// <reference path="./internal.ts" />
 import { metadata } from 'aurelia-metadata';
 import { Container } from './container';
-import { DependencyCtorOrFunctor, ImplOrAny, Impl, Args } from './types';
+import { DependencyCtorOrFunctor, ImplOrAny, Impl, Args, DependencyCtor } from './types';
 
 /**
  * Decorator: Specifies a custom Invoker for the decorated item.
  */
 export function invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
   value: Invoker<TBase, TImpl, TArgs>
-): any {
+): (target: DependencyCtor<TBase, TImpl, TArgs>) => void {
   return target => {
     metadata.define(metadata.invoker, value, target);
   };
@@ -19,8 +19,10 @@ export function invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBa
  * Decorator: Specifies that the decorated item should be called as a factory
  * function, rather than a constructor.
  */
-export function invokeAsFactory(potentialTarget?: any): any {
-  const deco = target => {
+export function invokeAsFactory<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(
+  potentialTarget?: DependencyCtor<TBase, TImpl, TArgs>
+): void | ((target: DependencyCtor<TBase, TImpl, TArgs>) => void) {
+  const deco = (target: DependencyCtor<TBase, TImpl, TArgs>) => {
     metadata.define(metadata.invoker, FactoryInvoker.instance, target);
   };
 
@@ -63,14 +65,14 @@ export interface Invoker<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TB
  * An Invoker that is used to invoke a factory method.
  */
 export class FactoryInvoker<
-  TBase = any,
-  TArgs extends Args<TBase> = Args<TBase>,
-  TImpl extends Impl<TBase> = Impl<TBase>
-  > {
+  TBase,
+  TImpl extends Impl<TBase> = Impl<TBase>,
+  TArgs extends Args<TBase> = Args<TBase>
+  > implements Invoker<TBase, TImpl, TArgs> {
   /**
    * The singleton instance of the FactoryInvoker.
    */
-  public static instance: FactoryInvoker;
+  public static instance: FactoryInvoker<any>;
 
   /**
    * Invokes the function with the provided dependencies.

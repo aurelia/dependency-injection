@@ -2,7 +2,7 @@
 /// <reference path="./internal.ts" />
 import { metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
-import { resolver, StrategyResolver, Resolver, Strategy } from './resolvers';
+import { resolver, StrategyResolver, Resolver, Strategy, StrategyState } from './resolvers';
 import { Invoker } from './invokers';
 import {
   DependencyCtorOrFunctor,
@@ -11,7 +11,8 @@ import {
   PrimitiveOrDependencyCtorOrFunctor,
   ImplOrAny,
   Impl,
-  Args
+  Args,
+  Primitive
 } from './types';
 
 function validateKey(key: any) {
@@ -73,7 +74,7 @@ export class InvocationHandler<
    * @param dynamicDependencies Additional dependencies to use during invocation.
    * @return The result of the function invocation.
    */
-  public invoke(container: Container, dynamicDependencies?: any[]): any {
+  public invoke(container: Container, dynamicDependencies?: TArgs[]): TImpl {
     return dynamicDependencies !== undefined
       ? this.invoker.invokeWithDynamicDependencies(
         container,
@@ -260,10 +261,14 @@ export class Container {
    * @return The resolver that was registered.
    */
   public registerSingleton<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
-    key: any, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver {
+    key: Primitive, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+  public registerSingleton<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+  public registerSingleton<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+    key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver {
     return this.registerResolver(
       key,
-      new StrategyResolver(1, fn === undefined ? key : fn)
+      new StrategyResolver(Strategy.singleton, fn === undefined ? key as DependencyCtor<TBase, TImpl, TArgs> : fn)
     );
   }
 
@@ -277,7 +282,7 @@ export class Container {
    * @return The resolver that was registered.
    */
   public registerTransient<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
-    key: string, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+    key: Primitive, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
   public registerTransient<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
   public registerTransient<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
@@ -360,7 +365,7 @@ export class Container {
    * instantiated. This defaults to the key value when fn is not supplied.
    */
   public autoRegister<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
-    key: string, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
+    key: Primitive, fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
   public autoRegister<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: DependencyCtor<TBase, TImpl, TArgs>, fn?: DependencyCtorOrFunctor<TBase, TImpl, TArgs>): Resolver;
   public autoRegister<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
@@ -424,8 +429,14 @@ export class Container {
    * @param key The key that identifies the dependency at resolution time; usually a constructor function.
    * @return Returns the resolver, if registred, otherwise undefined.
    */
-  public getResolver<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
-    key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>) {
+  public getResolver<
+    TStrategyKey extends keyof StrategyState<TBase, TImpl, TArgs>,
+    TBase,
+    TImpl extends Impl<TBase> = Impl<TBase>,
+    TArgs extends Args<TBase> = Args<TBase>
+  >(
+    key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>
+  ): StrategyResolver<TBase, TImpl, TArgs, TStrategyKey> {
     return this._resolvers.get(key);
   }
 
@@ -558,13 +569,9 @@ export class Container {
     }
   }
 
-  public _createInvocationHandler<
-    TBase,
-    TImpl extends Impl<TBase> = Impl<TBase>,
-    TArgs extends Args<TBase> = Args<TBase>>(
-      fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs> & {
-        inject?: any;
-      }
+  public _createInvocationHandler
+    <TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
+      fn: DependencyCtorOrFunctor<TBase, TImpl, TArgs> & { inject?: any; }
     ): InvocationHandler<TBase, TImpl, TArgs> {
     let dependencies;
 

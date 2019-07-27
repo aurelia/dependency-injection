@@ -216,7 +216,7 @@ export class All<TBase,
    * @param container The container to resolve from.
    * @return Returns an array of all matching instances.
    */
-  public get(container: Container): any[] {
+  public get(container: Container): TImpl[] {
     return container.getAll(this._key);
   }
 
@@ -264,7 +264,7 @@ export class Optional<TBase,
    * @param container The container to resolve from.
    * @return Returns the instance if found; otherwise null.
    */
-  public get(container: Container): any {
+  public get(container: Container): TImpl {
     if (container.hasResolver(this._key, this._checkParent)) {
       return container.get(this._key);
     }
@@ -312,7 +312,7 @@ export class Parent<TBase,
    * @param container The container to resolve the parent from.
    * @return Returns the matching instance from the parent container
    */
-  public get(container: Container): any {
+  public get(container: Container): TImpl {
     return container.parent ? container.parent.get(this._key) : null;
   }
 
