@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.4.3](https://github.com/aurelia/dependency-injection/compare/1.4.2...1.4.3) (2019-07-06)
+## [1.5.0](https://github.com/aurelia/dependency-injection/compare/1.4.2...1.5.0) (2019-08-06)
+
+
+### Bug Fixes
+
+* **ci:** add dev dep jspm ([ad4be00](https://github.com/aurelia/dependency-injection/commit/ad4be00))
+* **ci:** take our circle ci ([9899197](https://github.com/aurelia/dependency-injection/commit/9899197))
+
 
 #### Breaking Changes
 
@@ -13,13 +20,6 @@ All notable changes to this project will be documented in this file. See [standa
   return type of the functor. All other keys will be typed to any.
 
  ([e5e277df](http://github.com/aurelia/dependency-injection/commit/e5e277dfa74d99ee9952f0b731eae4ec30e628ea))
-
-
-### Bug Fixes
-
-* **ci:** add dev dep jspm ([ad4be00](https://github.com/aurelia/dependency-injection/commit/ad4be00))
-* **ci:** take our circle ci ([9899197](https://github.com/aurelia/dependency-injection/commit/9899197))
-
 
 
 <a name="1.4.2"></a>
