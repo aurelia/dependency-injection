@@ -15,7 +15,7 @@
   "license": "MIT",
   "author": "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)",
   "main": "dist/commonjs/aurelia-dependency-injection.js",
-  "module": "dist/es2015/aurelia-dependency-injection.js",
+  "module": "dist/native-modules/aurelia-dependency-injection.js",
   "typings": "dist/aurelia-dependency-injection.d.ts",
   "repository": {
     "type": "git",
