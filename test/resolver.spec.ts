@@ -551,7 +551,7 @@ describe('resolver', () => {
     class SubService2 { }
 
     @autoinject()
-    class ParentApp {
+    abstract class ParentApp {
       constructor(@lazy(Logger) public logger: () => Logger) { }
     }
 
