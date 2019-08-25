@@ -1,18 +1,25 @@
 import { metadata } from 'aurelia-metadata';
 import { _emptyParameters } from './container';
-import { DependencyCtor, Args, Impl } from './types';
+import { Args, Impl, DependencyCtor } from './types';
+
+// tslint:disable-next-line:ban-types
+export type Injectable = Function & { inject?: any };
+
+function isInjectable(potentialTarget: any): potentialTarget is Injectable {
+  return !!potentialTarget;
+}
 
 /**
  * Decorator: Directs the TypeScript transpiler to write-out type metadata for
  * the decorated class.
  */
-export function autoinject(
-  potentialTarget?: DependencyCtor<any, any, any>
-): any {
-  const deco = (target: DependencyCtor<any, any, any> & { inject?: any }) => {
+export function autoinject<TPotential>(
+  potentialTarget?: TPotential
+): TPotential extends Injectable ? void : (target: Injectable) => void {
+  const deco = (target: Injectable): void => {
     if (!target.hasOwnProperty('inject')) {
       target.inject = (
-        (metadata.getOwn(metadata.paramTypes, target) as Array<any>) ||
+        (metadata.getOwn(metadata.paramTypes, target) as any[]) ||
         _emptyParameters
       ).slice();
       if (target.inject && target.inject.length > 0) {
@@ -25,10 +32,11 @@ export function autoinject(
       }
     }
   };
-
-  return potentialTarget ? deco(potentialTarget) : deco;
+  if (isInjectable(potentialTarget)) {
+    return deco(potentialTarget) as TPotential extends Injectable ? void : (target: Injectable) => void;
+  }
+  return deco as TPotential extends Injectable ? void : (target: Injectable) => void;
 }
-
 /**
  * Decorator: Specifies the dependencies that should be injected by the DI Container into the decorated class/function.
  */
