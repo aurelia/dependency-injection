@@ -78,7 +78,7 @@ describe('resolver', () => {
 
         class Logger extends LoggerBase { }
 
-        @autoinject()
+        @autoinject
         class App {
           constructor(@all(LoggerBase) public loggers) {
             this.loggers = loggers;
@@ -150,7 +150,7 @@ describe('resolver', () => {
         class VerboseLogger { }
         class Logger { }
 
-        @autoinject()
+        @autoinject
         class App {
           constructor(@optional() public logger: Logger) {
           }
@@ -241,7 +241,7 @@ describe('resolver', () => {
       it('checks the parent container hierarchy when checkParent is true or default using decorator', () => {
         class Logger { }
 
-        @autoinject()
+        @autoinject
         class App {
           constructor(@optional() public logger: Logger) {
           }
@@ -325,7 +325,7 @@ describe('resolver', () => {
       it('returns null when no parent container exists using decorator', () => {
         class Logger { }
 
-        @autoinject()
+        @autoinject
         class App {
           constructor(@parent public logger: Logger) {
           }
@@ -442,7 +442,7 @@ describe('resolver', () => {
       });
 
       it('decorate to inject a new instance of a dependency', () => {
-        @autoinject()
+        @autoinject
         class App1 {
           constructor(@newInstance() public logger: Logger) {
           }
@@ -488,7 +488,7 @@ describe('resolver', () => {
       });
 
       it('decorate to inject a new instance of a dependency, with instance dynamic dependency', () => {
-        @autoinject()
+        @autoinject
         class App1 {
           constructor(@newInstance(Logger, Dependency) public logger: Logger) {
           }
@@ -550,7 +550,7 @@ describe('resolver', () => {
     class SubService1 { }
     class SubService2 { }
 
-    @autoinject()
+    @autoinject
     abstract class ParentApp {
       constructor(@lazy(Logger) public logger: () => Logger) { }
     }
@@ -562,7 +562,7 @@ describe('resolver', () => {
       }
     }
 
-    @autoinject()
+    @autoinject
     class SubChildApp1 extends ChildApp {
       constructor(@lazy(SubService1) public subService1: () => SubService1,
                   service: Service, @lazy(Logger) ...rest: [() => Logger]) {
@@ -582,7 +582,7 @@ describe('resolver', () => {
     class SubChildApp3 extends ChildApp {
     }
 
-    @autoinject()
+    @autoinject
     class SubChildApp4 extends ChildApp {
       constructor(@lazy(Logger) logger: () => Logger,
                   @lazy(SubService1) public subService1: () => SubService1, service: Service) {
@@ -644,7 +644,7 @@ describe('resolver', () => {
         }
       }
 
-      @autoinject()
+      @autoinject
       class App {
         public service: Service & { data: string };
         constructor(

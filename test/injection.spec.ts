@@ -172,7 +172,7 @@ describe('injection', () => {
 
     describe('inheritance', () => {
       @autoinject()
-      class ParentApp {
+      abstract class ParentApp {
         constructor(public logger: Logger) {
           this.logger = logger;
         }
