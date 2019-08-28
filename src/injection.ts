@@ -3,7 +3,7 @@ import { _emptyParameters } from './container';
 import { Args, Impl, DependencyCtor } from './types';
 
 // tslint:disable-next-line:ban-types
-export type Injectable = Function & { inject?: any };
+export type Injectable = Function & { inject?: any[] | (() => any[]) };
 
 function isInjectable(potentialTarget: any): potentialTarget is Injectable {
   return !!potentialTarget;
