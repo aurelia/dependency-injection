@@ -181,7 +181,10 @@ export declare class Container {
 		inject?: any;
 	}): InvocationHandler<TBase, TImpl, TArgs>;
 }
-export declare function autoinject(potentialTarget?: DependencyCtor<any, any, any>): any;
+export declare type Injectable = Function & {
+	inject?: any[] | (() => any[]);
+};
+export declare function autoinject<TPotential>(potentialTarget?: TPotential): TPotential extends Injectable ? void : (target: Injectable) => void;
 export declare function inject<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(...rest: TArgs[number][]): any;
 export declare function registration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(value: Registration<TBase, TImpl, TArgs>): (target: DependencyCtor<TBase, TImpl, TArgs>) => void;
 export declare function transient<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>(key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): (target: DependencyCtor<TBase, TImpl, TArgs>) => void;

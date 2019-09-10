@@ -30,6 +30,9 @@
       if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
   }
 
+  function isInjectable(potentialTarget) {
+      return !!potentialTarget;
+  }
   function autoinject(potentialTarget) {
       const deco = (target) => {
           if (!target.hasOwnProperty('inject')) {
@@ -42,7 +45,10 @@
               }
           }
       };
-      return potentialTarget ? deco(potentialTarget) : deco;
+      if (isInjectable(potentialTarget)) {
+          return deco(potentialTarget);
+      }
+      return deco;
   }
   function inject(...rest) {
       return (target, _key, descriptor) => {
