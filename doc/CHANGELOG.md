@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.1](https://github.com/aurelia/dependency-injection/compare/1.5.0...1.5.1) (2019-09-10)
+
+
+### Bug Fixes
+
+* **all:** change package.json module from es2015 back to native-modules ([86e2699](https://github.com/aurelia/dependency-injection/commit/86e2699))
+
+
+
 ## [1.5.0](https://github.com/aurelia/dependency-injection/compare/1.4.2...1.5.0) (2019-08-06)
 
 
