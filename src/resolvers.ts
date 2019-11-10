@@ -42,7 +42,7 @@ export interface Resolver {
   get(container: Container, key: any): any;
 }
 
-export const enum Strategy {
+export enum Strategy {
   instance = 0,
   singleton = 1,
   transient = 2,
