@@ -42,7 +42,7 @@ export interface Resolver {
   get(container: Container, key: any): any;
 }
 
-export const enum Strategy {
+export enum Strategy {
   instance = 0,
   singleton = 1,
   transient = 2,
@@ -71,12 +71,16 @@ export interface StrategyState<
   [Strategy.singleton]: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
   [Strategy.transient]: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
   [Strategy.function]: StrategyFunctor<TBase, TImpl, TArgs>;
-  [Strategy.array]: [{
+  /**
+   * For typings purposes, this is done as ({ get: StrategyFunctor } | TImpl)[]
+   * But it should be understood, and used as [{ get: StrategyFunctor }, ...TImp[]]
+   */
+  [Strategy.array]: ({
     get: (
       container: Container,
       key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>
     ) => TImpl
-  }, ...TImpl[]];
+  } | TImpl)[];
   [Strategy.alias]: any;
 }
 
@@ -139,7 +143,7 @@ export class StrategyResolver<
       return this.state(container, key, this);
     }
     if (isStrategy<TBase, TImpl, TArgs, Strategy.array>(this.strategy, Strategy.array, this.state)) {
-      return this.state[0].get(container, key);
+      return (this.state[0] as { get: StrategyFunctor<TBase, TImpl, TArgs> }).get(container, key);
     }
     if (isStrategy<TBase, TImpl, TArgs, Strategy.alias>(this.strategy, Strategy.alias, this.state)) {
       return container.get(this.state) as TImpl;
