@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.2](https://github.com/aurelia/dependency-injection/compare/1.5.1...1.5.2) (2019-11-20)
+
+
+### Bug Fixes
+
+* **typings:** dont use const enum ([28bad61](https://github.com/aurelia/dependency-injection/commit/28bad61))
+
+
+
 ## [1.5.1](https://github.com/aurelia/dependency-injection/compare/1.5.0...1.5.1) (2019-09-10)
 
 

@@ -73,6 +73,15 @@ const resolver = protocol.create('aurelia:resolver', (target) => {
     }
     return true;
 });
+var Strategy;
+(function (Strategy) {
+    Strategy[Strategy["instance"] = 0] = "instance";
+    Strategy[Strategy["singleton"] = 1] = "singleton";
+    Strategy[Strategy["transient"] = 2] = "transient";
+    Strategy[Strategy["function"] = 3] = "function";
+    Strategy[Strategy["array"] = 4] = "array";
+    Strategy[Strategy["alias"] = 5] = "alias";
+})(Strategy || (Strategy = {}));
 function isStrategy(actual, expected, state) {
     return actual === expected;
 }
@@ -82,25 +91,25 @@ let StrategyResolver = class StrategyResolver {
         this.state = state;
     }
     get(container, key) {
-        if (isStrategy(this.strategy, 0, this.state)) {
+        if (isStrategy(this.strategy, Strategy.instance, this.state)) {
             return this.state;
         }
-        if (isStrategy(this.strategy, 1, this.state)) {
+        if (isStrategy(this.strategy, Strategy.singleton, this.state)) {
             const singleton = container.invoke(this.state);
             this.state = singleton;
             this.strategy = 0;
             return singleton;
         }
-        if (isStrategy(this.strategy, 2, this.state)) {
+        if (isStrategy(this.strategy, Strategy.transient, this.state)) {
             return container.invoke(this.state);
         }
-        if (isStrategy(this.strategy, 3, this.state)) {
+        if (isStrategy(this.strategy, Strategy.function, this.state)) {
             return this.state(container, key, this);
         }
-        if (isStrategy(this.strategy, 4, this.state)) {
+        if (isStrategy(this.strategy, Strategy.array, this.state)) {
             return this.state[0].get(container, key);
         }
-        if (isStrategy(this.strategy, 5, this.state)) {
+        if (isStrategy(this.strategy, Strategy.alias, this.state)) {
             return container.get(this.state);
         }
         throw new Error('Invalid strategy: ' + this.strategy);
@@ -181,7 +190,7 @@ let Factory = Factory_1 = class Factory {
     get(container) {
         let fn = this._key;
         const resolver = container.getResolver(fn);
-        if (resolver && resolver.strategy === 3) {
+        if (resolver && resolver.strategy === Strategy.function) {
             fn = resolver.state;
         }
         return (...rest) => container.invoke(fn, rest);
@@ -586,4 +595,4 @@ class SingletonRegistration {
     }
 }
 
-export { _emptyParameters, InvocationHandler, Container, autoinject, inject, invoker, invokeAsFactory, FactoryInvoker, registration, transient, singleton, TransientRegistration, SingletonRegistration, resolver, StrategyResolver, Lazy, All, Optional, Parent, Factory, NewInstance, getDecoratorDependencies, lazy, all, optional, parent, factory, newInstance };
+export { _emptyParameters, InvocationHandler, Container, autoinject, inject, invoker, invokeAsFactory, FactoryInvoker, registration, transient, singleton, TransientRegistration, SingletonRegistration, resolver, Strategy, StrategyResolver, Lazy, All, Optional, Parent, Factory, NewInstance, getDecoratorDependencies, lazy, all, optional, parent, factory, newInstance };

@@ -79,6 +79,14 @@
       }
       return true;
   });
+  (function (Strategy) {
+      Strategy[Strategy["instance"] = 0] = "instance";
+      Strategy[Strategy["singleton"] = 1] = "singleton";
+      Strategy[Strategy["transient"] = 2] = "transient";
+      Strategy[Strategy["function"] = 3] = "function";
+      Strategy[Strategy["array"] = 4] = "array";
+      Strategy[Strategy["alias"] = 5] = "alias";
+  })(exports.Strategy || (exports.Strategy = {}));
   function isStrategy(actual, expected, state) {
       return actual === expected;
   }
@@ -88,25 +96,25 @@
           this.state = state;
       }
       StrategyResolver.prototype.get = function (container, key) {
-          if (isStrategy(this.strategy, 0, this.state)) {
+          if (isStrategy(this.strategy, exports.Strategy.instance, this.state)) {
               return this.state;
           }
-          if (isStrategy(this.strategy, 1, this.state)) {
+          if (isStrategy(this.strategy, exports.Strategy.singleton, this.state)) {
               var singleton = container.invoke(this.state);
               this.state = singleton;
               this.strategy = 0;
               return singleton;
           }
-          if (isStrategy(this.strategy, 2, this.state)) {
+          if (isStrategy(this.strategy, exports.Strategy.transient, this.state)) {
               return container.invoke(this.state);
           }
-          if (isStrategy(this.strategy, 3, this.state)) {
+          if (isStrategy(this.strategy, exports.Strategy.function, this.state)) {
               return this.state(container, key, this);
           }
-          if (isStrategy(this.strategy, 4, this.state)) {
+          if (isStrategy(this.strategy, exports.Strategy.array, this.state)) {
               return this.state[0].get(container, key);
           }
-          if (isStrategy(this.strategy, 5, this.state)) {
+          if (isStrategy(this.strategy, exports.Strategy.alias, this.state)) {
               return container.get(this.state);
           }
           throw new Error('Invalid strategy: ' + this.strategy);
@@ -204,7 +212,7 @@
       Factory.prototype.get = function (container) {
           var fn = this._key;
           var resolver = container.getResolver(fn);
-          if (resolver && resolver.strategy === 3) {
+          if (resolver && resolver.strategy === exports.Strategy.function) {
               fn = resolver.state;
           }
           return function () {

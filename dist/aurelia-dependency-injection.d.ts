@@ -47,7 +47,7 @@ export declare const resolver: {
 export interface Resolver {
 	get(container: Container, key: any): any;
 }
-export declare const enum Strategy {
+export declare enum Strategy {
 	instance = 0,
 	singleton = 1,
 	transient = 2,
@@ -62,9 +62,9 @@ export interface StrategyState<TBase, TImpl extends Impl<TBase> = Impl<TBase>, T
 	[Strategy.singleton]: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
 	[Strategy.transient]: DependencyCtorOrFunctor<TBase, TImpl, TArgs>;
 	[Strategy.function]: StrategyFunctor<TBase, TImpl, TArgs>;
-	[Strategy.array]: [{
+	[Strategy.array]: ({
 		get: (container: Container, key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>) => TImpl;
-	}, ...TImpl[]];
+	} | TImpl)[];
 	[Strategy.alias]: any;
 }
 export declare class StrategyResolver<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>, TStrategyKey extends keyof StrategyState<TBase, TImpl, TArgs>> {
