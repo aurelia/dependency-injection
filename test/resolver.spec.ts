@@ -426,6 +426,26 @@ describe('resolver', () => {
 
       class Dependency { }
 
+      it('get a new instance of a dependency, without regard for existing instances in the container', () => {
+        const container = new Container();
+        const logger = container.get(Logger);
+        const newLogger = container.get(NewInstance.of(Logger));
+
+        expect(logger).toEqual(jasmine.any(Logger));
+        expect(newLogger).toEqual(jasmine.any(Logger));
+        expect(newLogger).not.toBe(logger);
+      });
+
+      it('new instance of a dependency does not become the default instance in the container', () => {
+        const container = new Container();
+        const newLogger = container.get(NewInstance.of(Logger));
+        const logger = container.get(Logger);
+
+        expect(logger).toEqual(jasmine.any(Logger));
+        expect(newLogger).toEqual(jasmine.any(Logger));
+        expect(newLogger).not.toBe(logger);
+      });
+
       it('inject a new instance of a dependency, without regard for existing instances in the container', () => {
         class App1 {
           public static inject() { return [NewInstance.of(Logger)]; }
@@ -434,8 +454,8 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get(Logger);
         const app1 = container.get(App1);
+        const logger = container.get(Logger);
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toBe(logger);
@@ -449,11 +469,108 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get(Logger);
         const app1 = container.get(App1);
+        const logger = container.get(Logger);
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toBe(logger);
+      });
+
+      it('decorate with inject(NewInstance.of()) to inject a new instance of a dependency', () => {
+        type ILogger = Logger;
+
+        @autoinject
+        class App1 {
+          constructor(
+            @inject(NewInstance.of(Logger)) public logger: ILogger,
+          ) {
+          }
+        }
+
+        const container = new Container();
+        const app1 = container.get(App1);
+        const logger = container.get(Logger);
+
+        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).not.toBe(logger);
+      });
+
+      it('decorate with inject(NewInstance.of()) to inject a new instance of a dependency (inject default elsewhere)',
+        () => {
+          type ILogger = Logger;
+
+          @autoinject
+          class Child {
+            constructor(
+              public logger: Logger,
+            ) { }
+          }
+
+          @autoinject
+          class App1 {
+            constructor(
+              @inject(NewInstance.of(Logger)) public logger: ILogger,
+              public child: Child,
+            ) {
+            }
+          }
+
+          const container = new Container();
+          const app1 = container.get(App1);
+          const logger = container.get(Logger);
+
+          expect(app1.logger).toEqual(jasmine.any(Logger));
+          expect(app1.logger).not.toBe(logger);
+        });
+
+      it('decorate to inject a new instance of a dependency (inject default elsewhere)', () => {
+        @autoinject
+        class Child {
+          constructor(
+            public logger: Logger,
+          ) { }
+        }
+
+        @autoinject
+        class App1 {
+          constructor(
+            @newInstance() public logger: Logger,
+            public child: Child,
+          ) {
+          }
+        }
+
+        const container = new Container();
+        const app1 = container.get(App1);
+        const logger = container.get(Logger);
+
+        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).not.toBe(logger);
+      });
+
+      it('default instance can be injected when newInstance injected in parent', () => {
+        @autoinject
+        class Child {
+          constructor(
+            public logger: Logger,
+          ) { }
+        }
+
+        @autoinject
+        class App1 {
+          constructor(
+            @newInstance() public logger: Logger,
+            public child: Child,
+          ) {
+          }
+        }
+
+        const container = new Container();
+        const app1 = container.get(App1);
+        const logger = container.get(Logger);
+
+        expect(app1.child).toEqual(jasmine.any(Child));
+        expect(app1.child.logger).toBe(logger);
       });
 
       it('decorate to inject a new instance of a dependency under a new key', () => {
@@ -464,8 +581,8 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get<string, Logger>('akey');
         const app1 = container.get(App1);
+        const logger = container.get<string, Logger>('akey');
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toEqual(logger);
@@ -479,8 +596,8 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get(Logger);
         const app1 = container.get(App1);
+        const logger = container.get(Logger);
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toBe(logger);
@@ -495,8 +612,8 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get(Logger);
         const app1 = container.get(App1);
+        const logger = container.get(Logger);
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toBe(logger);
@@ -511,8 +628,8 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get(Logger);
         const app1 = container.get(App1);
+        const logger = container.get(Logger);
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toBe(logger);
@@ -526,8 +643,8 @@ describe('resolver', () => {
         }
 
         const container = new Container();
-        const logger = container.get(Logger);
         const app1 = container.get(App1);
+        const logger = container.get(Logger);
 
         expect(app1.logger).toEqual(jasmine.any(Logger));
         expect(app1.logger).not.toBe(logger);
