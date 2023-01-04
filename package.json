@@ -85,7 +85,7 @@
     "cross-env": "^5.2.0",
     "dts-bundle-generator": "^2.1.0",
     "jasmine-core": "^3.2.1",
-    "jspm": "^0.16.53",
+    "jspm": "^2.0.0-beta.7",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-ie-launcher": "^1.0.0",
