@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from 'bun:test';
 import { Container } from '../src/container';
 import {
   Lazy, All, Optional, Parent,
@@ -5,7 +6,7 @@ import {
   parent, factory, newInstance
 } from '../src/resolvers';
 import { inject, autoinject } from '../src/injection';
-import { DependencyCtorOrFunctor, DependencyCtor, DependencyFunctor } from '../src/types';
+// import { DependencyCtorOrFunctor, DependencyCtor, DependencyFunctor } from '../src/types';
 
 describe('resolver', () => {
   describe('Custom resolvers', () => {
@@ -24,7 +25,7 @@ describe('resolver', () => {
 
         const logger = app1.getLogger;
 
-        expect(logger()).toEqual(jasmine.any(Logger));
+        expect(logger()).toEqual(expect.any(Logger));
       });
 
       it('provides a  which=>, when called, will return the instance using decorator', () => {
@@ -41,7 +42,7 @@ describe('resolver', () => {
         const app = container.get(App);
 
         const logger = app.getLogger;
-        expect(logger()).toEqual(jasmine.any(Logger));
+        expect(logger()).toEqual(expect.any(Logger));
       });
     });
 
@@ -65,10 +66,10 @@ describe('resolver', () => {
         container.registerTransient(LoggerBase, Logger);
         const app = container.get(App);
 
-        expect(app.loggers).toEqual(jasmine.any(Array));
+        expect(app.loggers).toEqual(expect.any(Array));
         expect(app.loggers.length).toBe(2);
-        expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
-        expect(app.loggers[1]).toEqual(jasmine.any(Logger));
+        expect(app.loggers[0]).toEqual(expect.any(VerboseLogger));
+        expect(app.loggers[1]).toEqual(expect.any(Logger));
       });
 
       it('resolves all matching dependencies as an array of instances using decorator', () => {
@@ -90,10 +91,10 @@ describe('resolver', () => {
         container.registerTransient(LoggerBase, Logger);
         const app = container.get(App);
 
-        expect(app.loggers).toEqual(jasmine.any(Array));
+        expect(app.loggers).toEqual(expect.any(Array));
         expect(app.loggers.length).toBe(2);
-        expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
-        expect(app.loggers[1]).toEqual(jasmine.any(Logger));
+        expect(app.loggers[0]).toEqual(expect.any(VerboseLogger));
+        expect(app.loggers[1]).toEqual(expect.any(Logger));
       });
     });
 
@@ -111,7 +112,7 @@ describe('resolver', () => {
         container.registerSingleton(Logger, Logger);
         const app = container.get(App);
 
-        expect(app.logger).toEqual(jasmine.any(Logger));
+        expect(app.logger).toEqual(expect.any(Logger));
       });
 
       it('injects the instance if its registered in the container using decorator', () => {
@@ -126,7 +127,7 @@ describe('resolver', () => {
         container.registerSingleton(Logger, Logger);
         const app = container.get(App);
 
-        expect(app.logger).toEqual(jasmine.any(Logger));
+        expect(app.logger).toEqual(expect.any(Logger));
       });
 
       it('injects null if key is not registered in the container', () => {
@@ -235,7 +236,7 @@ describe('resolver', () => {
 
         const app = childContainer.get(App);
 
-        expect(app.logger).toEqual(jasmine.any(Logger));
+        expect(app.logger).toEqual(expect.any(Logger));
       });
 
       it('checks the parent container hierarchy when checkParent is true or default using decorator', () => {
@@ -254,7 +255,7 @@ describe('resolver', () => {
 
         const app = childContainer.get(App);
 
-        expect(app.logger).toEqual(jasmine.any(Logger));
+        expect(app.logger).toEqual(expect.any(Logger));
       });
     });
 
@@ -370,7 +371,7 @@ describe('resolver', () => {
       it('provides a function which, when called, will return the instance', () => {
         app = container.get(App);
         service = app.GetService;
-        expect(service()).toEqual(jasmine.any(Service));
+        expect(service()).toEqual(expect.any(Service));
       });
 
       it('passes data in to the constructor as the second argument', () => {
@@ -408,7 +409,7 @@ describe('resolver', () => {
       it('provides a  which=>, when called, will return the instance', () => {
         app = container.get(App);
         service = app.GetService;
-        expect(service()).toEqual(jasmine.any(Service));
+        expect(service()).toEqual(expect.any(Service));
       });
 
       it('passes data in to the constructor as the second argument', () => {
@@ -437,7 +438,7 @@ describe('resolver', () => {
         const logger = container.get(Logger);
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toBe(logger);
       });
 
@@ -452,7 +453,7 @@ describe('resolver', () => {
         const logger = container.get(Logger);
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toBe(logger);
       });
 
@@ -467,7 +468,7 @@ describe('resolver', () => {
         const logger = container.get<string, Logger>('akey');
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toEqual(logger);
       });
 
@@ -482,9 +483,9 @@ describe('resolver', () => {
         const logger = container.get(Logger);
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toBe(logger);
-        expect(app1.logger.dep).toEqual(jasmine.any(Dependency));
+        expect(app1.logger.dep).toEqual(expect.any(Dependency));
       });
 
       it('decorate to inject a new instance of a dependency, with instance dynamic dependency', () => {
@@ -498,9 +499,9 @@ describe('resolver', () => {
         const logger = container.get(Logger);
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toBe(logger);
-        expect(app1.logger.dep).toEqual(jasmine.any(Dependency));
+        expect(app1.logger.dep).toEqual(expect.any(Dependency));
       });
 
       it('inject a new instance of a dependency, with resolver dynamic dependency', () => {
@@ -514,9 +515,9 @@ describe('resolver', () => {
         const logger = container.get(Logger);
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toBe(logger);
-        expect(app1.logger.dep()).toEqual(jasmine.any(Dependency));
+        expect(app1.logger.dep()).toEqual(expect.any(Dependency));
       });
 
       it('decorate to inject a new instance of a dependency, with resolver dynamic dependency', () => {
@@ -529,9 +530,9 @@ describe('resolver', () => {
         const logger = container.get(Logger);
         const app1 = container.get(App1);
 
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
         expect(app1.logger).not.toBe(logger);
-        expect(app1.logger.dep()).toEqual(jasmine.any(Dependency));
+        expect(app1.logger.dep()).toEqual(expect.any(Dependency));
       });
     });
   });
@@ -599,29 +600,29 @@ describe('resolver', () => {
     const app4 = container.get(SubChildApp4);
 
     it('loads dependencies in tree classes', () => {
-      expect(app1.subService1()).toEqual(jasmine.any(SubService1));
-      expect(app1.service).toEqual(jasmine.any(Service));
-      expect(app1.logger()).toEqual(jasmine.any(Logger));
+      expect(app1.subService1()).toEqual(expect.any(SubService1));
+      expect(app1.service).toEqual(expect.any(Service));
+      expect(app1.logger()).toEqual(expect.any(Logger));
     });
 
     it('does not effect other child classes with different parameters', () => {
       const app2 = container.get(SubChildApp2);
       const service = container.get(Service);
-      expect(app2.subService2()).toEqual(jasmine.any(SubService2));
-      expect(app2.service).toEqual(jasmine.any(Service));
+      expect(app2.subService2()).toEqual(expect.any(SubService2));
+      expect(app2.service).toEqual(expect.any(Service));
       expect(app2.service).not.toBe(service);
-      expect(app2.logger()).toEqual(jasmine.any(Logger));
+      expect(app2.logger()).toEqual(expect.any(Logger));
     });
 
     it('does inherit injection without own autoinject', () => {
-      expect(app3.service).toEqual(jasmine.any(Service));
-      expect(app3.logger()).toEqual(jasmine.any(Logger));
+      expect(app3.service).toEqual(expect.any(Service));
+      expect(app3.logger()).toEqual(expect.any(Logger));
     });
 
     it('does allow a changed constructor parameter order', () => {
-      expect(app4.subService1()).toEqual(jasmine.any(SubService1));
-      expect(app4.service).toEqual(jasmine.any(Service));
-      expect(app4.logger()).toEqual(jasmine.any(Logger));
+      expect(app4.subService1()).toEqual(expect.any(SubService1));
+      expect(app4.service).toEqual(expect.any(Service));
+      expect(app4.logger()).toEqual(expect.any(Logger));
     });
   });
 
@@ -674,26 +675,26 @@ describe('resolver', () => {
       const app = container.get(App);
 
       const logger = app.getLogger;
-      expect(logger()).toEqual(jasmine.any(Logger));
+      expect(logger()).toEqual(expect.any(Logger));
 
-      expect(app.loggers).toEqual(jasmine.any(Array));
+      expect(app.loggers).toEqual(expect.any(Array));
       expect(app.loggers.length).toBe(2);
-      expect(app.loggers[0]).toEqual(jasmine.any(VerboseLogger));
-      expect(app.loggers[1]).toEqual(jasmine.any(Logger));
+      expect(app.loggers[0]).toEqual(expect.any(VerboseLogger));
+      expect(app.loggers[1]).toEqual(expect.any(Logger));
 
-      expect(app.optionalLogger).toEqual(jasmine.any(Logger));
+      expect(app.optionalLogger).toEqual(expect.any(Logger));
 
       expect(app.parentLogger).toBe(parentInstance);
 
-      expect(app.newLogger).toEqual(jasmine.any(Logger));
+      expect(app.newLogger).toEqual(expect.any(Logger));
       expect(app.newLogger).not.toBe(logger);
-      expect(app.newLogger.dep).toEqual(jasmine.any(Dependency));
+      expect(app.newLogger.dep).toEqual(expect.any(Dependency));
 
       const service = app.GetService;
-      expect(service()).toEqual(jasmine.any(MyService));
+      expect(service()).toEqual(expect.any(MyService));
       expect(app.service.data).toEqual(data);
 
-      expect(app.otherNewLogger).toEqual(jasmine.any(Logger));
+      expect(app.otherNewLogger).toEqual(expect.any(Logger));
       expect(app.otherNewLogger).not.toBe(logger);
       expect(app.otherNewLogger).not.toBe(app.newLogger);
     });

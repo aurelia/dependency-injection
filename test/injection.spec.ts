@@ -1,4 +1,4 @@
-import './setup';
+import { describe, it, expect } from 'bun:test';
 import { Container } from '../src/container';
 import { inject, autoinject } from '../src/injection';
 
@@ -9,7 +9,7 @@ describe('injection', () => {
     const container = new Container();
     const app = container.get(App);
 
-    expect(app).toEqual(jasmine.any(App));
+    expect(app).toEqual(expect.any(App));
   });
 
   describe('inject', () => {
@@ -25,7 +25,7 @@ describe('injection', () => {
 
       const container = new Container();
       const app = container.get(App);
-      expect(app.logger).toEqual(jasmine.any(Logger));
+      expect(app.logger).toEqual(expect.any(Logger));
     });
 
     it('uses public static inject property (TypeScript,CoffeeScript,ES5)', () => {
@@ -43,7 +43,7 @@ describe('injection', () => {
       const container = new Container();
       const app = container.get(App);
 
-      expect(app.logger).toEqual(jasmine.any(Logger));
+      expect(app.logger).toEqual(expect.any(Logger));
     });
 
     it('uses inject decorator', () => {
@@ -59,7 +59,7 @@ describe('injection', () => {
       const container = new Container();
       const app = container.get(App);
 
-      expect(app.logger).toEqual(jasmine.any(Logger));
+      expect(app.logger).toEqual(expect.any(Logger));
     });
 
     it('uses inject as param decorator', () => {
@@ -79,7 +79,7 @@ describe('injection', () => {
 
       const logger = app1.logger;
 
-      expect(logger).toEqual(jasmine.any(Logger));
+      expect(logger).toEqual(expect.any(Logger));
     });
 
     describe('inheritance', () => {
@@ -103,7 +103,7 @@ describe('injection', () => {
 
         const container = new Container();
         const app = container.get(ChildApp);
-        expect(app.logger).toEqual(jasmine.any(Logger));
+        expect(app.logger).toEqual(expect.any(Logger));
       });
 
       it('loads dependencies for the child class', () => {
@@ -121,7 +121,7 @@ describe('injection', () => {
 
         const container = new Container();
         const app = container.get(ChildApp);
-        expect(app.service).toEqual(jasmine.any(Service));
+        expect(app.service).toEqual(expect.any(Service));
       });
 
       it('loads dependencies for both classes', () => {
@@ -143,8 +143,8 @@ describe('injection', () => {
 
         const container = new Container();
         const app = container.get(ChildApp);
-        expect(app.service).toEqual(jasmine.any(Service));
-        expect(app.logger).toEqual(jasmine.any(Logger));
+        expect(app.service).toEqual(expect.any(Service));
+        expect(app.logger).toEqual(expect.any(Logger));
       });
     });
   });
@@ -166,8 +166,8 @@ describe('injection', () => {
       const container = new Container();
       const app = container.get(App);
 
-      expect(app.logger).toEqual(jasmine.any(Logger));
-      expect(app.service).toEqual(jasmine.any(Service));
+      expect(app.logger).toEqual(expect.any(Logger));
+      expect(app.service).toEqual(expect.any(Service));
     });
 
     describe('inheritance', () => {
@@ -224,26 +224,26 @@ describe('injection', () => {
       const app4 = container.get(SubChildApp4);
 
       it('loads dependencies in tree classes', () => {
-        expect(app1.subService1).toEqual(jasmine.any(SubService1));
-        expect(app1.service).toEqual(jasmine.any(Service));
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.subService1).toEqual(expect.any(SubService1));
+        expect(app1.service).toEqual(expect.any(Service));
+        expect(app1.logger).toEqual(expect.any(Logger));
       });
 
       it('does not effect other child classes with different parameters', () => {
-        expect(app2.subService2).toEqual(jasmine.any(SubService2));
-        expect(app2.service).toEqual(jasmine.any(Service));
-        expect(app2.logger).toEqual(jasmine.any(Logger));
+        expect(app2.subService2).toEqual(expect.any(SubService2));
+        expect(app2.service).toEqual(expect.any(Service));
+        expect(app2.logger).toEqual(expect.any(Logger));
       });
 
       it('does inherit injection without own autoinject', () => {
-        expect(app3.service).toEqual(jasmine.any(Service));
-        expect(app3.logger).toEqual(jasmine.any(Logger));
+        expect(app3.service).toEqual(expect.any(Service));
+        expect(app3.logger).toEqual(expect.any(Logger));
       });
 
       it('does allow a changed constructor parameter order', () => {
-        expect(app4.subService1).toEqual(jasmine.any(SubService1));
-        expect(app4.service).toEqual(jasmine.any(Service));
-        expect(app4.logger).toEqual(jasmine.any(Logger));
+        expect(app4.subService1).toEqual(expect.any(SubService1));
+        expect(app4.service).toEqual(expect.any(Service));
+        expect(app4.logger).toEqual(expect.any(Logger));
       });
 
       it('not fail with inherited inject() method', () => {
@@ -276,11 +276,11 @@ describe('injection', () => {
         const container = new Container();
 
         const app1 = container.get(ParentApp);
-        expect(app1.logger).toEqual(jasmine.any(Logger));
+        expect(app1.logger).toEqual(expect.any(Logger));
 
         const app2 = container.get(ChildApp);
-        expect(app2.logger).toEqual(jasmine.any(Logger));
-        expect(app2.service).toEqual(jasmine.any(Service));
+        expect(app2.logger).toEqual(expect.any(Logger));
+        expect(app2.service).toEqual(expect.any(Service));
       });
 
       it('test variadic arguments (TypeScript metadata)', () => {
@@ -322,8 +322,8 @@ describe('injection', () => {
 
         {
           const a = container.get(ChildOneDep$1);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
         }
 
         @autoinject()
@@ -337,9 +337,9 @@ describe('injection', () => {
 
         {
           const a = container.get(ChildOneDep$2);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
         }
 
         @autoinject()
@@ -365,46 +365,46 @@ describe('injection', () => {
         class GrandChildZeroDeps$01 extends ChildZeroDeps$1 { }
         {
           const a = container.get(GrandChildZeroDeps$01);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
         }
 
         class GrandChildZeroDeps$02 extends ChildZeroDeps$2 { }
         {
           const a = container.get(GrandChildZeroDeps$02);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
         }
 
         class GrandChildZeroDeps$11 extends ChildOneDep$1 { }
         {
           const a = container.get(GrandChildZeroDeps$11);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
         }
 
         class GrandChildZeroDeps$12 extends ChildOneDep$2 { }
         {
           const a = container.get(GrandChildZeroDeps$12);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
         }
 
         class GrandChildZeroDeps$21 extends ChildTwoDeps$1 { }
         {
           const a = container.get(GrandChildZeroDeps$21);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
-          expect(a.dep4).toEqual(jasmine.any(Dep$4));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
+          expect(a.dep4).toEqual(expect.any(Dep$4));
         }
 
         class GrandChildZeroDeps$22 extends ChildTwoDeps$2 { }
         {
           const a = container.get(GrandChildZeroDeps$22);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
-          expect(a.dep4).toEqual(jasmine.any(Dep$4));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
+          expect(a.dep4).toEqual(expect.any(Dep$4));
         }
 
         @autoinject()
@@ -418,8 +418,8 @@ describe('injection', () => {
 
         {
           const a = container.get(GrandChildOneDep$01);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep5).toEqual(expect.any(Dep$5));
         }
 
         @autoinject()
@@ -432,9 +432,9 @@ describe('injection', () => {
         }
         {
           const a = container.get(GrandChildOneDep$02);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
-          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
+          expect(a.dep5).toEqual(expect.any(Dep$5));
         }
 
         @autoinject()
@@ -447,9 +447,9 @@ describe('injection', () => {
         }
         {
           const a = container.get(GrandChildOneDep$11);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
-          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
+          expect(a.dep5).toEqual(expect.any(Dep$5));
         }
 
         @autoinject()
@@ -462,10 +462,10 @@ describe('injection', () => {
         }
         {
           const a = container.get(GrandChildOneDep$12);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
-          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
+          expect(a.dep5).toEqual(expect.any(Dep$5));
         }
 
         @autoinject()
@@ -478,10 +478,10 @@ describe('injection', () => {
         }
         {
           const a = container.get(GrandChildOneDep$21);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
-          expect(a.dep4).toEqual(jasmine.any(Dep$4));
-          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
+          expect(a.dep4).toEqual(expect.any(Dep$4));
+          expect(a.dep5).toEqual(expect.any(Dep$5));
         }
 
         @autoinject()
@@ -495,11 +495,11 @@ describe('injection', () => {
 
         {
           const a = container.get(GrandChildOneDep$22);
-          expect(a.dep1).toEqual(jasmine.any(Dep$1));
-          expect(a.dep2).toEqual(jasmine.any(Dep$2));
-          expect(a.dep3).toEqual(jasmine.any(Dep$3));
-          expect(a.dep4).toEqual(jasmine.any(Dep$4));
-          expect(a.dep5).toEqual(jasmine.any(Dep$5));
+          expect(a.dep1).toEqual(expect.any(Dep$1));
+          expect(a.dep2).toEqual(expect.any(Dep$2));
+          expect(a.dep3).toEqual(expect.any(Dep$3));
+          expect(a.dep4).toEqual(expect.any(Dep$4));
+          expect(a.dep5).toEqual(expect.any(Dep$5));
         }
       });
     });
@@ -522,7 +522,7 @@ describe('injection', () => {
 
       const logger = app1.logger;
 
-      expect(logger).toEqual(jasmine.any(Logger));
+      expect(logger).toEqual(expect.any(Logger));
     });
 
     // not very useful maybe, but allowed in the current implementation
@@ -542,7 +542,7 @@ describe('injection', () => {
 
       const logger = app1.logger;
 
-      expect(logger).toEqual(jasmine.any(Logger));
+      expect(logger).toEqual(expect.any(Logger));
     });
 
     it('fixes the dependency derived from metadata (Typescript)', () => {
@@ -561,12 +561,19 @@ describe('injection', () => {
 
       const logger = app1.logger;
 
-      expect(logger).not.toEqual(jasmine.any(Logger));
-      expect(logger).toEqual(jasmine.any(LoggerBase));
+      expect(logger).not.toEqual(expect.any(Logger));
+      expect(logger).toEqual(expect.any(LoggerBase));
     });
 
+    // update 10/8/2024:
+    // this test is no longer valid with the official implementation of Reflect
+    // since `member() {...}` is a class method
+    // the runtime will throw an error when we try to use new operator on it
+    // container.get(app1.member) will throw, and is not doing anything meaningful anyway
+    //
+    // ------------------------
     // not sure if that's useful, but current implementation allows it
-    it('on a member function', () => {
+    it.skip('on a member function', () => {
       class Logger { }
 
       /*
@@ -587,12 +594,12 @@ describe('injection', () => {
 
       const container = new Container();
       const app1 = container.get(App1);
-      // @ts-ignore
       const member: App1 = container.get(app1.member);
 
       const logger = member.logger;
 
-      expect(logger).toEqual(jasmine.any(Logger));
+
+      expect(logger).toEqual(expect.any(Logger));
     });
   });
 });

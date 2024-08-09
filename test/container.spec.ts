@@ -1,4 +1,4 @@
-import './setup';
+import { describe, it, expect } from 'bun:test';
 import { Container } from '../src/container';
 import { inject } from '../src/injection';
 
@@ -221,8 +221,8 @@ describe('container', () => {
     const logger1 = container.get(Logger);
     const logger2 = container.get(Logger);
 
-    expect(logger1).toEqual(jasmine.any(Logger));
-    expect(logger2).toEqual(jasmine.any(Logger));
+    expect(logger1).toEqual(expect.any(Logger));
+    expect(logger2).toEqual(expect.any(Logger));
     expect(logger2).not.toBe(logger1);
   });
 
@@ -235,8 +235,8 @@ describe('container', () => {
     const logger1 = container.get(Logger);
     const logger2 = container.get(Logger);
 
-    expect(logger1).toEqual(jasmine.any(Logger));
-    expect(logger2).toEqual(jasmine.any(Logger));
+    expect(logger1).toEqual(expect.any(Logger));
+    expect(logger2).toEqual(expect.any(Logger));
     expect(logger2).toBe(logger1);
   });
 
@@ -256,7 +256,7 @@ describe('container', () => {
 
     const app = container.get(App);
 
-    expect(app.logger).toEqual(jasmine.any(Logger));
+    expect(app.logger).toEqual(expect.any(Logger));
   });
 
   it('configures concrete transient via api for abstract dependency', () => {
@@ -275,6 +275,6 @@ describe('container', () => {
 
     const app = container.get(App);
 
-    expect(app.logger).toEqual(jasmine.any(Logger));
+    expect(app.logger).toEqual(expect.any(Logger));
   });
 });

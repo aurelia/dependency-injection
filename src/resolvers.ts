@@ -1,7 +1,7 @@
 import { protocol } from 'aurelia-metadata';
 import { Container } from './container';
 import { autoinject } from './injection';
-import {
+import type {
   PrimitiveOrDependencyCtor,
   DependencyCtorOrFunctor,
   PrimitiveOrDependencyCtorOrFunctor,
