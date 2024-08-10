@@ -1,5 +1,4 @@
-// tslint:disable-next-line:no-reference
-/// <reference path="./internal.ts" />
+import './internal';
 import { Resolver } from './resolvers';
 import { Container } from './container';
 import { metadata } from 'aurelia-metadata';

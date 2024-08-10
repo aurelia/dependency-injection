@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "rules": {
+    "eslint(no-extra-boolean-cast)": "off",
+    "eslint-plugin-unicorn(no-new-array)": "off",
+    "no-new-array": "off"
+  }
+}

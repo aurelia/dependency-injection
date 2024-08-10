@@ -17,11 +17,12 @@
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
     "stripInternal": true,
-    "removeComments": false
+    "removeComments": false,
+    "skipLibCheck": true,
+    "strict": true
   },
   "exclude": [
     ".vscode",
-    "dist",
     "doc",
     "node_modules"
   ]

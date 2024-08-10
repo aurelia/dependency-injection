@@ -1,15 +1,11 @@
+/// <reference types="node" />
+import { defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
-// import cfg from './tsconfig.json';
 
 const isProduction = process.env.NODE_ENV === "production";
 const entryName = "aurelia-dependency-injection";
-// const defaultCfg = { ...cfg, include: ['src'], exclude: undefined };
 
-// defaultCfg.compilerOptions.module = 'es2015';
-// defaultCfg.compilerOptions.noEmitHelpers = true;
-// defaultCfg.compilerOptions.importHelpers = true;
-
-export default [{
+export default [defineConfig({
   input: `src/${entryName}.ts`,
   output: [
     {
@@ -20,6 +16,7 @@ export default [{
       file: `dist/umd-es2015/${entryName}.js`,
       format: "umd",
       globals: {
+        "aurelia-metadata": "au",
         "aurelia-binding": "au",
         "aurelia-dependency-injection": "au",
         "aurelia-logging": "au.LogManager",
@@ -32,42 +29,26 @@ export default [{
   ],
   plugins: [
     typescript({
-      cacheRoot: ".rollupcache",
-      // tsconfigDefaults: defaultCfg,
-      // tsconfig: undefined,
-      tsconfigOverride: {
-        compilerOptions: {
-          module: "es2015",
-          target: "es2015",
-        },
-        exclude: ["src/internal.d.ts"],
-        include: ["src"],
+      compilerOptions: {
+        module: "es2015",
+        target: "es2015",
       },
-      useTsconfigDeclarationDir: true,
     }),
   ],
-}].concat(!isProduction
+})].concat(!isProduction
   ? []
-  : [
+  : defineConfig([
     {
       input: `src/${entryName}.ts`,
-      output: {
-        // @ts-ignore
+      output: [{
         file: `dist/es2017/${entryName}.js`,
         format: "es",
-      },
+      }],
       plugins: [
         typescript({
-          // tsconfigDefaults: defaultCfg,
-          // tsconfig: undefined,
-          cacheRoot: ".rollupcache",
-          tsconfigOverride: {
-            compilerOptions: {
-              module: "es2015",
-              target: "es2017",
-            },
-            exclude: ["src/internal.d.ts"],
-            include: ["src"],
+          compilerOptions: {
+            module: "es2015",
+            target: "es2017",
           },
         }),
       ],
@@ -81,6 +62,7 @@ export default [{
         { file: `dist/umd/${entryName}.js`,
           format: "umd",
           globals: {
+            "aurelia-metadata": "au",
             "aurelia-binding": "au",
             "aurelia-dependency-injection": "au",
             "aurelia-logging": "au.LogManager",
@@ -94,19 +76,31 @@ export default [{
       ],
       plugins: [
         typescript({
-          // tsconfigDefaults: defaultCfg,
-          // tsconfig: undefined,
-          cacheRoot: ".rollupcache",
-          tsconfigOverride: {
-            compilerOptions: {
-              module: "es2015",
-              target: "es5",
-            },
-            exclude: ["src/internal.d.ts"],
-            include: ["src"],
+          compilerOptions: {
+            module: "es2015",
+            target: "es5",
           },
         }),
       ],
     },
-  ],
-);
+  ]),
+).map(config => {
+  config.external = [
+    "aurelia-metadata",
+    "aurelia-binding",
+    "aurelia-dependency-injection",
+    "aurelia-logging",
+    "aurelia-pal",
+    "aurelia-task-queue",
+    "aurelia-templating",
+  ];
+  if (Array.isArray(config.output)) {
+    config.output.forEach(output => output.sourcemap = true);
+  }
+  config.onwarn = /** @type {import('rollup').WarningHandlerWithDefault} */ (warning, warn) => {
+    if (warning.code === 'CIRCULAR_DEPENDENCY') return;
+    warn(warning.message);
+  };
+
+  return config;
+});

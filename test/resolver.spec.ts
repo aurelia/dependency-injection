@@ -136,7 +136,7 @@ describe('resolver', () => {
 
         class App {
           public static inject() { return [Optional.of(Logger)]; }
-          constructor(public logger: Logger) {
+          constructor(public logger: Logger | null) {
           }
         }
 
@@ -153,7 +153,7 @@ describe('resolver', () => {
 
         @autoinject
         class App {
-          constructor(@optional() public logger: Logger) {
+          constructor(@optional() public logger: Logger | null) {
           }
         }
 
@@ -170,7 +170,7 @@ describe('resolver', () => {
 
         class App {
           public static inject() { return [Optional.of(Logger)]; }
-          constructor(public logger: Logger) {
+          constructor(public logger: Logger | null) {
           }
         }
 
@@ -185,7 +185,7 @@ describe('resolver', () => {
 
         class App {
           public static inject() { return [Optional.of(Logger, false)]; }
-          constructor(public logger: Logger) {
+          constructor(public logger: Logger | null) {
           }
         }
 
@@ -205,7 +205,7 @@ describe('resolver', () => {
 
         @autoinject()
         class App {
-          constructor(@optional(false) public logger: Logger) {
+          constructor(@optional(false) public logger: Logger | null) {
           }
         }
         const parentContainer = new Container();
@@ -310,7 +310,7 @@ describe('resolver', () => {
 
         class App {
           public static inject() { return [Parent.of(Logger)]; }
-          constructor(public logger: Logger) {
+          constructor(public logger: Logger | null) {
           }
         }
 
@@ -328,7 +328,7 @@ describe('resolver', () => {
 
         @autoinject
         class App {
-          constructor(@parent public logger: Logger) {
+          constructor(@parent public logger: Logger | null) {
           }
         }
 
@@ -553,6 +553,7 @@ describe('resolver', () => {
 
     @autoinject
     abstract class ParentApp {
+      // @ts-expect-error abstract works, but typing is messy if changed
       constructor(@lazy(Logger) public logger: () => Logger) { }
     }
 

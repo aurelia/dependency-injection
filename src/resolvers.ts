@@ -535,7 +535,7 @@ export function lazy<
     keyValue: any
   ) {
   return (
-    target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
+    target: { new (...args: TArgs): TBase | TImpl },
     _key,
     index: number
   ) => {
@@ -636,7 +636,7 @@ export function newInstance<
 ) {
   const deco = (asKey?: typeof asKeyOrTarget) => {
     return (
-      target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
+      target: { new (...args: any[]): any },
       _key,
       index: number
     ) => {

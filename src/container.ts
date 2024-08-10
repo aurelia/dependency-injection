@@ -1,5 +1,4 @@
-// tslint:disable-next-line:no-reference
-/// <reference path="./internal.ts" />
+import './internal';
 import { metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
 import { resolver, StrategyResolver, Resolver, Strategy, StrategyState, Factory, NewInstance, Lazy, Optional, All, Parent } from './resolvers';
@@ -24,6 +23,8 @@ function validateKey(key: any) {
     );
   }
 }
+
+/** @internal */
 export const _emptyParameters = Object.freeze([]) as [];
 
 metadata.registration = 'aurelia:registration';
