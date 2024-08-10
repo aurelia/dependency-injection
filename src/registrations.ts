@@ -73,7 +73,7 @@ export interface Registration<
 export class TransientRegistration<TBase, TImpl extends Impl<TBase>, TArgs extends Args<TBase>>
   implements Registration<TBase, TImpl, TArgs> {
   /** @internal */
-  public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
+  public _key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
    * Creates an instance of TransientRegistration.
@@ -114,7 +114,7 @@ export class SingletonRegistration<TBase, TImpl extends Impl<TBase>, TArgs exten
   public _registerInChild: boolean;
 
   /** @internal */
-  public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
+  public _key?: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
    * Creates an instance of SingletonRegistration.

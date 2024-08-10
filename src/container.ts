@@ -2,7 +2,7 @@
 /// <reference path="./internal.ts" />
 import { metadata } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
-import { resolver, StrategyResolver, Resolver, Strategy, StrategyState } from './resolvers';
+import { resolver, StrategyResolver, Resolver, Strategy, StrategyState, Factory, NewInstance, Lazy, Optional, All, Parent } from './resolvers';
 import { Invoker } from './invokers';
 import {
   DependencyCtorOrFunctor,
@@ -14,6 +14,8 @@ import {
   Args,
   Primitive
 } from './types';
+
+let currentContainer: Container | null = null;
 
 function validateKey(key: any) {
   if (key === null || key === undefined) {
@@ -27,7 +29,7 @@ export const _emptyParameters = Object.freeze([]) as [];
 metadata.registration = 'aurelia:registration';
 metadata.invoker = 'aurelia:invoker';
 
-const resolverDecorates = resolver.decorates;
+const resolverDecorates = resolver.decorates!;
 
 /**
  * Stores the information needed to invoke a function.
@@ -75,14 +77,20 @@ export class InvocationHandler<
    * @return The result of the function invocation.
    */
   public invoke(container: Container, dynamicDependencies?: TArgs[]): TImpl {
-    return dynamicDependencies !== undefined
-      ? this.invoker.invokeWithDynamicDependencies(
-        container,
-        this.fn,
-        this.dependencies,
-        dynamicDependencies
-      )
-      : this.invoker.invoke(container, this.fn, this.dependencies);
+    const previousContainer = currentContainer;
+    currentContainer = container;
+    try {
+      return dynamicDependencies !== undefined
+        ? this.invoker.invokeWithDynamicDependencies(
+          container,
+          this.fn,
+          this.dependencies,
+          dynamicDependencies
+        )
+        : this.invoker.invoke(container, this.fn, this.dependencies);
+    } finally {
+      currentContainer = previousContainer;
+    }
   }
 }
 
@@ -169,7 +177,7 @@ export class Container {
   /**
    * The parent container in the DI hierarchy.
    */
-  public parent: Container;
+  public parent: Container | null;
 
   /**
    * The root container in the DI hierarchy.
@@ -200,7 +208,7 @@ export class Container {
     }
 
     this._configuration = configuration;
-    this._onHandlerCreated = configuration.onHandlerCreated;
+    this._onHandlerCreated = configuration.onHandlerCreated!;
     this._handlers =
       configuration.handlers || (configuration.handlers = new Map());
     this._resolvers = new Map();
@@ -560,10 +568,10 @@ export class Container {
 
       return handler.invoke(this, dynamicDependencies);
     } catch (e) {
-      // @ts-ignore
+      // @ts-expect-error AggregateError returns an Error in its type hence it fails (new ...) but it's fine
       throw new AggregateError(
         `Error invoking ${fn.name}. Check the inner error for details.`,
-        e,
+        e as Error | undefined,
         true
       );
     }
@@ -594,4 +602,39 @@ export class Container {
       ? this._onHandlerCreated(handler)
       : handler;
   }
+}
+
+export type ResolvedValue<T> =
+  T extends { new (...args: any[]): infer R }
+    ? R
+    : T extends Factory<infer R>
+      ? (...args: unknown[]) => R
+      : T extends Lazy<infer R>
+        ? () => R
+        : T extends NewInstance<infer R>
+          ? R
+          : T extends Optional<infer R>
+            ? R | null
+            : T extends All<infer R>
+              ? R[]
+              : T extends Parent<infer R>
+                ? R | null
+                : T extends [infer T1, ...infer T2]
+                  ? [ResolvedValue<T1>, ...ResolvedValue<T2>]
+                  : T;
+
+export function resolve<K extends any>(key: K): ResolvedValue<K>;
+export function resolve<K extends any[]>(...keys: K): ResolvedValue<K>
+export function resolve<K extends any[]>(...keys: K) {
+  if (currentContainer == null) {
+    throw new Error(`There is not a currently active container to resolve "${String(keys)}". Are you trying to "new SomeClass(...)" that has a resolve(...) call?`);
+  }
+  
+  return keys.length === 1
+    ? currentContainer.get(keys[0])
+    : keys.map(containerGetKey, currentContainer);
+}
+
+function containerGetKey(this: Container, key: any) {
+  return this.get(key);
 }

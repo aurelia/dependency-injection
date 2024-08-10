@@ -1,4 +1,4 @@
-import typescript from "rollup-plugin-typescript2";
+import typescript from "@rollup/plugin-typescript";
 // import cfg from './tsconfig.json';
 
 const isProduction = process.env.NODE_ENV === "production";
