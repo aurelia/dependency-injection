@@ -13,7 +13,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowJs": true,
-    "checkJs": true,
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
     "stripInternal": true,
