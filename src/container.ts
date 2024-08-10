@@ -626,6 +626,20 @@ export type ResolvedValue<T> =
                   ? [ResolvedValue<T1>, ...ResolvedValue<T2>]
                   : T;
 
+/**
+ * Resolve a key, or list of keys based on the current container.
+ * 
+ * @example
+ * ```ts
+ * import { resolve } from 'aurelia-framework';
+ * // or
+ * // import { Container, resolve } from 'aurelia-dependency-injection';
+ * 
+ * class MyCustomElement {
+ *  someService = resolve(MyService);
+ * }
+ * ```
+ */
 export function resolve<K extends any>(key: K): ResolvedValue<K>;
 export function resolve<K extends any[]>(...keys: K): ResolvedValue<K>
 export function resolve<K extends any[]>(...keys: K) {
