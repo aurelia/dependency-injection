@@ -38,9 +38,8 @@
     "build": "rollup -c --environment NODE_ENV:production",
     "postbuild": "npm run build:dts",
     "build:dts": "dts-bundle-generator ./src/aurelia-dependency-injection.ts -o dist/aurelia-dependency-injection.d.ts",
-    "predoc": "cross-env rimraf doc/api.json && rimraf dist/doc-temp && tsc --project tsconfig.build.json && node doc/shape-defs && copyfiles tsconfig.json dist/doc-temp",
-    "doc": "cross-env typedoc --json doc/api.json --excludeExternals --name aurelia-dependency-injection-docs dist",
-    "postdoc": "cross-env node doc/shape-doc && rimraf dist/doc-temp",
+    "doc": "typedoc --options typedoc.json",
+    "postdoc": "rimraf doc/typedoc",
     "precut-release": "npm run test && npm run lint && npm run build",
     "cut-release": "commit-and-tag-version -t \"\" -i doc/CHANGELOG.md --skip.commit --skip.tag",
     "postcut-release": " npm run doc"

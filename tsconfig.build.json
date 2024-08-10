@@ -20,6 +20,9 @@
     "skipLibCheck": true,
     "strict": true
   },
+  "include": [
+    "dist"
+  ],
   "exclude": [
     ".vscode",
     "doc",
