@@ -154,12 +154,11 @@ describe('resolve()', () => {
     });
   });
 
-  describe('combo', function () {
+  describe('combo', () => {
     it('works with a combination of usages', () => {
       class Bar {}
       class Foo {
         provider: () => Bar = resolve(Lazy.of(Bar));
-        constructor(...args: any[]) {}
       }
   
       const foo1 = container.get(NewInstance.of(Foo));
@@ -170,6 +169,24 @@ describe('resolve()', () => {
       const bar2 = foo2.provider();
       expect(bar1).toBe(bar2);
       expect(container.getAll(Bar)).toEqual([bar1]);
+    });
+
+    it('works with nested resolve', () => {
+      class Bar {}
+      class Foo {
+        provider = resolve(Lazy.of(Bar));
+      }
+      class Baz {
+        foo = resolve(NewInstance.of(Foo));
+      }
+  
+      const baz1 = container.get(NewInstance.of(Baz));
+      const baz2 = container.get(NewInstance.of(Baz));
+  
+      expect(baz1).not.toBe(baz2);
+      expect(baz1.foo).not.toBe(baz2.foo);
+      expect(baz1.foo.provider()).toBe(baz2.foo.provider());
+      expect(container.getAll(Bar)).toEqual([baz1.foo.provider()]);
     });
   });
 });
