@@ -31,8 +31,8 @@
   ],
   "scripts": {
     "lint": "cross-env tslint --project tsconfig.json",
-    "pretest": "cross-env npm run lint",
-    "test": "cross-env rimraf dist && tsc && karma start --single-run",
+    "test": "bun test --preload=\"./test/setup.ts\" --coverage",
+    "test:watch": "npm run test -- --watch",
     "develop": "concurrently \"./node_modules/.bin/tsc --watch\" \"./node_modules/.bin/karma start\"",
     "prebuild": "cross-env rimraf dist",
     "build": "rollup -c --environment NODE_ENV:production",

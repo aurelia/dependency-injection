@@ -3,6 +3,13 @@ import { Container } from '../src/container';
 import { inject } from '../src/injection';
 
 describe('container', () => {
+  it('makes global', () => {
+    const container = new Container();
+    expect(Container.instance).toBeFalsy();
+    container.makeGlobal();
+    expect(Container.instance).toBe(container);
+  });
+
   it('asserts keys are defined', () => {
     const container = new Container();
 
@@ -55,13 +62,15 @@ describe('container', () => {
 
     class Key7 {
       constructor(dep?: string) { this.keyProps = dep; }
-      public keyProps: string;
+      public keyProps?: string;
     }
     container.registerInstance(Key7, instance);
+    // @ts-expect-error it seems .toBe API excludes undefined
     expect(container.get(Key7).keyProps).toBe(undefined);
 
     function Key7Functor() { return new Key7(...['']); }
     container.registerInstance(Key7Functor, instance);
+    // @ts-expect-error it seems .toBe API excludes undefined
     expect(container.get(Key7).keyProps).toBe(undefined);
   });
 

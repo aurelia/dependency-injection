@@ -453,6 +453,8 @@ export class Container {
    * @param key The key that identifies the object to resolve.
    * @return Returns the resolved instance.
    */
+  public get<TBase, TResolver extends NewInstance<TBase> | Lazy<TBase> | Factory<TBase> | Optional<TBase> | Parent<TBase> | All<TBase>>(
+    key: TResolver): ResolvedValue<TResolver>;
   public get<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
     key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>): ImplOrAny<TImpl>;
   public get<TBase, TImpl extends Impl<TBase> = Impl<TBase>, TArgs extends Args<TBase> = Args<TBase>>(
