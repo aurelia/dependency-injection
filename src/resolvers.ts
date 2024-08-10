@@ -1,7 +1,7 @@
 import { protocol } from 'aurelia-metadata';
 import { Container } from './container';
 import { autoinject } from './injection';
-import {
+import type {
   PrimitiveOrDependencyCtor,
   DependencyCtorOrFunctor,
   PrimitiveOrDependencyCtorOrFunctor,
@@ -163,6 +163,13 @@ export class Lazy<TBase,
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
+   * A non existent property to help TS distinguish between Lazy and other
+   *
+   * This is semi-private, and should not be used by application
+   */
+  __resolver_type__!: 'lazy';
+
+  /**
    * Creates an instance of the Lazy class.
    * @param key The key to lazily resolve.
    */
@@ -205,6 +212,13 @@ export class All<TBase,
   TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
+
+  /**
+   * A non existent property to help TS distinguish between Lazy and other
+   *
+   * This is semi-private, and should not be used by application
+   */
+  __resolver_type__!: 'all';
 
   /**
    * Creates an instance of the All class.
@@ -253,6 +267,13 @@ export class Optional<TBase,
   public _checkParent: boolean;
 
   /**
+   * A non existent property to help TS distinguish between Lazy and other
+   *
+   * This is semi-private, and should not be used by application
+   */
+  __resolver_type__!: 'optional';
+
+  /**
    * Creates an instance of the Optional class.
    * @param key The key to optionally resolve for.
    * @param checkParent Indicates whether or not the parent container hierarchy
@@ -268,7 +289,7 @@ export class Optional<TBase,
    * @param container The container to resolve from.
    * @return Returns the instance if found; otherwise null.
    */
-  public get(container: Container): TImpl {
+  public get(container: Container): TImpl | null {
     if (container.hasResolver(this._key, this._checkParent)) {
       return container.get(this._key);
     }
@@ -304,6 +325,13 @@ export class Parent<TBase,
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
+   * A non existent property to help TS distinguish between Lazy and other
+   *
+   * This is semi-private, and should not be used by application
+   */
+  __resolver_type__!: 'parent';
+
+  /**
    * Creates an instance of the Parent class.
    * @param key The key to resolve from the parent container.
    */
@@ -316,7 +344,7 @@ export class Parent<TBase,
    * @param container The container to resolve the parent from.
    * @return Returns the matching instance from the parent container
    */
-  public get(container: Container): TImpl {
+  public get(container: Container): TImpl | null {
     return container.parent ? container.parent.get(this._key) : null;
   }
 
@@ -343,6 +371,13 @@ export class Factory<TBase,
   TArgs extends Args<TBase> = Args<TBase>> {
   /** @internal */
   public _key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
+
+  /**
+   * A non existent property to help TS distinguish between Lazy and other
+   *
+   * This is semi-private, and should not be used by application
+   */
+  __resolver_type__!: 'factory';
 
   /**
    * Creates an instance of the Factory class.
@@ -400,6 +435,13 @@ export class NewInstance<
   public asKey: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
   /** @internal */
   public dynamicDependencies: TArgs[number][];
+
+  /**
+   * A non existent property to help TS distinguish between Lazy and other
+   *
+   * This is semi-private, and should not be used by application
+   */
+  __resolver_type__!: 'newInstance';
 
   /**
    * Creates an instance of the NewInstance class.
@@ -493,11 +535,11 @@ export function lazy<
     keyValue: any
   ) {
   return (
-    target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
+    target: { new (...args: TArgs): TBase | TImpl },
     _key,
     index: number
   ) => {
-    const inject = getDecoratorDependencies(target);
+    const inject = getDecoratorDependencies(target)!;
     inject[index] = Lazy.of(keyValue);
   };
 }
@@ -517,7 +559,7 @@ export function all<
     _key,
     index: number
   ) => {
-    const inject = getDecoratorDependencies(target);
+    const inject = getDecoratorDependencies(target)!;
     inject[index] = All.of(keyValue);
   };
 }
@@ -535,7 +577,7 @@ export function optional<
       target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
       _key,
       index: number) => {
-      const inject = getDecoratorDependencies(target);
+      const inject = getDecoratorDependencies(target)!;
       inject[index] = Optional.of(inject[index], checkParent);
     };
   };
@@ -556,7 +598,7 @@ export function parent<
     target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
     _key,
     index: number) {
-  const inject = getDecoratorDependencies(target);
+  const inject = getDecoratorDependencies(target)!;
   inject[index] = Parent.of(inject[index]);
 }
 
@@ -575,7 +617,7 @@ export function factory<
     _key,
     index: number
   ) => {
-    const inject = getDecoratorDependencies(target);
+    const inject = getDecoratorDependencies(target)!;
     inject[index] = Factory.of(keyValue);
   };
 }
@@ -594,11 +636,11 @@ export function newInstance<
 ) {
   const deco = (asKey?: typeof asKeyOrTarget) => {
     return (
-      target: DependencyCtor<TBase, TImpl, TArgs> & { inject?: TArgs[number][] },
+      target: { new (...args: any[]): any },
       _key,
       index: number
     ) => {
-      const inject = getDecoratorDependencies(target);
+      const inject = getDecoratorDependencies(target)!;
       inject[index] = NewInstance.of(inject[index], ...dynamicDependencies);
       if (!!asKey) {
         inject[index].as(asKey);

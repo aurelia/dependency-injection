@@ -6,6 +6,8 @@ export type Primitive = boolean
   | ((...args: any[]) => any)
   | Array<any>;
 
+export type Constructable<T = any> = new (...args: any[]) => T;
+
 export type CtorArgs<TBase> = TBase extends new (...args: infer TArgs) => infer Impl ? TArgs : any[];
 export type CtorImpl<TBase> = TBase extends new (...args: infer TArgs) => infer Impl ? Impl : any;
 export type FuncArgs<TBase> = TBase extends (...args: infer TArgs) => infer Impl ? TArgs : any[];

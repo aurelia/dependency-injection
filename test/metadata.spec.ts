@@ -1,4 +1,4 @@
-import './setup';
+import { describe, it, expect } from 'bun:test';
 import { Container } from '../src/container';
 import { Parent } from '../src/resolvers';
 

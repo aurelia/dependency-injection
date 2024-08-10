@@ -9,3 +9,5 @@ npm-debug.log*
 .rollupcache
 dist/doc-temp
 dist/test
+doc/typedoc
+.npmrc

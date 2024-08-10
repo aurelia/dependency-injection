@@ -1,6 +1,10 @@
 {
+  "typeAcquisition": {
+    "enable": false
+  },
   "compilerOptions": {
-    "module": "amd",
+    "types": [],
+    "module": "es2015",
     "moduleResolution": "node",
     "target": "es5",
     "lib": [
@@ -13,16 +17,16 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowJs": true,
-    "checkJs": true,
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,
-    "stripInternal": true
+    "stripInternal": true,
+    "strict": true
   },
   "exclude": [
     ".vscode",
     "dist",
     "doc",
-    "node_modules"
+    "node_modules",
+    "test"
   ]
 }

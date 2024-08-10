@@ -1,0 +1,6 @@
+doc
+dist
+test
+.vscode
+.github
+node_modules

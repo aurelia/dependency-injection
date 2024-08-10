@@ -30,76 +30,40 @@
     "LICENSE"
   ],
   "scripts": {
-    "lint": "cross-env tslint --project tsconfig.json",
-    "pretest": "cross-env npm run lint",
-    "test": "cross-env rimraf dist && tsc && karma start --single-run",
-    "develop": "concurrently \"./node_modules/.bin/tsc --watch\" \"./node_modules/.bin/karma start\"",
+    "lint": "oxlint -A no-new-array",
+    "test": "bun test --preload=\"./test/setup.ts\" --coverage",
+    "test:watch": "npm run test -- --watch",
+    "develop": "concurrently \"npm run build -- --watch\" \"npm run test:watch\"",
     "prebuild": "cross-env rimraf dist",
     "build": "rollup -c --environment NODE_ENV:production",
     "postbuild": "npm run build:dts",
     "build:dts": "dts-bundle-generator ./src/aurelia-dependency-injection.ts -o dist/aurelia-dependency-injection.d.ts",
-    "predoc": "cross-env rimraf doc/api.json && rimraf dist/doc-temp && tsc --project tsconfig.build.json && node doc/shape-defs && copyfiles tsconfig.json dist/doc-temp",
-    "doc": "cross-env typedoc --json doc/api.json --excludeExternals --includeDeclarations --mode modules --target ES6 --name aurelia-dependency-injection-docs dist",
-    "postdoc": "cross-env node doc/shape-doc && rimraf dist/doc-temp",
-    "precut-release": "cross-env npm run test",
-    "cut-release": "standard-version -t \"\" -i doc/CHANGELOG.md && npm run build && npm run doc"
-  },
-  "jspm": {
-    "registry": "npm",
-    "jspmPackage": true,
-    "main": "aurelia-dependency-injection",
-    "format": "amd",
-    "directories": {
-      "dist": "dist/amd"
-    },
-    "peerDependencies": {
-      "aurelia-metadata": "^1.0.0",
-      "aurelia-pal": "^1.0.0"
-    },
-    "dependencies": {
-      "aurelia-metadata": "^1.0.0",
-      "aurelia-pal": "^1.0.0"
-    },
-    "devDependencies": {
-      "aurelia-polyfills": "^1.0.0-beta.1.0.1",
-      "babel": "babel-core@^5.1.13",
-      "babel-runtime": "^5.1.13",
-      "core-js": "^2.0.3"
-    }
+    "doc": "typedoc --options typedoc.json",
+    "postdoc": "rimraf doc/typedoc",
+    "precut-release": "npm run test && npm run lint && npm run build",
+    "cut-release": "commit-and-tag-version -t \"\" -i doc/CHANGELOG.md --skip.commit --skip.tag",
+    "postcut-release": " npm run doc"
   },
   "dependencies": {
     "aurelia-metadata": "^1.0.0",
     "aurelia-pal": "^1.0.0"
   },
   "devDependencies": {
-    "@types/jsdom": "^12.2.0",
-    "@types/node": "^8.5.1",
-    "aurelia-bootstrapper": "^2.3.0",
-    "aurelia-pal-browser": "^1.8.0",
-    "aurelia-pal-nodejs": "^1.1.1",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/bun": "^1.1.6",
+    "@types/node": "^20.14.15",
     "aurelia-polyfills": "^1.3.0",
-    "aurelia-testing": "^1.0.0",
-    "concurrently": "^4.0.1",
-    "conventional-changelog-cli": "^2.0.5",
-    "copyfiles": "^2.1.0",
-    "cross-env": "^5.2.0",
-    "dts-bundle-generator": "^2.1.0",
-    "jasmine-core": "^3.2.1",
-    "jspm": "^0.16.53",
-    "karma": "^3.0.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-ie-launcher": "^1.0.0",
-    "karma-jasmine": "^1.1.2",
-    "karma-requirejs": "^1.1.0",
-    "requirejs": "^2.3.6",
-    "requirejs-text": "^2.0.15",
-    "rimraf": "^2.6.2",
-    "rollup": "^0.66.2",
-    "rollup-plugin-typescript2": "^0.17.0",
-    "standard-version": "^5.0.2",
-    "tslib": "^1.9.3",
-    "tslint": "^5.11.0",
-    "typedoc": "^0.12.0",
-    "typescript": "^3.4.1"
+    "bun": "^1.1.22",
+    "commit-and-tag-version": "12.4.1",
+    "concurrently": "^8.2.2",
+    "conventional-changelog-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
+    "dts-bundle-generator": "^9.5.1",
+    "oxlint": "^0.7.0",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.20.0",
+    "tslib": "^2.6.3",
+    "typedoc": "^0.26.5",
+    "typescript": "5.5.4"
   }
 }

@@ -1,8 +1,7 @@
-// tslint:disable-next-line:no-reference
-/// <reference path="./internal.ts" />
+import './internal';
 import { metadata } from 'aurelia-metadata';
 import { Container } from './container';
-import { DependencyCtorOrFunctor, ImplOrAny, Impl, Args, DependencyCtor } from './types';
+import { DependencyCtorOrFunctor, ImplOrAny, Impl, Args, DependencyCtor, DependencyFunctor } from './types';
 
 /**
  * Decorator: Specifies a custom Invoker for the decorated item.
@@ -93,7 +92,7 @@ export class FactoryInvoker<
       args[i] = container.get(dependencies[i]);
     }
 
-    return fn.apply(undefined, args);
+    return ((fn as DependencyFunctor<TBase, TImpl, TArgs>).apply(undefined, args as TArgs)) as ImplOrAny<TImpl>;
   }
 
   /**
@@ -121,7 +120,7 @@ export class FactoryInvoker<
       args = args.concat(dynamicDependencies);
     }
 
-    return fn.apply(undefined, args);
+    return (fn as DependencyFunctor<TBase, TImpl, TArgs>).apply(undefined, args as TArgs) as ImplOrAny<TImpl>;
   }
 }
 

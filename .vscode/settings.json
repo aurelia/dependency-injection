@@ -3,5 +3,6 @@
   "tslint.nodePath": "./node_modules/tslint/bin/tslint",
   "editor.formatOnSave": false,
   "json.format.enable": false,
-  "typescript.format.enable": true
+  "typescript.format.enable": true,
+  "editor.tabSize": 2
 }

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/aurelia-dependency-injection.ts"],
+  "out": "doc/typedoc",
+  "json": "doc/api.json",
+  "emit": "docs",
+  "pretty": false
+}
