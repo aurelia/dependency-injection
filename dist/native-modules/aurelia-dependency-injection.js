@@ -1,20 +1,22 @@
 import { metadata, protocol } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
 
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
 
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol */
+
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -26,6 +28,21 @@ function __decorate(decorators, target, key, desc) {
 function __metadata(metadataKey, metadataValue) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
 }
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
 
 function isInjectable(potentialTarget) {
     return !!potentialTarget;
@@ -268,7 +285,7 @@ var NewInstance = (function () {
         for (var _i = 1; _i < arguments.length; _i++) {
             dynamicDependencies[_i - 1] = arguments[_i];
         }
-        return new (NewInstance_1.bind.apply(NewInstance_1, [void 0, key].concat(dynamicDependencies)))();
+        return new (NewInstance_1.bind.apply(NewInstance_1, __spreadArray([void 0, key], dynamicDependencies, false)))();
     };
     var NewInstance_1;
     NewInstance = NewInstance_1 = __decorate([
@@ -283,22 +300,22 @@ function getDecoratorDependencies(target) {
 }
 function lazy(keyValue) {
     return function (target, _key, index) {
-        var inject$$1 = getDecoratorDependencies(target);
-        inject$$1[index] = Lazy.of(keyValue);
+        var inject = getDecoratorDependencies(target);
+        inject[index] = Lazy.of(keyValue);
     };
 }
 function all(keyValue) {
     return function (target, _key, index) {
-        var inject$$1 = getDecoratorDependencies(target);
-        inject$$1[index] = All.of(keyValue);
+        var inject = getDecoratorDependencies(target);
+        inject[index] = All.of(keyValue);
     };
 }
 function optional(checkParentOrTarget) {
     if (checkParentOrTarget === void 0) { checkParentOrTarget = true; }
     var deco = function (checkParent) {
         return function (target, _key, index) {
-            var inject$$1 = getDecoratorDependencies(target);
-            inject$$1[index] = Optional.of(inject$$1[index], checkParent);
+            var inject = getDecoratorDependencies(target);
+            inject[index] = Optional.of(inject[index], checkParent);
         };
     };
     if (typeof checkParentOrTarget === 'boolean') {
@@ -307,13 +324,13 @@ function optional(checkParentOrTarget) {
     return deco(true);
 }
 function parent(target, _key, index) {
-    var inject$$1 = getDecoratorDependencies(target);
-    inject$$1[index] = Parent.of(inject$$1[index]);
+    var inject = getDecoratorDependencies(target);
+    inject[index] = Parent.of(inject[index]);
 }
 function factory(keyValue) {
     return function (target, _key, index) {
-        var inject$$1 = getDecoratorDependencies(target);
-        inject$$1[index] = Factory.of(keyValue);
+        var inject = getDecoratorDependencies(target);
+        inject[index] = Factory.of(keyValue);
     };
 }
 function newInstance(asKeyOrTarget) {
@@ -323,10 +340,10 @@ function newInstance(asKeyOrTarget) {
     }
     var deco = function (asKey) {
         return function (target, _key, index) {
-            var inject$$1 = getDecoratorDependencies(target);
-            inject$$1[index] = NewInstance.of.apply(NewInstance, [inject$$1[index]].concat(dynamicDependencies));
+            var inject = getDecoratorDependencies(target);
+            inject[index] = NewInstance.of.apply(NewInstance, __spreadArray([inject[index]], dynamicDependencies, false));
             if (!!asKey) {
-                inject$$1[index].as(asKey);
+                inject[index].as(asKey);
             }
         };
     };
@@ -336,6 +353,7 @@ function newInstance(asKeyOrTarget) {
     return deco();
 }
 
+var currentContainer = null;
 function validateKey(key) {
     if (key === null || key === undefined) {
         throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
@@ -352,9 +370,16 @@ var InvocationHandler = (function () {
         this.dependencies = dependencies;
     }
     InvocationHandler.prototype.invoke = function (container, dynamicDependencies) {
-        return dynamicDependencies !== undefined
-            ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
-            : this.invoker.invoke(container, this.fn, this.dependencies);
+        var previousContainer = currentContainer;
+        currentContainer = container;
+        try {
+            return dynamicDependencies !== undefined
+                ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
+                : this.invoker.invoke(container, this.fn, this.dependencies);
+        }
+        finally {
+            currentContainer = previousContainer;
+        }
     };
     return InvocationHandler;
 }());
@@ -419,31 +444,31 @@ var Container = (function () {
         return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
     };
     Container.prototype.registerSingleton = function (key, fn) {
-        return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+        return this.registerResolver(key, new StrategyResolver(Strategy.singleton, fn === undefined ? key : fn));
     };
     Container.prototype.registerTransient = function (key, fn) {
         return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
     };
     Container.prototype.registerHandler = function (key, handler) {
-        return this.registerResolver(key, new StrategyResolver(3, handler));
+        return this.registerResolver(key, new StrategyResolver(Strategy.function, handler));
     };
     Container.prototype.registerAlias = function (originalKey, aliasKey) {
         return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
     };
-    Container.prototype.registerResolver = function (key, resolver$$1) {
+    Container.prototype.registerResolver = function (key, resolver) {
         validateKey(key);
         var allResolvers = this._resolvers;
         var result = allResolvers.get(key);
         if (result === undefined) {
-            allResolvers.set(key, resolver$$1);
+            allResolvers.set(key, resolver);
         }
         else if (result.strategy === 4) {
-            result.state.push(resolver$$1);
+            result.state.push(resolver);
         }
         else {
-            allResolvers.set(key, new StrategyResolver(4, [result, resolver$$1]));
+            allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
         }
-        return resolver$$1;
+        return resolver;
     };
     Container.prototype.autoRegister = function (key, fn) {
         fn = fn === undefined ? key : fn;
@@ -484,8 +509,8 @@ var Container = (function () {
         if (resolverDecorates(key)) {
             return key.get(this, key);
         }
-        var resolver$$1 = this._resolvers.get(key);
-        if (resolver$$1 === undefined) {
+        var resolver = this._resolvers.get(key);
+        if (resolver === undefined) {
             if (this.parent === null) {
                 return this.autoRegister(key).get(this, key);
             }
@@ -495,29 +520,29 @@ var Container = (function () {
             }
             return registration.registerResolver(this, key, key).get(this, key);
         }
-        return resolver$$1.get(this, key);
+        return resolver.get(this, key);
     };
     Container.prototype._get = function (key) {
-        var resolver$$1 = this._resolvers.get(key);
-        if (resolver$$1 === undefined) {
+        var resolver = this._resolvers.get(key);
+        if (resolver === undefined) {
             if (this.parent === null) {
                 return this.autoRegister(key).get(this, key);
             }
             return this.parent._get(key);
         }
-        return resolver$$1.get(this, key);
+        return resolver.get(this, key);
     };
     Container.prototype.getAll = function (key) {
         validateKey(key);
-        var resolver$$1 = this._resolvers.get(key);
-        if (resolver$$1 === undefined) {
+        var resolver = this._resolvers.get(key);
+        if (resolver === undefined) {
             if (this.parent === null) {
                 return _emptyParameters;
             }
             return this.parent.getAll(key);
         }
-        if (resolver$$1.strategy === 4) {
-            var state = resolver$$1.state;
+        if (resolver.strategy === 4) {
+            var state = resolver.state;
             var i = state.length;
             var results = new Array(i);
             while (i--) {
@@ -525,7 +550,7 @@ var Container = (function () {
             }
             return results;
         }
-        return [resolver$$1.get(this, key)];
+        return [resolver.get(this, key)];
     };
     Container.prototype.createChild = function () {
         var child = new Container(this._configuration);
@@ -543,7 +568,7 @@ var Container = (function () {
             return handler.invoke(this, dynamicDependencies);
         }
         catch (e) {
-            throw new AggregateError("Error invoking " + fn.name + ". Check the inner error for details.", e, true);
+            throw new AggregateError("Error invoking ".concat(fn.name, ". Check the inner error for details."), e, true);
         }
     };
     Container.prototype._createInvocationHandler = function (fn) {
@@ -568,6 +593,21 @@ var Container = (function () {
     };
     return Container;
 }());
+function resolve() {
+    var keys = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        keys[_i] = arguments[_i];
+    }
+    if (currentContainer == null) {
+        throw new Error("There is not a currently active container to resolve \"".concat(String(keys), "\". Are you trying to \"new SomeClass(...)\" that has a resolve(...) call?"));
+    }
+    return keys.length === 1
+        ? currentContainer.get(keys[0])
+        : keys.map(containerGetKey, currentContainer);
+}
+function containerGetKey(key) {
+    return this.get(key);
+}
 
 function invoker(value) {
     return function (target) {
@@ -589,7 +629,7 @@ var FactoryInvoker = (function () {
         while (i--) {
             args[i] = container.get(dependencies[i]);
         }
-        return fn.apply(undefined, args);
+        return (fn.apply(undefined, args));
     };
     FactoryInvoker.prototype.invokeWithDynamicDependencies = function (container, fn, staticDependencies, dynamicDependencies) {
         var i = staticDependencies.length;
@@ -651,4 +691,5 @@ var SingletonRegistration = (function () {
     return SingletonRegistration;
 }());
 
-export { _emptyParameters, InvocationHandler, Container, autoinject, inject, invoker, invokeAsFactory, FactoryInvoker, registration, transient, singleton, TransientRegistration, SingletonRegistration, resolver, Strategy, StrategyResolver, Lazy, All, Optional, Parent, Factory, NewInstance, getDecoratorDependencies, lazy, all, optional, parent, factory, newInstance };
+export { All, Container, Factory, FactoryInvoker, InvocationHandler, Lazy, NewInstance, Optional, Parent, SingletonRegistration, Strategy, StrategyResolver, TransientRegistration, _emptyParameters, all, autoinject, factory, getDecoratorDependencies, inject, invokeAsFactory, invoker, lazy, newInstance, optional, parent, registration, resolve, resolver, singleton, transient };
+//# sourceMappingURL=aurelia-dependency-injection.js.map

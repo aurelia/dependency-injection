@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.6.0](https://github.com/aurelia/dependency-injection/compare/1.5.2...1.6.0) (2024-08-11)
+
+
+### Features
+
+* backport resolve ([#228](https://github.com/aurelia/dependency-injection/issues/228)) ([ccac164](https://github.com/aurelia/dependency-injection/commit/ccac164c511274a5b37db441cdfea924c92b37fd))
 
 ## [1.5.2](https://github.com/aurelia/dependency-injection/compare/1.5.1...1.5.2) (2019-11-20)
 

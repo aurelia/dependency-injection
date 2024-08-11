@@ -1,20 +1,22 @@
 import { metadata, protocol } from 'aurelia-metadata';
 import { AggregateError } from 'aurelia-pal';
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
 
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
 
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol */
+
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -26,6 +28,11 @@ function __decorate(decorators, target, key, desc) {
 function __metadata(metadataKey, metadataValue) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
 }
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
 
 function isInjectable(potentialTarget) {
     return !!potentialTarget;
@@ -242,21 +249,21 @@ function getDecoratorDependencies(target) {
 }
 function lazy(keyValue) {
     return (target, _key, index) => {
-        const inject$$1 = getDecoratorDependencies(target);
-        inject$$1[index] = Lazy.of(keyValue);
+        const inject = getDecoratorDependencies(target);
+        inject[index] = Lazy.of(keyValue);
     };
 }
 function all(keyValue) {
     return (target, _key, index) => {
-        const inject$$1 = getDecoratorDependencies(target);
-        inject$$1[index] = All.of(keyValue);
+        const inject = getDecoratorDependencies(target);
+        inject[index] = All.of(keyValue);
     };
 }
 function optional(checkParentOrTarget = true) {
     const deco = (checkParent) => {
         return (target, _key, index) => {
-            const inject$$1 = getDecoratorDependencies(target);
-            inject$$1[index] = Optional.of(inject$$1[index], checkParent);
+            const inject = getDecoratorDependencies(target);
+            inject[index] = Optional.of(inject[index], checkParent);
         };
     };
     if (typeof checkParentOrTarget === 'boolean') {
@@ -265,22 +272,22 @@ function optional(checkParentOrTarget = true) {
     return deco(true);
 }
 function parent(target, _key, index) {
-    const inject$$1 = getDecoratorDependencies(target);
-    inject$$1[index] = Parent.of(inject$$1[index]);
+    const inject = getDecoratorDependencies(target);
+    inject[index] = Parent.of(inject[index]);
 }
 function factory(keyValue) {
     return (target, _key, index) => {
-        const inject$$1 = getDecoratorDependencies(target);
-        inject$$1[index] = Factory.of(keyValue);
+        const inject = getDecoratorDependencies(target);
+        inject[index] = Factory.of(keyValue);
     };
 }
 function newInstance(asKeyOrTarget, ...dynamicDependencies) {
     const deco = (asKey) => {
         return (target, _key, index) => {
-            const inject$$1 = getDecoratorDependencies(target);
-            inject$$1[index] = NewInstance.of(inject$$1[index], ...dynamicDependencies);
+            const inject = getDecoratorDependencies(target);
+            inject[index] = NewInstance.of(inject[index], ...dynamicDependencies);
             if (!!asKey) {
-                inject$$1[index].as(asKey);
+                inject[index].as(asKey);
             }
         };
     };
@@ -290,6 +297,7 @@ function newInstance(asKeyOrTarget, ...dynamicDependencies) {
     return deco();
 }
 
+let currentContainer = null;
 function validateKey(key) {
     if (key === null || key === undefined) {
         throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
@@ -306,9 +314,16 @@ class InvocationHandler {
         this.dependencies = dependencies;
     }
     invoke(container, dynamicDependencies) {
-        return dynamicDependencies !== undefined
-            ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
-            : this.invoker.invoke(container, this.fn, this.dependencies);
+        const previousContainer = currentContainer;
+        currentContainer = container;
+        try {
+            return dynamicDependencies !== undefined
+                ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies)
+                : this.invoker.invoke(container, this.fn, this.dependencies);
+        }
+        finally {
+            currentContainer = previousContainer;
+        }
     }
 }
 function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
@@ -372,31 +387,31 @@ class Container {
         return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
     }
     registerSingleton(key, fn) {
-        return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+        return this.registerResolver(key, new StrategyResolver(Strategy.singleton, fn === undefined ? key : fn));
     }
     registerTransient(key, fn) {
         return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
     }
     registerHandler(key, handler) {
-        return this.registerResolver(key, new StrategyResolver(3, handler));
+        return this.registerResolver(key, new StrategyResolver(Strategy.function, handler));
     }
     registerAlias(originalKey, aliasKey) {
         return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
     }
-    registerResolver(key, resolver$$1) {
+    registerResolver(key, resolver) {
         validateKey(key);
         const allResolvers = this._resolvers;
         const result = allResolvers.get(key);
         if (result === undefined) {
-            allResolvers.set(key, resolver$$1);
+            allResolvers.set(key, resolver);
         }
         else if (result.strategy === 4) {
-            result.state.push(resolver$$1);
+            result.state.push(resolver);
         }
         else {
-            allResolvers.set(key, new StrategyResolver(4, [result, resolver$$1]));
+            allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
         }
-        return resolver$$1;
+        return resolver;
     }
     autoRegister(key, fn) {
         fn = fn === undefined ? key : fn;
@@ -436,8 +451,8 @@ class Container {
         if (resolverDecorates(key)) {
             return key.get(this, key);
         }
-        const resolver$$1 = this._resolvers.get(key);
-        if (resolver$$1 === undefined) {
+        const resolver = this._resolvers.get(key);
+        if (resolver === undefined) {
             if (this.parent === null) {
                 return this.autoRegister(key).get(this, key);
             }
@@ -447,29 +462,29 @@ class Container {
             }
             return registration.registerResolver(this, key, key).get(this, key);
         }
-        return resolver$$1.get(this, key);
+        return resolver.get(this, key);
     }
     _get(key) {
-        const resolver$$1 = this._resolvers.get(key);
-        if (resolver$$1 === undefined) {
+        const resolver = this._resolvers.get(key);
+        if (resolver === undefined) {
             if (this.parent === null) {
                 return this.autoRegister(key).get(this, key);
             }
             return this.parent._get(key);
         }
-        return resolver$$1.get(this, key);
+        return resolver.get(this, key);
     }
     getAll(key) {
         validateKey(key);
-        const resolver$$1 = this._resolvers.get(key);
-        if (resolver$$1 === undefined) {
+        const resolver = this._resolvers.get(key);
+        if (resolver === undefined) {
             if (this.parent === null) {
                 return _emptyParameters;
             }
             return this.parent.getAll(key);
         }
-        if (resolver$$1.strategy === 4) {
-            const state = resolver$$1.state;
+        if (resolver.strategy === 4) {
+            const state = resolver.state;
             let i = state.length;
             const results = new Array(i);
             while (i--) {
@@ -477,7 +492,7 @@ class Container {
             }
             return results;
         }
-        return [resolver$$1.get(this, key)];
+        return [resolver.get(this, key)];
     }
     createChild() {
         const child = new Container(this._configuration);
@@ -519,6 +534,17 @@ class Container {
             : handler;
     }
 }
+function resolve(...keys) {
+    if (currentContainer == null) {
+        throw new Error(`There is not a currently active container to resolve "${String(keys)}". Are you trying to "new SomeClass(...)" that has a resolve(...) call?`);
+    }
+    return keys.length === 1
+        ? currentContainer.get(keys[0])
+        : keys.map(containerGetKey, currentContainer);
+}
+function containerGetKey(key) {
+    return this.get(key);
+}
 
 function invoker(value) {
     return target => {
@@ -538,7 +564,7 @@ class FactoryInvoker {
         while (i--) {
             args[i] = container.get(dependencies[i]);
         }
-        return fn.apply(undefined, args);
+        return (fn.apply(undefined, args));
     }
     invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
         let i = staticDependencies.length;
@@ -595,4 +621,5 @@ class SingletonRegistration {
     }
 }
 
-export { _emptyParameters, InvocationHandler, Container, autoinject, inject, invoker, invokeAsFactory, FactoryInvoker, registration, transient, singleton, TransientRegistration, SingletonRegistration, resolver, Strategy, StrategyResolver, Lazy, All, Optional, Parent, Factory, NewInstance, getDecoratorDependencies, lazy, all, optional, parent, factory, newInstance };
+export { All, Container, Factory, FactoryInvoker, InvocationHandler, Lazy, NewInstance, Optional, Parent, SingletonRegistration, Strategy, StrategyResolver, TransientRegistration, _emptyParameters, all, autoinject, factory, getDecoratorDependencies, inject, invokeAsFactory, invoker, lazy, newInstance, optional, parent, registration, resolve, resolver, singleton, transient };
+//# sourceMappingURL=aurelia-dependency-injection.js.map
