@@ -30,6 +30,7 @@ export default [defineConfig({
   plugins: [
     typescript({
       compilerOptions: {
+        removeComments: true,
         module: "es2015",
         target: "es2015",
       },
@@ -47,6 +48,7 @@ export default [defineConfig({
       plugins: [
         typescript({
           compilerOptions: {
+            removeComments: true,
             module: "es2015",
             target: "es2017",
           },
@@ -77,6 +79,7 @@ export default [defineConfig({
       plugins: [
         typescript({
           compilerOptions: {
+            removeComments: true,
             module: "es2015",
             target: "es5",
           },

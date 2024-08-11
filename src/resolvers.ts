@@ -163,7 +163,7 @@ export class Lazy<TBase,
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
-   * A non existent property to help TS distinguish between Lazy and other
+   * A non existent property to help TS distinguish resolvers
    *
    * This is semi-private, and should not be used by application
    */
@@ -214,7 +214,7 @@ export class All<TBase,
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
-   * A non existent property to help TS distinguish between Lazy and other
+   * A non existent property to help TS distinguish resolvers
    *
    * This is semi-private, and should not be used by application
    */
@@ -267,7 +267,7 @@ export class Optional<TBase,
   public _checkParent: boolean;
 
   /**
-   * A non existent property to help TS distinguish between Lazy and other
+   * A non existent property to help TS distinguish resolvers
    *
    * This is semi-private, and should not be used by application
    */
@@ -325,7 +325,7 @@ export class Parent<TBase,
   public _key: PrimitiveOrDependencyCtor<TBase, TImpl, TArgs>;
 
   /**
-   * A non existent property to help TS distinguish between Lazy and other
+   * A non existent property to help TS distinguish resolvers
    *
    * This is semi-private, and should not be used by application
    */
@@ -373,7 +373,7 @@ export class Factory<TBase,
   public _key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>;
 
   /**
-   * A non existent property to help TS distinguish between Lazy and other
+   * A non existent property to help TS distinguish resolvers
    *
    * This is semi-private, and should not be used by application
    */
@@ -437,7 +437,7 @@ export class NewInstance<
   public dynamicDependencies: TArgs[number][];
 
   /**
-   * A non existent property to help TS distinguish between Lazy and other
+   * A non existent property to help TS distinguish resolvers
    *
    * This is semi-private, and should not be used by application
    */
