@@ -608,23 +608,25 @@ export class Container {
 }
 
 export type ResolvedValue<T> =
-  T extends { new (...args: any[]): infer R }
+  T extends (new (...args: any[]) => infer R)
     ? R
-    : T extends Factory<infer R>
-      ? (...args: unknown[]) => R
-      : T extends Lazy<infer R>
-        ? () => R
-        : T extends NewInstance<infer R>
-          ? R
-          : T extends Optional<infer R>
-            ? R | null
-            : T extends All<infer R>
-              ? R[]
-              : T extends Parent<infer R>
-                ? R | null
-                : T extends [infer T1, ...infer T2]
-                  ? [ResolvedValue<T1>, ...ResolvedValue<T2>]
-                  : T;
+    : T extends (abstract new (...args: any[]) => infer R)
+      ? R
+      : T extends Factory<infer R>
+        ? (...args: unknown[]) => R
+        : T extends Lazy<infer R>
+          ? () => R
+          : T extends NewInstance<infer R>
+            ? R
+            : T extends Optional<infer R>
+              ? R | null
+              : T extends All<infer R>
+                ? R[]
+                : T extends Parent<infer R>
+                  ? R | null
+                  : T extends [infer T1, ...infer T2]
+                    ? [ResolvedValue<T1>, ...ResolvedValue<T2>]
+                    : T;
 
 /**
  * Resolve a key, or list of keys based on the current container.

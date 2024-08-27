@@ -6,6 +6,17 @@ declare const assertType: <R, U = [R]>(result: [R] extends U ? R : never) => voi
 
 function testResolve() {
 
+  function testAbstractClass() {
+    abstract class A {
+      a = 1;
+    }
+
+    const a = resolve(A);
+    if (a.a === 2) {
+      
+    }
+  }
+
   function testResolveSingle() {
     class A { a = 1 }
     class B { b = '2' }
