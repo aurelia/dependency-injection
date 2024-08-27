@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.6.1](https://github.com/aurelia/dependency-injection/compare/1.6.0...1.6.1) (2024-08-27)
+
+
+### Bug Fixes
+
+* correctly infer type from abstract classes ([230e7bd](https://github.com/aurelia/dependency-injection/commit/230e7bd42f6d2e15dd94627620eb0c09402b90cc))
+
 ## [1.6.0](https://github.com/aurelia/dependency-injection/compare/1.5.2...1.6.0) (2024-08-11)
 
 

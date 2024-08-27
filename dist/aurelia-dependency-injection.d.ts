@@ -578,9 +578,7 @@ export declare class Container {
 		inject?: any;
 	}): InvocationHandler<TBase, TImpl, TArgs>;
 }
-export type ResolvedValue<T> = T extends {
-	new (...args: any[]): infer R;
-} ? R : T extends Factory<infer R> ? (...args: unknown[]) => R : T extends Lazy<infer R> ? () => R : T extends NewInstance<infer R> ? R : T extends Optional<infer R> ? R | null : T extends All<infer R> ? R[] : T extends Parent<infer R> ? R | null : T extends [
+export type ResolvedValue<T> = T extends (new (...args: any[]) => infer R) ? R : T extends (abstract new (...args: any[]) => infer R) ? R : T extends Factory<infer R> ? (...args: unknown[]) => R : T extends Lazy<infer R> ? () => R : T extends NewInstance<infer R> ? R : T extends Optional<infer R> ? R | null : T extends All<infer R> ? R[] : T extends Parent<infer R> ? R | null : T extends [
 	infer T1,
 	...infer T2
 ] ? [
