@@ -436,7 +436,7 @@ export class Container {
   /**
    * Gets the resolver for the particular key, if it has been registered.
    * @param key The key that identifies the dependency at resolution time; usually a constructor function.
-   * @return Returns the resolver, if registred, otherwise undefined.
+   * @return Returns the resolver, if registered, otherwise undefined.
    */
   public getResolver<
     TStrategyKey extends keyof StrategyState<TBase, TImpl, TArgs>,
@@ -445,7 +445,7 @@ export class Container {
     TArgs extends Args<TBase> = Args<TBase>
   >(
     key: PrimitiveOrDependencyCtorOrFunctor<TBase, TImpl, TArgs>
-  ): StrategyResolver<TBase, TImpl, TArgs, TStrategyKey> {
+  ): StrategyResolver<TBase, TImpl, TArgs, TStrategyKey> | undefined {
     return this._resolvers.get(key);
   }
 

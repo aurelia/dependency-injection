@@ -473,7 +473,14 @@ export class NewInstance<
 
     let fn = this.key;
     const resolver = container.getResolver(fn);
-    if (resolver && resolver.strategy === 3) {
+    // If the key has not been previously registered, register it so that the "new instance" is not the first instance.
+    if (resolver === undefined) {
+      if (typeof fn === 'function') {
+        container.autoRegister(fn as DependencyCtor<TBase, TImpl, TArgs>);
+      } else {
+        container.get(fn);
+      }
+    } else if (resolver.strategy === 3) {
       fn = resolver.state;
     }
 
